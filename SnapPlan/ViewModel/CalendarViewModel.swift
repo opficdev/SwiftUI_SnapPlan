@@ -6,8 +6,19 @@
 //  MonthView와 TimeView에 사용되는 ViewModel
 
 import SwiftUI
+import Combine
 
 final class CalendarViewModel: ObservableObject {
+    @Published var today = Date()
+    @Published var selectDate = Date() //  캘린더에서 선택된 날짜
+    @Published var showFullCalendar = false // 전체 달력을 보여줄지 여부
+    @Published var calendarHeight: CGFloat = 0
+
+    init() {
+        startTimer()
+    }
+    
+    private var timerCancellable: AnyCancellable?
     private var calendar: Calendar {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "ko_KR")
@@ -16,9 +27,14 @@ final class CalendarViewModel: ObservableObject {
     var daysOfWeek: [String] {
         return calendar.shortWeekdaySymbols
     }
-    @Published var today = Date()
-    @Published var selectDate = Date() //  캘린더에서 선택된 날짜
-    @Published var showFullCalendar = false // 전체 달력을 보여줄지 여부
+    
+    private func startTimer() {
+        timerCancellable = Timer.publish(every: 60, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.today = Date()
+            }
+    }
     
     func dateString(date: Date, component: Calendar.Component) -> String {
         return "\(calendar.component(component, from: date))"
@@ -89,6 +105,10 @@ final class CalendarViewModel: ObservableObject {
         }
 
         return dates
+    }
+    
+    deinit {
+        timerCancellable?.cancel()
     }
 }
 
