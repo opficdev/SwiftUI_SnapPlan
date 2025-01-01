@@ -12,7 +12,7 @@ struct ContentView: View {
     
     var body: some View {
         if viewModel.signedIn {
-            CalendarView()
+            PlannerView()
         }
         else {
             LoginView()
