@@ -1,14 +1,14 @@
 //
-//  TimeView.swift
+//  CalendarView.swift
 //  SnapPlan
 //
-//  Created by opfic on 12/31/24.
+//  Created by opfic on 1/1/25.
 //
 
 import SwiftUI
 
 struct CalendarView: View {
-    @StateObject var viewModel = CalendarViewModel()
+    @EnvironmentObject private var viewModel: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
     
     let screenWidth = UIScreen.main.bounds.width
@@ -114,21 +114,23 @@ struct CalendarView: View {
                                 }
                             }
                         }
+                        .background(
+                            GeometryReader { geometry in
+                                Color.clear.onAppear {
+                                    viewModel.calendarHeight = geometry.size.height
+                                }
+                            }
+                        )
                     }
+                    .frame(height: viewModel.calendarHeight)
                 }
             }
             .background(Color.gray.opacity(0.1))
-            
-            ScrollView(showsIndicators: false) {
-                LazyVStack {
-                    
-                }
-            }
         }
     }
 }
 
 #Preview {
     CalendarView()
+        .environmentObject(PlannerViewModel())
 }
-
