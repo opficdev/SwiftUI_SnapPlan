@@ -8,7 +8,6 @@
 import SwiftUI
 
 final class CalendarViewModel: ObservableObject {
-    private let today = Date()
     private var calendar: Calendar {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "ko_KR")
@@ -17,14 +16,9 @@ final class CalendarViewModel: ObservableObject {
     var daysOfWeek: [String] {
         return calendar.shortWeekdaySymbols
     }
+    @Published var today = Date()
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
-    @Published var showFullCalendar = true // 전체 달력을 보여줄지 여부
-    @Published var didShowFullCalendar = false
-    // MARK: didShowFullCalendar의 설명
-    // MARK: TimeView에서 가장 상단에 있는 뷰의 너비가 정하기 위해서
-    // MARK: 최초 한번은 월 단위 캘린더가 뷰에 나와야 한다.
-    // MARK: 이때 사용자 입장에서는 캘린더를 펴지 않았는데도 불구하고 뷰에 표시되어 있으면 이상하므로
-    // MARK: 해당 상황을 제어하기 위한 변수이다.
+    @Published var showFullCalendar = false // 전체 달력을 보여줄지 여부
     
     func dateString(date: Date, component: Calendar.Component) -> String {
         return "\(calendar.component(component, from: date))"
