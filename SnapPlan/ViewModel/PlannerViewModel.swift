@@ -1,14 +1,14 @@
 //
-//  CalendarViewModel.swift
+//  PlannerViewModel.swift
 //  SnapPlan
 //
 //  Created by opfic on 1/1/25.
-//  MonthView와 TimeView에 사용되는 ViewModel
+//  CalendarView와 ScheduleView에 사용되는 ViewModel
 
 import SwiftUI
 import Combine
 
-final class CalendarViewModel: ObservableObject {
+final class PlannerViewModel: ObservableObject {
     @Published var today = Date()
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
     @Published var showFullCalendar = false // 전체 달력을 보여줄지 여부
