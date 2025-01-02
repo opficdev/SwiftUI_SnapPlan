@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct CalendarView: View {
     @EnvironmentObject private var viewModel: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
+    
+    @State private var currentIndex = 1 //
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -27,7 +30,7 @@ struct CalendarView: View {
                             
                         }
                     HStack(spacing: 4) {
-                        Text(viewModel.getSelectedMonthYear())
+                        Text(viewModel.getCurrentMonthYear())
                             .font(.title)
                             .bold()
                         Image(systemName: "chevron.\(viewModel.showFullCalendar ? "up" : "down")")
@@ -64,7 +67,12 @@ struct CalendarView: View {
                                     )
                             )
                             .onTapGesture{
-                                viewModel.selectDate = viewModel.today
+                                withAnimation {
+                                    if !viewModel.dateCompare(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                                        viewModel.selectDate = viewModel.today
+                                        viewModel.currentDate = viewModel.today
+                                    }
+                                }
                             }
                     }
                 }
@@ -83,7 +91,7 @@ struct CalendarView: View {
                     .padding(.vertical, 8)
                 
                     ScrollView(showsIndicators: false) {
-                        ForEach(viewModel.calendarDates(), id: \.self) { week in
+                        ForEach(Array(zip(viewModel.calendarData.indices, viewModel.calendarData)), id: \.0) { idx, week in
                             HStack(spacing: 0) {
                                 ForEach(week, id: \.self) { date in
                                     Spacer()
@@ -94,6 +102,10 @@ struct CalendarView: View {
                                                     Color.gray.opacity(0.5)
                                                 )
                                                 .frame(width: screenWidth / 10, height: screenWidth / 10)
+                                                .transition(.asymmetric(
+                                                    insertion: .move(edge: viewModel.wasPast ? .leading : .trailing).combined(with: .opacity),
+                                                    removal: .identity
+                                                ))
                                         }
                                         
                                         if viewModel.dateCompare(date1: date, date2: Date(), components: [.year, .month, .day]) {
@@ -107,11 +119,20 @@ struct CalendarView: View {
                                             .foregroundStyle(viewModel.setDayForegroundColor(date: date, colorScheme: colorScheme))
                                             .frame(width: screenWidth / 10, height: screenWidth / 10)
                                             .onTapGesture {
-                                                viewModel.selectDate = date
+                                                withAnimation(.easeInOut(duration: 0.2)) {
+                                                    viewModel.selectDate = date
+                                                    viewModel.wasPast = viewModel.currentDate < date
+                                                    viewModel.currentDate = date
+                                                }
                                             }
                                     }
                                     Spacer()
                                 }
+                            }
+                        }
+                        .onAppear {
+                            DispatchQueue.main.async {
+                                viewModel.setCalendarData(date: viewModel.currentDate)
                             }
                         }
                         .background(
@@ -122,7 +143,7 @@ struct CalendarView: View {
                             }
                         )
                     }
-                    .frame(height: viewModel.calendarHeight)
+//                    .frame(height: viewModel.calendarHeight)
                 }
             }
             .background(Color.gray.opacity(0.1))

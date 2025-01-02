@@ -11,8 +11,12 @@ import Combine
 final class PlannerViewModel: ObservableObject {
     @Published var today = Date()
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
+    @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
+    @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들
     @Published var showFullCalendar = false // 전체 달력을 보여줄지 여부
     @Published var calendarHeight: CGFloat = 0
+    @Published var dragOffset: CGFloat = 0
+    @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
 
     init() {
         startTimer()
@@ -36,15 +40,35 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
+    func setCalendarData(date: Date) {
+        let lastMonth = calendar.date(byAdding: .month, value: -1, to: date)!
+        let nextMonth = calendar.date(byAdding: .month, value: 1, to: date)!
+        calendarData = Array(Set(calendarDates(date: lastMonth) + calendarDates(date: date) + calendarDates(date: nextMonth))).sorted{ lhs, rhs in
+            guard let lhsFirst = lhs.first, let rhsFirst = rhs.first else { return false }
+            return lhsFirst < rhsFirst
+        }
+    }
+    
+    func setCurrentDate() {
+        if dragOffset < -calendarHeight / 4 {
+            currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
+        }
+        else if dragOffset > calendarHeight / 4 {
+            currentDate = calendar.date(byAdding: .month, value: -1, to: currentDate)!
+        }
+        dragOffset = 0
+    }
+        
+    
     func dateString(date: Date, component: Calendar.Component) -> String {
         return "\(calendar.component(component, from: date))"
     }
     
-    func getSelectedMonthYear() -> String {
-        if calendar.dateComponents([.year], from: selectDate) == calendar.dateComponents([.year], from: today) {
-            return DateFormatter.krMonthFormatter.string(from: selectDate)
+    func getCurrentMonthYear() -> String {
+        if calendar.dateComponents([.year], from: currentDate) == calendar.dateComponents([.year], from: today) {
+            return DateFormatter.krMonthFormatter.string(from: currentDate)
         }
-        return DateFormatter.krMonthYearFormatter.string(from: selectDate)
+        return DateFormatter.krMonthYearFormatter.string(from: currentDate)
     }
     
     func dateCompare(date1: Date, date2: Date, components: Set<Calendar.Component>) -> Bool {
@@ -61,12 +85,12 @@ final class PlannerViewModel: ObservableObject {
         return colorScheme == .light ? Color.black : Color.white
     }
     
-    func calendarDates() -> [[Date]] {
+    func calendarDates(date: Date) -> [[Date]] {
         var dates: [[Date]] = []
 
         // 이번 달의 첫 번째 날짜와 마지막 날짜 계산
-        guard let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: selectDate)),
-              let range = calendar.range(of: .day, in: .month, for: selectDate) else { return dates }
+        guard let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date)),
+              let range = calendar.range(of: .day, in: .month, for: date) else { return dates }
         
         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth) - 1
         
@@ -93,7 +117,7 @@ final class PlannerViewModel: ObservableObject {
         }
 
         // 다음 달의 날짜들 추가 
-        var remainingDays = 49 - dates.flatMap { $0 } .count
+        var remainingDays = 42 - dates.flatMap { $0 } .count
         if remainingDays >= 7 { remainingDays -= 7 }
         if remainingDays > 0, let nextMonth = calendar.date(byAdding: .month, value: 1, to: firstDayOfMonth){
             for day in 1...remainingDays {
