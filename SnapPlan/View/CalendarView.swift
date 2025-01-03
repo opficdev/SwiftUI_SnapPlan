@@ -141,6 +141,7 @@ struct CalendarView: View {
                                 }
                             }
                         }
+                        .frame(height: viewModel.calendarHeight)
                         .onAppear {
                             viewModel.setCalendarData(date: viewModel.currentDate)
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
@@ -149,7 +150,12 @@ struct CalendarView: View {
                                 }
                             }
                         }
-                        .frame(height: viewModel.calendarHeight)
+                        .onChange(of: viewModel.currentDate) { newDate in
+                            viewModel.setCalendarData(date: newDate)
+                            if let idx = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                                proxy.scrollTo(idx, anchor: .top)
+                            }
+                        }
                     }
                 }
             }
