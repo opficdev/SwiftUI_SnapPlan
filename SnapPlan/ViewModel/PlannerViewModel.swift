@@ -41,11 +41,8 @@ final class PlannerViewModel: ObservableObject {
     }
     
     func findFirstDayofMonthIndex(date: Date) -> Int? {
-//        let idx = calendarData.firstIndex { row in
-//            row.contains { calendar.isDate($0, inSameDayAs: date) }
-//        }
-//        return idx
-        return calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: date) } }
+        let firstDateOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
+        return calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: firstDateOfMonth) }}
     }
     
     func setCalendarData(date: Date) {
