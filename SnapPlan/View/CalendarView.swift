@@ -11,8 +11,11 @@ import Foundation
 struct CalendarView: View {
     @EnvironmentObject private var viewModel: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
-    
-    @State private var currentIndex = 1 //
+    @State private var scrollId = (0,0) //  캘린더에 보여지는 최소, 최대 id
+    @State private var calendarRowGap: CGFloat = 0  //  캘린더 행 간의 간격
+    @State private var calendarHeight: CGFloat = 0
+    @State private var showFullCalendar = false // 전체 달력을 보여줄지 여부
+    @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -33,10 +36,10 @@ struct CalendarView: View {
                         Text(viewModel.getCurrentMonthYear())
                             .font(.title)
                             .bold()
-                        Image(systemName: "chevron.\(viewModel.showFullCalendar ? "up" : "down")")
+                        Image(systemName: "chevron.\(showFullCalendar ? "up" : "down")")
                             .foregroundStyle(
                                 Color.black.opacity(
-                                    viewModel.showFullCalendar ? 1 : 0.5
+                                    showFullCalendar ? 1 : 0.5
                                 )
                             )
                     }
@@ -45,12 +48,12 @@ struct CalendarView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .fill(
                                 Color.gray.opacity(
-                                    viewModel.showFullCalendar ? 0.3 : 0
+                                    showFullCalendar ? 0.3 : 0
                                 )
                             )
                     )
                     .onTapGesture {
-                        viewModel.showFullCalendar.toggle()
+                        showFullCalendar.toggle()
                     }
                     Spacer()
                     
@@ -78,7 +81,7 @@ struct CalendarView: View {
                 }
                 .padding(.horizontal)
                 
-                if viewModel.showFullCalendar {
+                if showFullCalendar {
                     HStack {
                         ForEach(viewModel.daysOfWeek, id: \.self) { day in
                             Spacer()
@@ -96,6 +99,13 @@ struct CalendarView: View {
                                     HStack(spacing: 0) {
                                         ForEach(week, id: \.self) { date in
                                             Spacer()
+                                                .background(
+                                                    GeometryReader { geometry in
+                                                        Color.clear.onAppear {
+                                                            
+                                                        }
+                                                    }
+                                                )
                                             ZStack {
                                                 if viewModel.dateCompare(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
                                                     RoundedRectangle(cornerRadius: 8)
@@ -104,7 +114,7 @@ struct CalendarView: View {
                                                         )
                                                         .frame(width: screenWidth / 10, height: screenWidth / 10)
                                                         .transition(.asymmetric(
-                                                            insertion: .move(edge: viewModel.wasPast ? .leading : .trailing).combined(with: .opacity),
+                                                            insertion: .move(edge: wasPast ? .leading : .trailing).combined(with: .opacity),
                                                             removal: .identity
                                                         ))
                                                 }
@@ -122,10 +132,22 @@ struct CalendarView: View {
                                                     .onTapGesture {
                                                         withAnimation(.easeInOut(duration: 0.2)) {
                                                             viewModel.selectDate = date
-                                                            viewModel.wasPast = viewModel.currentDate < date
+                                                            wasPast = viewModel.currentDate < date
                                                             viewModel.currentDate = date
                                                         }
                                                     }
+                                            }
+                                            .onAppear {
+                                                if idx < scrollId.0 {
+                                                    
+                                                    scrollId.0 = idx
+                                                    scrollId.1 = idx + 5
+                                                }
+                                                else if scrollId.1 < idx {
+                                                    
+                                                    scrollId.0 = idx - 5
+                                                    scrollId.1 = idx
+                                                }
                                             }
                                             Spacer()
                                         }
@@ -134,14 +156,14 @@ struct CalendarView: View {
                                     .background(
                                         GeometryReader { geometry in
                                             Color.clear.onAppear {
-                                                viewModel.calendarHeight = geometry.size.height * 6 + 40 // spacing값 * 5 = 40
+                                                calendarHeight = geometry.size.height * 6 + 40 // spacing값 * 5 = 40
                                             }
                                         }
                                     )
                                 }
                             }
                         }
-                        .frame(height: viewModel.calendarHeight)
+                        .frame(height: calendarHeight)
                         .onAppear {
                             viewModel.setCalendarData(date: viewModel.currentDate)
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {

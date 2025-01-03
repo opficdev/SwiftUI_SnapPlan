@@ -13,11 +13,8 @@ final class PlannerViewModel: ObservableObject {
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
     @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
     @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들
-    @Published var showFullCalendar = false // 전체 달력을 보여줄지 여부
-    @Published var calendarHeight: CGFloat = 0
-    @Published var dragOffset: CGFloat = 0
-    @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
 
+    
     init() {
         startTimer()
     }
@@ -53,17 +50,6 @@ final class PlannerViewModel: ObservableObject {
             return lhsFirst < rhsFirst
         }
     }
-    
-    func setCurrentDate() {
-        if dragOffset < -calendarHeight / 4 {
-            currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
-        }
-        else if dragOffset > calendarHeight / 4 {
-            currentDate = calendar.date(byAdding: .month, value: -1, to: currentDate)!
-        }
-        dragOffset = 0
-    }
-        
     
     func dateString(date: Date, component: Calendar.Component) -> String {
         return "\(calendar.component(component, from: date))"
