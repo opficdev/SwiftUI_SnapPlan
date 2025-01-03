@@ -40,6 +40,14 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
+    func findFirstDayofMonthIndex(date: Date) -> Int? {
+//        let idx = calendarData.firstIndex { row in
+//            row.contains { calendar.isDate($0, inSameDayAs: date) }
+//        }
+//        return idx
+        return calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: date) } }
+    }
+    
     func setCalendarData(date: Date) {
         let lastMonth = calendar.date(byAdding: .month, value: -1, to: date)!
         let nextMonth = calendar.date(byAdding: .month, value: 1, to: date)!

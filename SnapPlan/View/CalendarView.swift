@@ -89,61 +89,68 @@ struct CalendarView: View {
                         }
                     }
                     .padding(.vertical, 8)
-                
-                    ScrollView(showsIndicators: false) {
-                        ForEach(Array(zip(viewModel.calendarData.indices, viewModel.calendarData)), id: \.0) { idx, week in
-                            HStack(spacing: 0) {
-                                ForEach(week, id: \.self) { date in
-                                    Spacer()
-                                    ZStack {
-                                        if viewModel.dateCompare(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .fill(
-                                                    Color.gray.opacity(0.5)
-                                                )
-                                                .frame(width: screenWidth / 10, height: screenWidth / 10)
-                                                .transition(.asymmetric(
-                                                    insertion: .move(edge: viewModel.wasPast ? .leading : .trailing).combined(with: .opacity),
-                                                    removal: .identity
-                                                ))
-                                        }
-                                        
-                                        if viewModel.dateCompare(date1: date, date2: Date(), components: [.year, .month, .day]) {
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .fill(Color.pink)
-                                                .frame(width: screenWidth / 12, height: screenWidth / 12)
-                                        }
-                                            
-                                        Text(viewModel.dateString(date: date, component: .day))
-                                            .font(.subheadline)
-                                            .foregroundStyle(viewModel.setDayForegroundColor(date: date, colorScheme: colorScheme))
-                                            .frame(width: screenWidth / 10, height: screenWidth / 10)
-                                            .onTapGesture {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    viewModel.selectDate = date
-                                                    viewModel.wasPast = viewModel.currentDate < date
-                                                    viewModel.currentDate = date
+                    ScrollViewReader { proxy in
+                        ScrollView(showsIndicators: false) {
+                            VStack(spacing: 8) {
+                                ForEach(Array(zip(viewModel.calendarData.indices, viewModel.calendarData)), id: \.0) { idx, week in
+                                    HStack(spacing: 0) {
+                                        ForEach(week, id: \.self) { date in
+                                            Spacer()
+                                            ZStack {
+                                                if viewModel.dateCompare(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .fill(
+                                                            Color.gray.opacity(0.5)
+                                                        )
+                                                        .frame(width: screenWidth / 10, height: screenWidth / 10)
+                                                        .transition(.asymmetric(
+                                                            insertion: .move(edge: viewModel.wasPast ? .leading : .trailing).combined(with: .opacity),
+                                                            removal: .identity
+                                                        ))
                                                 }
+                                                
+                                                if viewModel.dateCompare(date1: date, date2: Date(), components: [.year, .month, .day]) {
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .fill(Color.pink)
+                                                        .frame(width: screenWidth / 12, height: screenWidth / 12)
+                                                }
+                                                
+                                                Text(viewModel.dateString(date: date, component: .day))
+                                                    .font(.subheadline)
+                                                    .foregroundStyle(viewModel.setDayForegroundColor(date: date, colorScheme: colorScheme))
+                                                    .frame(width: screenWidth / 10, height: screenWidth / 10)
+                                                    .onTapGesture {
+                                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                                            viewModel.selectDate = date
+                                                            viewModel.wasPast = viewModel.currentDate < date
+                                                            viewModel.currentDate = date
+                                                        }
+                                                    }
                                             }
+                                            Spacer()
+                                        }
                                     }
-                                    Spacer()
+                                    .id(idx)
+                                    .background(
+                                        GeometryReader { geometry in
+                                            Color.clear.onAppear {
+                                                viewModel.calendarHeight = geometry.size.height * 6 + 40 // spacing값 * 5 = 40
+                                            }
+                                        }
+                                    )
                                 }
                             }
                         }
                         .onAppear {
-                            DispatchQueue.main.async {
-                                viewModel.setCalendarData(date: viewModel.currentDate)
-                            }
-                        }
-                        .background(
-                            GeometryReader { geometry in
-                                Color.clear.onAppear {
-                                    viewModel.calendarHeight = geometry.size.height
+                            viewModel.setCalendarData(date: viewModel.currentDate)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                if let idx = viewModel.findFirstDayofMonthIndex(date: viewModel.currentDate) {
+                                    proxy.scrollTo(idx, anchor: .top)
                                 }
                             }
-                        )
+                        }
+                        .frame(height: viewModel.calendarHeight)
                     }
-//                    .frame(height: viewModel.calendarHeight)
                 }
             }
             .background(Color.gray.opacity(0.1))
