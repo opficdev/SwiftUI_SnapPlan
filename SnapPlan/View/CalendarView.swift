@@ -5,16 +5,16 @@
 //  Created by opfic on 1/1/25.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 struct CalendarView: View {
     @EnvironmentObject private var viewModel: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
-    @State private var scrollId = (0,0) //  캘린더에 보여지는 최소, 최대 id
-    @State private var calendarRowGap: CGFloat = 0  //  캘린더 행 간의 간격
-    @State private var calendarHeight: CGFloat = 0
-    @State private var showFullCalendar = false // 전체 달력을 보여줄지 여부
+    @State private var scrollId = (0,5) //  캘린더에 보여지는 최소, 최대 id
+    @State private var calendarSpacing: CGFloat = 0  //  캘린더 행 간의 간격
+    @State private var calendarHeight: CGFloat = UIScreen.main.bounds.height
+    @State private var showCalendar = true // 전체 달력을 보여줄지 여부
     @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     
     let screenWidth = UIScreen.main.bounds.width
@@ -36,10 +36,10 @@ struct CalendarView: View {
                         Text(viewModel.getCurrentMonthYear())
                             .font(.title)
                             .bold()
-                        Image(systemName: "chevron.\(showFullCalendar ? "up" : "down")")
+                        Image(systemName: "chevron.\(showCalendar ? "up" : "down")")
                             .foregroundStyle(
                                 Color.black.opacity(
-                                    showFullCalendar ? 1 : 0.5
+                                    showCalendar ? 1 : 0.5
                                 )
                             )
                     }
@@ -48,12 +48,14 @@ struct CalendarView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .fill(
                                 Color.gray.opacity(
-                                    showFullCalendar ? 0.3 : 0
+                                    showCalendar ? 0.3 : 0
                                 )
                             )
                     )
                     .onTapGesture {
-                        showFullCalendar.toggle()
+                        withAnimation {
+                            showCalendar.toggle()
+                        }
                     }
                     Spacer()
                     
@@ -81,7 +83,7 @@ struct CalendarView: View {
                 }
                 .padding(.horizontal)
                 
-                if showFullCalendar {
+                VStack(spacing: 0) {
                     HStack {
                         ForEach(viewModel.daysOfWeek, id: \.self) { day in
                             Spacer()
@@ -92,9 +94,10 @@ struct CalendarView: View {
                         }
                     }
                     .padding(.vertical, 8)
+                    
                     ScrollViewReader { proxy in
                         ScrollView(showsIndicators: false) {
-                            VStack(spacing: 8) {
+                            VStack(spacing: calendarSpacing) {
                                 ForEach(Array(zip(viewModel.calendarData.indices, viewModel.calendarData)), id: \.0) { idx, week in
                                     HStack(spacing: 0) {
                                         ForEach(week, id: \.self) { date in
@@ -102,7 +105,7 @@ struct CalendarView: View {
                                                 .background(
                                                     GeometryReader { geometry in
                                                         Color.clear.onAppear {
-                                                            
+                                                            calendarSpacing = geometry.size.width
                                                         }
                                                     }
                                                 )
@@ -118,13 +121,13 @@ struct CalendarView: View {
                                                             removal: .identity
                                                         ))
                                                 }
-                                                
+
                                                 if viewModel.dateCompare(date1: date, date2: Date(), components: [.year, .month, .day]) {
                                                     RoundedRectangle(cornerRadius: 8)
                                                         .fill(Color.pink)
                                                         .frame(width: screenWidth / 12, height: screenWidth / 12)
                                                 }
-                                                
+
                                                 Text(viewModel.dateString(date: date, component: .day))
                                                     .font(.subheadline)
                                                     .foregroundStyle(viewModel.setDayForegroundColor(date: date, colorScheme: colorScheme))
@@ -139,12 +142,12 @@ struct CalendarView: View {
                                             }
                                             .onAppear {
                                                 if idx < scrollId.0 {
-                                                    
+
                                                     scrollId.0 = idx
                                                     scrollId.1 = idx + 5
                                                 }
                                                 else if scrollId.1 < idx {
-                                                    
+
                                                     scrollId.0 = idx - 5
                                                     scrollId.1 = idx
                                                 }
@@ -156,30 +159,39 @@ struct CalendarView: View {
                                     .background(
                                         GeometryReader { geometry in
                                             Color.clear.onAppear {
-                                                calendarHeight = geometry.size.height * 6 + 40 // spacing값 * 5 = 40
+                                                calendarHeight = geometry.size.height * 6 + calendarSpacing * 5
                                             }
                                         }
                                     )
                                 }
                             }
                         }
-                        .frame(height: calendarHeight)
                         .onAppear {
-                            viewModel.setCalendarData(date: viewModel.currentDate)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                                if let idx = viewModel.findFirstDayofMonthIndex(date: viewModel.currentDate) {
-                                    proxy.scrollTo(idx, anchor: .top)
+                            viewModel.calendarData = viewModel.calendarDates(date: viewModel.today)
+                        }
+                        .onChange(of: viewModel.selectDate) { newDate in
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {   //  transition 애니메이션 이후에 실행되어야 함
+                                viewModel.setCalendarData(date: newDate)
+                                if let idx = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                                    withAnimation {
+                                        proxy.scrollTo(idx, anchor: .top)
+                                    }
                                 }
                             }
                         }
-                        .onChange(of: viewModel.currentDate) { newDate in
-                            viewModel.setCalendarData(date: newDate)
-                            if let idx = viewModel.findFirstDayofMonthIndex(date: newDate) {
-                                proxy.scrollTo(idx, anchor: .top)
-                            }
+                    }
+                    Spacer()
+                }
+                .frame(height: showCalendar ? calendarHeight : 0, alignment: .top)  // alignment: .top을 기억하자
+                .clipped()
+                .background(
+                    GeometryReader { geometry in
+                        Color.clear.onAppear {
+                            calendarHeight = geometry.size.height
+                            showCalendar = false
                         }
                     }
-                }
+                )
             }
             .background(Color.gray.opacity(0.1))
         }
