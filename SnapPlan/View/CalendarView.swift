@@ -17,6 +17,7 @@ struct CalendarView: View {
     @State private var daysHeight: CGFloat = 0  //  날짜 보여주는 부분의 height
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
+    @State private var isScrolling = false
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -69,12 +70,12 @@ struct CalendarView: View {
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(
-                                        viewModel.dateCompare(date1: Date(), date2: viewModel.selectDate, components: [.year, .month, .day]) ? Color.gray.opacity(0.5) : Color.pink
+                                        viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) ? Color.gray.opacity(0.5) : Color.pink
                                     )
                             )
                             .onTapGesture{
-                                withAnimation {
-                                    if !viewModel.dateCompare(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                                if !viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                                    withAnimation {
                                         viewModel.selectDate = viewModel.today
                                         viewModel.currentDate = viewModel.today
                                     }
@@ -118,7 +119,7 @@ struct CalendarView: View {
                                                     }
                                                 )
                                             ZStack {
-                                                if viewModel.dateCompare(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                                                if viewModel.isSameDate(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
                                                     RoundedRectangle(cornerRadius: 8)
                                                         .fill(
                                                             Color.gray.opacity(0.5)
@@ -130,7 +131,7 @@ struct CalendarView: View {
                                                         ))
                                                 }
 
-                                                if viewModel.dateCompare(date1: date, date2: Date(), components: [.year, .month, .day]) {
+                                                if viewModel.isSameDate(date1: date, date2: Date(), components: [.year, .month, .day]) {
                                                     RoundedRectangle(cornerRadius: 8)
                                                         .fill(Color.pink)
                                                         .frame(width: screenWidth / 12, height: screenWidth / 12)
@@ -140,24 +141,12 @@ struct CalendarView: View {
                                                     .font(.subheadline)
                                                     .foregroundStyle(viewModel.setDayForegroundColor(date: date, colorScheme: colorScheme))
                                                     .frame(width: screenWidth / 10, height: screenWidth / 10)
-                                                    .onTapGesture {
-                                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                                            viewModel.selectDate = date
-                                                            wasPast = viewModel.currentDate < date
-                                                            viewModel.currentDate = date
-                                                        }
-                                                    }
                                             }
-                                            .onAppear {
-                                                if idx < scrollId.0 {
-
-                                                    scrollId.0 = idx
-                                                    scrollId.1 = idx + 5
-                                                }
-                                                else if scrollId.1 < idx {
-
-                                                    scrollId.0 = idx - 5
-                                                    scrollId.1 = idx
+                                            .onTapGesture {
+                                                withAnimation(.easeInOut(duration: 0.2)) {
+                                                    viewModel.selectDate = date
+                                                    wasPast = viewModel.currentDate < date
+                                                    viewModel.currentDate = date
                                                 }
                                             }
                                             Spacer()
@@ -174,19 +163,46 @@ struct CalendarView: View {
                                 }
                             }
                         }
-                        .onAppear {
-                            viewModel.calendarData = viewModel.calendarDates(date: viewModel.today)
-                        }
-                        .onChange(of: viewModel.selectDate) { newDate in
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {   //  transition 애니메이션 이후에 실행되어야 함
-                                viewModel.setCalendarData(date: newDate)
-                                if let idx = viewModel.findFirstDayofMonthIndex(date: newDate) {
-                                    withAnimation {
+                        .onChange(of: showCalendar) { toggleOn in
+                            if toggleOn {
+                                viewModel.setCalendarData(date: viewModel.today)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    if let idx = viewModel.findFirstDayofMonthIndex(date: viewModel.today) {
                                         proxy.scrollTo(idx, anchor: .top)
                                     }
                                 }
                             }
+                            else {
+                                viewModel.calendarData.removeAll()
+                            }
                         }
+                        .onChange(of: viewModel.selectDate) { newDate in
+                            if let idx1 = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                                isScrolling = true
+                                withAnimation(.linear(duration: 0.15)) {
+                                    proxy.scrollTo(idx1, anchor: .top)
+                                    
+                                }
+                            }
+                            viewModel.setCalendarData(date: newDate)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                if let idx = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                                    proxy.scrollTo(idx, anchor: .top)
+                                    print(idx)
+                                }
+                                isScrolling = false
+                            }
+                        }
+                        .simultaneousGesture(
+                            DragGesture()
+                                .onChanged { _ in
+                                    isScrolling = true
+                                }
+                                .onEnded { _ in
+                                    isScrolling = false
+                                }
+                        )
+                        .allowsHitTesting(!isScrolling)
                     }
                 }
                 .frame(height: showCalendar ? weekHeight + daysHeight * 6 + calendarSpacing * 5 + 16 : 0, alignment: .top)

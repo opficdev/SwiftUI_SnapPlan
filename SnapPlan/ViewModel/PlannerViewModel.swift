@@ -12,8 +12,8 @@ final class PlannerViewModel: ObservableObject {
     @Published var today = Date()
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
     @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
+    @Published var lastDate = Date()    //  selectDate()의 과거형
     @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들
-
     
     init() {
         startTimer()
@@ -29,6 +29,7 @@ final class PlannerViewModel: ObservableObject {
         return calendar.shortWeekdaySymbols
     }
     
+    
     private func startTimer() {
         timerCancellable = Timer.publish(every: 60, on: .main, in: .common)
             .autoconnect()
@@ -42,10 +43,11 @@ final class PlannerViewModel: ObservableObject {
         return calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: firstDateOfMonth) }}
     }
     
-    func setCalendarData(date: Date) {
+    func setCalendarData(date: Date){
         let lastMonth = calendar.date(byAdding: .month, value: -1, to: date)!
         let nextMonth = calendar.date(byAdding: .month, value: 1, to: date)!
-        calendarData = Array(Set(calendarDates(date: lastMonth) + calendarDates(date: date) + calendarDates(date: nextMonth))).sorted{ lhs, rhs in
+        
+        calendarData = Array(Set(calendarDates(date: lastMonth) + calendarDates(date: date) + calendarDates(date: nextMonth))).sorted { lhs, rhs in
             guard let lhsFirst = lhs.first, let rhsFirst = rhs.first else { return false }
             return lhsFirst < rhsFirst
         }
@@ -62,15 +64,15 @@ final class PlannerViewModel: ObservableObject {
         return DateFormatter.krMonthYearFormatter.string(from: currentDate)
     }
     
-    func dateCompare(date1: Date, date2: Date, components: Set<Calendar.Component>) -> Bool {
+    func isSameDate(date1: Date, date2: Date, components: Set<Calendar.Component>) -> Bool {
         return calendar.dateComponents(components, from: date1) == calendar.dateComponents(components, from: date2)
     }
     
     func setDayForegroundColor(date: Date, colorScheme: ColorScheme) -> Color {
-        if dateCompare(date1: date, date2: today, components: [.year, .month, .day]) {
+        if isSameDate(date1: date, date2: today, components: [.year, .month, .day]) {
             return Color.white
         }
-        if !dateCompare(date1: date, date2: selectDate, components: [.year, .month]) {
+        if !isSameDate(date1: date, date2: selectDate, components: [.year, .month]) {
             return Color.gray
         }
         return colorScheme == .light ? Color.black : Color.white
@@ -108,7 +110,7 @@ final class PlannerViewModel: ObservableObject {
         }
 
         // 다음 달의 날짜들 추가 
-        var remainingDays = 42 - dates.flatMap { $0 } .count
+        var remainingDays = 49 - dates.flatMap { $0 } .count
         if remainingDays >= 7 { remainingDays -= 7 }
         if remainingDays > 0, let nextMonth = calendar.date(byAdding: .month, value: 1, to: firstDayOfMonth){
             for day in 1...remainingDays {
