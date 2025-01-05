@@ -13,7 +13,8 @@ struct CalendarView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var scrollId = (0,5) //  캘린더에 보여지는 최소, 최대 id
     @State private var calendarSpacing: CGFloat = 0  //  캘린더 행 간의 간격
-    @State private var calendarHeight: CGFloat = UIScreen.main.bounds.height
+    @State private var weekHeight: CGFloat = 0  //  요일 보여주는 부분의 height
+    @State private var daysHeight: CGFloat = 0  //  날짜 보여주는 부분의 height
     @State private var showCalendar = true // 전체 달력을 보여줄지 여부
     @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     
@@ -93,6 +94,13 @@ struct CalendarView: View {
                             Spacer()
                         }
                     }
+                    .background(
+                        GeometryReader { geometry in
+                            Color.clear.onAppear {
+                                weekHeight = geometry.size.height
+                            }
+                        }
+                    )
                     .padding(.vertical, 8)
                     
                     ScrollViewReader { proxy in
@@ -159,7 +167,7 @@ struct CalendarView: View {
                                     .background(
                                         GeometryReader { geometry in
                                             Color.clear.onAppear {
-                                                calendarHeight = geometry.size.height * 6 + calendarSpacing * 5
+                                                daysHeight = geometry.size.height
                                             }
                                         }
                                     )
@@ -180,18 +188,11 @@ struct CalendarView: View {
                             }
                         }
                     }
-                    Spacer()
                 }
-                .frame(height: showCalendar ? calendarHeight : 0, alignment: .top)  // alignment: .top을 기억하자
+                .frame(height: showCalendar ? weekHeight + daysHeight * 6 + calendarSpacing * 5 + 16 : 0, alignment: .top)
+                //  height 구조: 요일 HStack의 height and 위아래 패딩 + 각 열의 height * 6(캘린더가 6행임) + 행 사이의 spacing(5개)
+                //  .top으로 정렬해야 자연스러운 애니메이션
                 .clipped()
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear.onAppear {
-                            calendarHeight = geometry.size.height
-                            showCalendar = false
-                        }
-                    }
-                )
             }
             .background(Color.gray.opacity(0.1))
         }
