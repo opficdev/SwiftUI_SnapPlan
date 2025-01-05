@@ -15,7 +15,7 @@ struct CalendarView: View {
     @State private var calendarSpacing: CGFloat = 0  //  캘린더 행 간의 간격
     @State private var weekHeight: CGFloat = 0  //  요일 보여주는 부분의 height
     @State private var daysHeight: CGFloat = 0  //  날짜 보여주는 부분의 height
-    @State private var showCalendar = true // 전체 달력을 보여줄지 여부
+    @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     
     let screenWidth = UIScreen.main.bounds.width
@@ -54,7 +54,7 @@ struct CalendarView: View {
                             )
                     )
                     .onTapGesture {
-                        withAnimation {
+                        withAnimation(.linear(duration: 0.1)) {
                             showCalendar.toggle()
                         }
                     }
