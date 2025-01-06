@@ -76,8 +76,8 @@ struct CalendarView: View {
                             .onTapGesture{
                                 if !viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) {
                                     withAnimation {
+                                        wasPast = viewModel.selectDate < viewModel.today
                                         viewModel.selectDate = viewModel.today
-                                        viewModel.currentDate = viewModel.today
                                     }
                                 }
                             }
@@ -143,10 +143,11 @@ struct CalendarView: View {
                                                     .frame(width: screenWidth / 10, height: screenWidth / 10)
                                             }
                                             .onTapGesture {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    viewModel.selectDate = date
-                                                    wasPast = viewModel.currentDate < date
-                                                    viewModel.currentDate = date
+                                                if !isScrolling {
+                                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                                        viewModel.selectDate = date
+                                                        wasPast = viewModel.currentDate < date
+                                                    }
                                                 }
                                             }
                                             Spacer()
@@ -166,7 +167,7 @@ struct CalendarView: View {
                         .onChange(of: showCalendar) { toggleOn in
                             if toggleOn {
                                 viewModel.setCalendarData(date: viewModel.today)
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                     if let idx = viewModel.findFirstDayofMonthIndex(date: viewModel.today) {
                                         proxy.scrollTo(idx, anchor: .top)
                                     }
@@ -177,22 +178,24 @@ struct CalendarView: View {
                             }
                         }
                         .onChange(of: viewModel.selectDate) { newDate in
-                            if let idx1 = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.currentDate, components: [.year, .month]) {
                                 isScrolling = true
-                                withAnimation(.linear(duration: 0.15)) {
-                                    proxy.scrollTo(idx1, anchor: .top)
-                                    
-                                }
-                            }
-                            viewModel.setCalendarData(date: newDate)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                if let idx = viewModel.findFirstDayofMonthIndex(date: newDate) {
-                                    proxy.scrollTo(idx, anchor: .top)
-                                    print(idx)
-                                }
-                                isScrolling = false
+                                let stdIndex = viewModel.setCalendarData(date: newDate)
+                                    proxy.scrollTo(stdIndex, anchor: .top)
+                                    viewModel.currentDate = newDate
+                                    DispatchQueue.main.async {
+                                        if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                                            withAnimation(.easeInOut) {
+                                                proxy.scrollTo(newIndex, anchor: .top)
+                                            }
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                            isScrolling = false
+                                        }
+                                    }
                             }
                         }
+                        .allowsHitTesting(!isScrolling)
                         .simultaneousGesture(
                             DragGesture()
                                 .onChanged { _ in
@@ -202,7 +205,6 @@ struct CalendarView: View {
                                     isScrolling = false
                                 }
                         )
-                        .allowsHitTesting(!isScrolling)
                     }
                 }
                 .frame(height: showCalendar ? weekHeight + daysHeight * 6 + calendarSpacing * 5 + 16 : 0, alignment: .top)

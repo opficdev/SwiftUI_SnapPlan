@@ -29,7 +29,6 @@ final class PlannerViewModel: ObservableObject {
         return calendar.shortWeekdaySymbols
     }
     
-    
     private func startTimer() {
         timerCancellable = Timer.publish(every: 60, on: .main, in: .common)
             .autoconnect()
@@ -43,7 +42,9 @@ final class PlannerViewModel: ObservableObject {
         return calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: firstDateOfMonth) }}
     }
     
-    func setCalendarData(date: Date){
+    @discardableResult
+    func setCalendarData(date: Date) -> Int {
+        let tmp = calendarData
         let lastMonth = calendar.date(byAdding: .month, value: -1, to: date)!
         let nextMonth = calendar.date(byAdding: .month, value: 1, to: date)!
         
@@ -51,6 +52,10 @@ final class PlannerViewModel: ObservableObject {
             guard let lhsFirst = lhs.first, let rhsFirst = rhs.first else { return false }
             return lhsFirst < rhsFirst
         }
+        if tmp.isEmpty {
+            return 0
+        }
+        return tmp[0][0] < calendarData[0][0] ? 0 : calendarData.endIndex - 1
     }
     
     func dateString(date: Date, component: Calendar.Component) -> String {
@@ -58,7 +63,7 @@ final class PlannerViewModel: ObservableObject {
     }
     
     func getCurrentMonthYear() -> String {
-        if calendar.dateComponents([.year], from: currentDate) == calendar.dateComponents([.year], from: today) {
+        if isSameDate(date1: currentDate, date2: today, components: [.year]) {
             return DateFormatter.krMonthFormatter.string(from: currentDate)
         }
         return DateFormatter.krMonthYearFormatter.string(from: currentDate)
