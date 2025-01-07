@@ -9,9 +9,6 @@ import SwiftUI
 
 struct PlannerView: View {
     @StateObject var viewModel = PlannerViewModel()
-    @Environment(\.colorScheme) var colorScheme
-    
-    let screenWidth = UIScreen.main.bounds.width
     
     var body: some View {
         VStack(spacing: 0) {
