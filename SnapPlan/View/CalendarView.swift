@@ -167,10 +167,12 @@ struct CalendarView: View {
                         .onChange(of: showCalendar) { toggleOn in
                             if toggleOn {
                                 viewModel.setCalendarData(date: viewModel.today)
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                isLoading = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                     if let idx = viewModel.findFirstDayofMonthIndex(date: viewModel.today) {
                                         proxy.scrollTo(idx, anchor: .top)
                                     }
+                                    isLoading = false
                                 }
                             }
                             else {
@@ -179,21 +181,26 @@ struct CalendarView: View {
                         }
                         .onChange(of: viewModel.selectDate) { newDate in
                             if !viewModel.isSameDate(date1: newDate, date2: viewModel.currentDate, components: [.year, .month]) {
-                                isScrolling = true
-                                let stdIndex = viewModel.setCalendarData(date: newDate)
-                                isLoading = true
+                                isScrolling = true; isLoading = true
+                                var stdIndex = 0
+                                if viewModel.isSameDate(date1: newDate, date2: viewModel.today, components: [.year, .month, .day]) {
+                                    stdIndex = viewModel.setCalendarData(date: viewModel.date(byAdding: .month, value: wasPast ? -1 : 1, to: newDate)!)
+                                }
+                                else {
+                                    stdIndex = viewModel.setCalendarData(date: newDate)
+                                }
+                                viewModel.currentDate = newDate
+                                
                                 DispatchQueue.main.async {
                                     proxy.scrollTo(stdIndex, anchor: .top)
                                     isLoading = false
-                                    viewModel.currentDate = newDate
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                    if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
-                                        withAnimation(.easeInOut) {
-                                            proxy.scrollTo(newIndex, anchor: .top)
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                                                withAnimation(.easeInOut) {
+                                                proxy.scrollTo(newIndex, anchor: .top)
+                                            }
                                         }
                                     }
-                                    
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                     isScrolling = false
@@ -204,7 +211,7 @@ struct CalendarView: View {
                         .simultaneousGesture(
                             DragGesture()
                                 .onChanged { _ in
-                                    isScrolling = true
+
                                 }
                                 .onEnded { _ in
                                     isScrolling = false
@@ -218,6 +225,8 @@ struct CalendarView: View {
                 .clipped()
             }
             .background(Color.gray.opacity(0.1))
+            
+            
         }
     }
 }
