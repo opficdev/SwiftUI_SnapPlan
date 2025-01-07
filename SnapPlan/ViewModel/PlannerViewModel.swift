@@ -37,6 +37,31 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
+    func getHours(is12hoursFmt: Bool) -> [String] {
+        let hours = Array(1...24) // 1에서 24까지 배열 생성
+        
+        if is12hoursFmt {
+            return hours.map { hour in
+                let formattedHour = hour % 12 == 0 ? 12 : hour % 12 // 12시간제로 변환
+                return "\(hour / 12 == 0 ? "오전" : "오후") \(formattedHour)시"
+            }
+        }
+
+        return hours.map { "\($0):00"}
+    }
+
+    func getWeekDates(date: Date) -> [Date] {
+        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date))!
+        
+        return (0..<7).compactMap { offset in
+            calendar.date(byAdding: .day, value: offset, to: startOfWeek)
+        }
+    }
+    
+    func date(byAdding: Calendar.Component, value: Int, to: Date) -> Date? {
+        return calendar.date(byAdding: byAdding, value: value, to: to)
+    }
+    
     func findFirstDayofMonthIndex(date: Date) -> Int? {
         let firstDateOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
         return calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: firstDateOfMonth) }}
@@ -59,6 +84,10 @@ final class PlannerViewModel: ObservableObject {
     }
     
     func dateString(date: Date, component: Calendar.Component) -> String {
+        if component == .weekday {
+            return DateFormatter.krWeekDay.string(from: date)
+        }
+        
         return "\(calendar.component(component, from: date))"
     }
     
@@ -135,15 +164,20 @@ final class PlannerViewModel: ObservableObject {
 }
 
 extension DateFormatter {
+    static let fmt = DateFormatter()
     static let krMonthFormatter: DateFormatter = {
-        let fmt = DateFormatter()
         fmt.dateFormat = "M월" // 한국어 형식의 월 포맷
         return fmt
     }()
     
     static let krMonthYearFormatter: DateFormatter = {
-        let fmt = DateFormatter()
         fmt.dateFormat = "yyyy년 M월" // 한국어 형식의 연월 포맷
+        return fmt
+    }()
+    
+    static let krWeekDay: DateFormatter = {
+        fmt.locale = Locale(identifier: "ko_KR")
+        fmt.dateFormat = "E"
         return fmt
     }()
 }
