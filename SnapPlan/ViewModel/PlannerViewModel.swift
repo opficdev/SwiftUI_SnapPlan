@@ -17,6 +17,7 @@ final class PlannerViewModel: ObservableObject {
     
     init() {
         startTimer()
+        setCalendarData(date: selectDate)
     }
     
     private var timerCancellable: AnyCancellable?
@@ -37,17 +38,22 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
-    func getHours(is12hoursFmt: Bool) -> [String] {
+    func getHours(is12hoursFmt: Bool) -> [TimeData] {
         let hours = Array(1...24) // 1에서 24까지 배열 생성
         
         if is12hoursFmt {
             return hours.map { hour in
-                let formattedHour = hour % 12 == 0 ? 12 : hour % 12 // 12시간제로 변환
-                return "\(hour / 12 == 0 ? "오전" : "오후") \(formattedHour)시"
+                if hour == 12 {
+                    return TimeData(time: "정오")
+                }
+                if hour == 24 {
+                    return TimeData(time: "12", timePeriod: "오전")
+                }
+                return TimeData(time: "\(hour % 12)시", timePeriod: hour < 12 ? "오전" : "오후")
             }
         }
 
-        return hours.map { "\($0):00"}
+        return hours.map { TimeData(time: "\($0):00")}
     }
 
     func getWeekDates(date: Date) -> [Date] {
