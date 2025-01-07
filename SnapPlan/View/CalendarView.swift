@@ -18,6 +18,7 @@ struct CalendarView: View {
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     @State private var isScrolling = false
+    @State private var isLoading = false
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -143,11 +144,9 @@ struct CalendarView: View {
                                                     .frame(width: screenWidth / 10, height: screenWidth / 10)
                                             }
                                             .onTapGesture {
-                                                if !isScrolling {
-                                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                                        viewModel.selectDate = date
-                                                        wasPast = viewModel.currentDate < date
-                                                    }
+                                                withAnimation(.easeInOut(duration: 0.2)) {
+                                                    wasPast = viewModel.selectDate < date
+                                                    viewModel.selectDate = date
                                                 }
                                             }
                                             Spacer()
@@ -164,6 +163,7 @@ struct CalendarView: View {
                                 }
                             }
                         }
+                        .opacity(isLoading ? 0 : 1)
                         .onChange(of: showCalendar) { toggleOn in
                             if toggleOn {
                                 viewModel.setCalendarData(date: viewModel.today)
@@ -181,18 +181,23 @@ struct CalendarView: View {
                             if !viewModel.isSameDate(date1: newDate, date2: viewModel.currentDate, components: [.year, .month]) {
                                 isScrolling = true
                                 let stdIndex = viewModel.setCalendarData(date: newDate)
+                                isLoading = true
+                                DispatchQueue.main.async {
                                     proxy.scrollTo(stdIndex, anchor: .top)
+                                    isLoading = false
                                     viewModel.currentDate = newDate
-                                    DispatchQueue.main.async {
-                                        if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
-                                            withAnimation(.easeInOut) {
-                                                proxy.scrollTo(newIndex, anchor: .top)
-                                            }
-                                        }
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                            isScrolling = false
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                                        withAnimation(.easeInOut) {
+                                            proxy.scrollTo(newIndex, anchor: .top)
                                         }
                                     }
+                                    
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    isScrolling = false
+                                }
                             }
                         }
                         .allowsHitTesting(!isScrolling)
