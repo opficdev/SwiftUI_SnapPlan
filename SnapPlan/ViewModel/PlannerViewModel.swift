@@ -55,7 +55,7 @@ final class PlannerViewModel: ObservableObject {
         if tmp.isEmpty {
             return 0
         }
-        return tmp[0][0] < calendarData[0][0] ? 0 : calendarData.endIndex - 1
+        return tmp[0][0] < calendarData[0][0] ? 0 : calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: date) }}!
     }
     
     func dateString(date: Date, component: Calendar.Component) -> String {
