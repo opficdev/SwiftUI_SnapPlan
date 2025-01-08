@@ -47,7 +47,7 @@ final class PlannerViewModel: ObservableObject {
                     return TimeData(time: "정오")
                 }
                 if hour == 24 {
-                    return TimeData(time: "12", timePeriod: "오전")
+                    return TimeData(time: "12시", timePeriod: "오전")
                 }
                 return TimeData(time: "\(hour % 12)시", timePeriod: hour < 12 ? "오전" : "오후")
             }
