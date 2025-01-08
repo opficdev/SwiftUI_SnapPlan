@@ -31,21 +31,17 @@ struct ScheduleView: View {
                             ForEach(Array(zip(calendarData.indices, calendarData)), id: \.0) { idx, date in
                                 HStack {
                                     Text(viewModel.dateString(date: date, component: .day))
+                                        .font(.callout)
                                     ZStack {
-                                        if viewModel.isSameDate(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .fill(
-                                                    Color.pink
-                                                )
-                                                .frame(width: screenWidth / 10, height: screenWidth / 10)
-                                        }
-
-                                        if viewModel.isSameDate(date1: date, date2: Date(), components: [.year, .month, .day]) {
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .fill(Color.pink)
-                                                .frame(width: screenWidth / 12, height: screenWidth / 12)
-                                        }
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(
+                                                viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? Color.pink : Color.gray.opacity(0.5)
+                                            )
+                                            .frame(width: screenWidth / 14, height: screenWidth / 14)
                                         Text("\(DateFormatter.krWeekDay.string(from: date))")
+                                            .font(.callout)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(Color.white)
                                     }
                                 }
                                 .id(idx)
