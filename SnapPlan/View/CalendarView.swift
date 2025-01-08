@@ -114,12 +114,16 @@ struct CalendarView: View {
                                 GeometryReader { geo in
                                     Color.clear
                                         .onChange(of: geo.frame(in: .global)) { newValue in
-                                            if scrollViewOffsets.0 <= newValue.maxY {
-                                                print("TOP")
+                                            let newCurrentDate = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
+                                            if scrollViewOffsets.0 <= newValue.maxY && !viewModel.calendarData.flatMap({ $0 }).contains(newCurrentDate) {
+                                                viewModel.currentDate = newCurrentDate
+                                                print(newCurrentDate)
+                                                viewModel.setCalendarData(date: newCurrentDate)
                                             }
                                         }
                                 }
                                 .frame(height: 0) // 빈 공간 차지 방지
+                                
                                 VStack(spacing: calendarSpacing) {
                                     ForEach(Array(zip(viewModel.calendarData.indices, viewModel.calendarData)), id: \.0) { idx, week in
                                         HStack(spacing: 0) {
@@ -180,7 +184,7 @@ struct CalendarView: View {
                                     Color.clear
                                         .onChange(of: geo.frame(in: .global)) { newValue in
                                             if scrollViewOffsets.1 >= newValue.minY {
-                                                print("BOTTOM")
+                                                
                                             }
                                         }
                                 }
@@ -198,7 +202,6 @@ struct CalendarView: View {
                                         isLoading = false
                                     }
                                     scrollViewOffsets = (geometry.frame(in: .global).minY, geometry.frame(in: .global).maxY)
-                                    print(scrollViewOffsets)
                                 }
                             }
                             .onChange(of: viewModel.selectDate) { newDate in
@@ -238,9 +241,7 @@ struct CalendarView: View {
                 //  .top으로 정렬해야 자연스러운 애니메이션
                 .clipped()
             }
-            .background(Color.gray.opacity(0.1))
-            
-            
+            .background(Color.calendarBackground)
         }
     }
 }
