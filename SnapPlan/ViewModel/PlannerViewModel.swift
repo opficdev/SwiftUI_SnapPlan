@@ -90,10 +90,6 @@ final class PlannerViewModel: ObservableObject {
     }
     
     func dateString(date: Date, component: Calendar.Component) -> String {
-        if component == .weekday {
-            return DateFormatter.krWeekDay.string(from: date)
-        }
-        
         return "\(calendar.component(component, from: date))"
     }
     
