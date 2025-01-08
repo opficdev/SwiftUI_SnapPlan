@@ -19,6 +19,9 @@ struct CalendarView: View {
     @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     @State private var isScrolling = false
     @State private var isLoading = false
+    @State private var scrollOffset = CGFloat.zero
+    @State private var baseOffset = CGFloat.zero
+    @State private var scrollViewOffsets = (CGFloat.zero, CGFloat.zero)
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -106,114 +109,128 @@ struct CalendarView: View {
                     .padding(.vertical, 8)
                     
                     ScrollViewReader { proxy in
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: calendarSpacing) {
-                                ForEach(Array(zip(viewModel.calendarData.indices, viewModel.calendarData)), id: \.0) { idx, week in
-                                    HStack(spacing: 0) {
-                                        ForEach(week, id: \.self) { date in
-                                            Spacer()
-                                                .background(
-                                                    GeometryReader { geometry in
-                                                        Color.clear.onAppear {
-                                                            calendarSpacing = geometry.size.width
+                        GeometryReader { geometry in
+                            ScrollView(showsIndicators: false) {
+                                GeometryReader { geo in
+                                    Color.clear
+                                        .onChange(of: geo.frame(in: .global)) { newValue in
+                                            if scrollViewOffsets.0 <= newValue.maxY {
+                                                print("TOP")
+                                            }
+                                        }
+                                }
+                                .frame(height: 0) // 빈 공간 차지 방지
+                                VStack(spacing: calendarSpacing) {
+                                    ForEach(Array(zip(viewModel.calendarData.indices, viewModel.calendarData)), id: \.0) { idx, week in
+                                        HStack(spacing: 0) {
+                                            ForEach(week, id: \.self) { date in
+                                                Spacer()
+                                                    .background(
+                                                        GeometryReader { geo in
+                                                            Color.clear.onAppear {
+                                                                calendarSpacing = geo.size.width
+                                                            }
                                                         }
+                                                    )
+                                                ZStack {
+                                                    if viewModel.isSameDate(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                                                        RoundedRectangle(cornerRadius: 8)
+                                                            .fill(
+                                                                Color.gray.opacity(0.5)
+                                                            )
+                                                            .frame(width: screenWidth / 10, height: screenWidth / 10)
+                                                            .transition(.asymmetric(
+                                                                insertion: .move(edge: wasPast ? .leading : .trailing).combined(with: .opacity),
+                                                                removal: .identity
+                                                            ))
                                                     }
-                                                )
-                                            ZStack {
-                                                if viewModel.isSameDate(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .fill(
-                                                            Color.gray.opacity(0.5)
-                                                        )
+                                                    
+                                                    if viewModel.isSameDate(date1: date, date2: Date(), components: [.year, .month, .day]) {
+                                                        RoundedRectangle(cornerRadius: 8)
+                                                            .fill(Color.pink)
+                                                            .frame(width: screenWidth / 12, height: screenWidth / 12)
+                                                    }
+                                                    
+                                                    Text(viewModel.dateString(date: date, component: .day))
+                                                        .font(.subheadline)
+                                                        .foregroundStyle(viewModel.setDayForegroundColor(date: date, colorScheme: colorScheme))
                                                         .frame(width: screenWidth / 10, height: screenWidth / 10)
-                                                        .transition(.asymmetric(
-                                                            insertion: .move(edge: wasPast ? .leading : .trailing).combined(with: .opacity),
-                                                            removal: .identity
-                                                        ))
                                                 }
-
-                                                if viewModel.isSameDate(date1: date, date2: Date(), components: [.year, .month, .day]) {
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .fill(Color.pink)
-                                                        .frame(width: screenWidth / 12, height: screenWidth / 12)
+                                                .onTapGesture {
+                                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                                        wasPast = viewModel.selectDate < date
+                                                        viewModel.selectDate = date
+                                                    }
                                                 }
-
-                                                Text(viewModel.dateString(date: date, component: .day))
-                                                    .font(.subheadline)
-                                                    .foregroundStyle(viewModel.setDayForegroundColor(date: date, colorScheme: colorScheme))
-                                                    .frame(width: screenWidth / 10, height: screenWidth / 10)
-                                            }
-                                            .onTapGesture {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    wasPast = viewModel.selectDate < date
-                                                    viewModel.selectDate = date
-                                                }
-                                            }
-                                            Spacer()
-                                        }
-                                    }
-                                    .id(idx)
-                                    .background(
-                                        GeometryReader { geometry in
-                                            Color.clear.onAppear {
-                                                daysHeight = geometry.size.height
+                                                Spacer()
                                             }
                                         }
-                                    )
-                                }
-                            }
-                        }
-                        .opacity(isLoading ? 0 : 1)
-                        .onChange(of: showCalendar) { toggleOn in
-                            if toggleOn {
-                                viewModel.setCalendarData(date: viewModel.today)
-                                isLoading = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                    if let idx = viewModel.findFirstDayofMonthIndex(date: viewModel.today) {
-                                        proxy.scrollTo(idx, anchor: .top)
+                                        .id(idx)
+                                        .background(
+                                            GeometryReader { geo in
+                                                Color.clear.onAppear {
+                                                    daysHeight = geo.size.height
+                                                }
+                                            }
+                                        )
                                     }
-                                    isLoading = false
                                 }
-                            }
-                        }
-                        .onChange(of: viewModel.selectDate) { newDate in
-                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.currentDate, components: [.year, .month]) {
-                                isScrolling = true; isLoading = true
-                                var stdIndex = 0
-                                if viewModel.isSameDate(date1: newDate, date2: viewModel.today, components: [.year, .month, .day]) {
-                                    stdIndex = viewModel.setCalendarData(date: viewModel.date(byAdding: .month, value: wasPast ? -1 : 1, to: newDate)!)
-                                }
-                                else {
-                                    stdIndex = viewModel.setCalendarData(date: newDate)
-                                }
-                                viewModel.currentDate = newDate
                                 
-                                DispatchQueue.main.async {
-                                    proxy.scrollTo(stdIndex, anchor: .top)
-                                    isLoading = false
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
-                                            withAnimation(.easeInOut) {
-                                                proxy.scrollTo(newIndex, anchor: .top)
+                                GeometryReader { geo in
+                                    Color.clear
+                                        .onChange(of: geo.frame(in: .global)) { newValue in
+                                            if scrollViewOffsets.1 >= newValue.minY {
+                                                print("BOTTOM")
+                                            }
+                                        }
+                                }
+                                .frame(height: 0) // 빈 공간 차지 방지
+                            }
+                            .opacity(isLoading ? 0 : 1)
+                            .onChange(of: showCalendar) { toggleOn in
+                                if toggleOn {
+                                    viewModel.setCalendarData(date: viewModel.today)
+                                    isLoading = true
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                        if let idx = viewModel.findFirstDayofMonthIndex(date: viewModel.today) {
+                                            proxy.scrollTo(idx, anchor: .top)
+                                        }
+                                        isLoading = false
+                                    }
+                                    scrollViewOffsets = (geometry.frame(in: .global).minY, geometry.frame(in: .global).maxY)
+                                    print(scrollViewOffsets)
+                                }
+                            }
+                            .onChange(of: viewModel.selectDate) { newDate in
+                                if !viewModel.isSameDate(date1: newDate, date2: viewModel.currentDate, components: [.year, .month]) {
+                                    isScrolling = true; isLoading = true
+                                    var stdIndex = 0
+                                    if viewModel.isSameDate(date1: newDate, date2: viewModel.today, components: [.year, .month, .day]) {
+                                        stdIndex = viewModel.setCalendarData(date: viewModel.date(byAdding: .month, value: wasPast ? -1 : 1, to: newDate)!)
+                                    }
+                                    else {
+                                        stdIndex = viewModel.setCalendarData(date: newDate)
+                                    }
+                                    viewModel.currentDate = newDate
+                                    
+                                    DispatchQueue.main.async {
+                                        proxy.scrollTo(stdIndex, anchor: .top)
+                                        isLoading = false
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
+                                                withAnimation(.easeInOut) {
+                                                    proxy.scrollTo(newIndex, anchor: .top)
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    isScrolling = false
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        isScrolling = false
+                                    }
                                 }
                             }
+                            .allowsHitTesting(!isScrolling)
                         }
-                        .allowsHitTesting(!isScrolling)
-                        .simultaneousGesture(
-                            DragGesture()
-                                .onChanged { _ in
-
-                                }
-                                .onEnded { _ in
-                                    isScrolling = false
-                                }
-                        )
                     }
                 }
                 .frame(height: showCalendar ? weekHeight + daysHeight * 6 + calendarSpacing * 5 + 16 : 0, alignment: .top)
