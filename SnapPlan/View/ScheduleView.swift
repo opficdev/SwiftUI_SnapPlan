@@ -22,6 +22,7 @@ struct ScheduleView: View {
             let calendarData = viewModel.calendarData.flatMap {$0}
             HStack(spacing: 0) {
                 Text(is12TimeFmt ? "12시간제" : "24시간제")
+                    .frame(width: screenWidth / 7)
                     .font(.caption)
                     .onTapGesture {
                         is12TimeFmt.toggle()
