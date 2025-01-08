@@ -2,8 +2,20 @@
 
 **기존 캘린더에 사진, 위치 정보를 포함한 지도, 음성 메모까지 추가할 수 있는 캘린더 확장판**
 
-<img align="center" width="40%" height="auto" src="./Preview/main_light.png">
-<img align="center" width="40%" height="auto" src="./Preview/main_dark.png">
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img width="40%" height="auto" src="./Preview/main_light.png">
+        <p><strong>라이트 모드</strong></p>
+      </td>
+      <td align="center">
+        <img width="40%" height="auto" src="./Preview/main_dark.png">
+        <p><strong>다크 모드</strong></p>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ----
 
