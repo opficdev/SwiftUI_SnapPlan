@@ -175,9 +175,6 @@ struct CalendarView: View {
                                     isLoading = false
                                 }
                             }
-                            else {
-                                viewModel.calendarData.removeAll()
-                            }
                         }
                         .onChange(of: viewModel.selectDate) { newDate in
                             if !viewModel.isSameDate(date1: newDate, date2: viewModel.currentDate, components: [.year, .month]) {
@@ -196,7 +193,7 @@ struct CalendarView: View {
                                     isLoading = false
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                         if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
-                                                withAnimation(.easeInOut) {
+                                            withAnimation(.easeInOut) {
                                                 proxy.scrollTo(newIndex, anchor: .top)
                                             }
                                         }
