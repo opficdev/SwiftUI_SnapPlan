@@ -18,6 +18,7 @@ struct ScheduleView: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            let calendarData = viewModel.calendarData.flatMap {$0}
             HStack(spacing: 0) {
                 Text(is12TimeFmt ? "12시간제" : "24시간제")
                     .font(.caption)
@@ -27,17 +28,40 @@ struct ScheduleView: View {
                 ScrollViewReader { proxy in
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 0) {
-                            ForEach(viewModel.calendarData.flatMap {$0}, id: \.self) { day in
+                            ForEach(Array(zip(calendarData.indices, calendarData)), id: \.0) { idx, date in
                                 HStack {
-                                    Text(viewModel.dateString(date: day, component: .day))
-                                    Text("(\(viewModel.dateString(date: day, component: .weekday)))")
+                                    Text(viewModel.dateString(date: date, component: .day))
+                                    ZStack {
+                                        if viewModel.isSameDate(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(
+                                                    Color.pink
+                                                )
+                                                .frame(width: screenWidth / 10, height: screenWidth / 10)
+                                        }
+
+                                        if viewModel.isSameDate(date1: date, date2: Date(), components: [.year, .month, .day]) {
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(Color.pink)
+                                                .frame(width: screenWidth / 12, height: screenWidth / 12)
+                                        }
+                                        Text("\(DateFormatter.krWeekDay.string(from: date))")
+                                    }
                                 }
+                                .id(idx)
                             }
                             .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
                         }
                     }
                     .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
-                    .disabled(true)
+                    .onAppear {
+                        let index = calendarData.firstIndex(where: { viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) })!
+                        proxy.scrollTo(index, anchor: .center)
+                    }
+                    .onChange(of: viewModel.selectDate) { value in
+                        
+                    }
+//                    .disabled(true)
                 }
             }
             .background(Color.gray.opacity(0.1))
@@ -71,7 +95,7 @@ struct ScheduleView: View {
                     ScrollViewReader { proxy in
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 0) {
-                                ForEach(viewModel.calendarData.flatMap {$0}, id: \.self) { day in
+                                ForEach(Array(zip(calendarData.indices, calendarData)), id: \.0) { idx, date in
                                     VStack(spacing: gap) {
                                         ForEach(1...24, id: \.self) { index in
                                             ZStack {
@@ -81,10 +105,15 @@ struct ScheduleView: View {
                                             .frame(height: timeZoneSize.height)
                                         }
                                     }
+                                    .id(idx)
                                 }
                                 .border(Color.black)
                                 .frame(width: screenWidth - timeZoneSize.width)
                             }
+                        }
+                        .onAppear {
+                            let index = calendarData.firstIndex(where: { viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) })!
+                            proxy.scrollTo(index, anchor: .center)
                         }
                         .border(Color.black)
                     }
