@@ -26,9 +26,18 @@ struct ScheduleView: View {
                     }
                 ScrollViewReader { proxy in
                     ScrollView(.horizontal, showsIndicators: false) {
-                        
+                        HStack(spacing: 0) {
+                            ForEach(viewModel.calendarData.flatMap {$0}, id: \.self) { day in
+                                HStack {
+                                    Text(viewModel.dateString(date: day, component: .day))
+                                    Text("(\(viewModel.dateString(date: day, component: .weekday)))")
+                                }
+                            }
+                            .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
+                        }
                     }
                     .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
+                    .disabled(true)
                 }
             }
             .background(Color.gray.opacity(0.1))
