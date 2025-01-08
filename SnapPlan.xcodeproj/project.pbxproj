@@ -12,10 +12,12 @@
 		DF6B54FE2D23998D006BB54A /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = DF6B54FD2D23998D006BB54A /* FirebaseDatabase */; };
 		DF6B55012D2399A3006BB54A /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = DF6B55002D2399A3006BB54A /* GoogleSignIn */; };
 		DF6B55032D2399A3006BB54A /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = DF6B55022D2399A3006BB54A /* GoogleSignInSwift */; };
+		DF9A76A62D2ED2BC00D1CAF4 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DF9A76A52D2ED2BC00D1CAF4 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		DF4F8AF52D228F2700ACA504 /* SnapPlan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapPlan.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF9A76A52D2ED2BC00D1CAF4 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -35,6 +37,11 @@
 				DF4F8B1A2D23944700ACA504 /* Exceptions for "SnapPlan" folder in "SnapPlan" target */,
 			);
 			path = SnapPlan;
+			sourceTree = "<group>";
+		};
+		DF9A76D32D2ED37F00D1CAF4 /* Preview */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Preview;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -58,6 +65,8 @@
 		DF4F8AEC2D228F2700ACA504 = {
 			isa = PBXGroup;
 			children = (
+				DF9A76D32D2ED37F00D1CAF4 /* Preview */,
+				DF9A76A52D2ED2BC00D1CAF4 /* README.md */,
 				DF4F8AF72D228F2700ACA504 /* SnapPlan */,
 				DF4F8AF62D228F2700ACA504 /* Products */,
 			);
@@ -88,6 +97,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				DF4F8AF72D228F2700ACA504 /* SnapPlan */,
+				DF9A76D32D2ED37F00D1CAF4 /* Preview */,
 			);
 			name = SnapPlan;
 			packageProductDependencies = (
@@ -144,6 +154,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF9A76A62D2ED2BC00D1CAF4 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
