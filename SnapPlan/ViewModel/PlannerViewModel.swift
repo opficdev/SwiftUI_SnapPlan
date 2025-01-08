@@ -170,18 +170,20 @@ final class PlannerViewModel: ObservableObject {
 }
 
 extension DateFormatter {
-    static let fmt = DateFormatter()
     static let krMonthFormatter: DateFormatter = {
+        let fmt = DateFormatter()
         fmt.dateFormat = "M월" // 한국어 형식의 월 포맷
         return fmt
     }()
     
     static let krMonthYearFormatter: DateFormatter = {
+        let fmt = DateFormatter()
         fmt.dateFormat = "yyyy년 M월" // 한국어 형식의 연월 포맷
         return fmt
     }()
     
     static let krWeekDay: DateFormatter = {
+        let fmt = DateFormatter()
         fmt.locale = Locale(identifier: "ko_KR")
         fmt.dateFormat = "E"
         return fmt
