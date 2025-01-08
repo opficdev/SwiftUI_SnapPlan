@@ -15,6 +15,7 @@ struct ScheduleView: View {
     @State private var is12TimeFmt = true  //  후에 firebase에 저장 및 가져와야함
     @State private var timeZoneSize = CGSizeZero
     @State private var gap: CGFloat = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
+    @State private var scrollOffset = CGFloat.zero
     
     var body: some View {
         VStack(spacing: 0) {
@@ -48,16 +49,10 @@ struct ScheduleView: View {
                             }
                             .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
                         }
+                        .offset(x: -scrollOffset)
                     }
                     .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
-                    .onAppear {
-                        let index = calendarData.firstIndex(where: { viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) })!
-                        proxy.scrollTo(index, anchor: .center)
-                    }
-                    .onChange(of: viewModel.selectDate) { value in
-                        
-                    }
-//                    .disabled(true)
+                    .disabled(true)
                 }
             }
             .background(Color.gray.opacity(0.1))
@@ -106,11 +101,19 @@ struct ScheduleView: View {
                                 .border(Color.black)
                                 .frame(width: screenWidth - timeZoneSize.width)
                             }
+                            .background(GeometryReader {
+                                Color.clear.preference(key: SyncScrollViewKey.self,
+                                                       value: -$0.frame(in: .named("timeScroll")).origin.x)
+                            })
+                            .onPreferenceChange(SyncScrollViewKey.self) { value in
+                                scrollOffset = value
+                            }
                         }
                         .onAppear {
                             let index = calendarData.firstIndex(where: { viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) })!
                             proxy.scrollTo(index, anchor: .center)
                         }
+                        .coordinateSpace(name: "timeScroll")
                         .border(Color.black)
                     }
                 }
