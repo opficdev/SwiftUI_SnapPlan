@@ -17,7 +17,8 @@ final class PlannerViewModel: ObservableObject {
     
     init() {
         startTimer()
-        setCalendarData(date: today)
+//        setCalendarData(date: today)
+        calendarData = calendarDates(date: today)
     }
     
     private var timerCancellable: AnyCancellable?
