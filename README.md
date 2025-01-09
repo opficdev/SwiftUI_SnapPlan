@@ -4,11 +4,11 @@
 
 <table>
   <tr>
-    <td align="left" width="200px">
+    <td align="center" width="200px">
       <img src="./Preview/main_light.png" width="200px">
       <p><strong>라이트 모드</strong></p>
     </td>
-    <td align="left" width="200px">
+    <td align="center" width="200px">
       <img src="./Preview/main_dark.png" width="200px">
       <p><strong>다크 모드</strong></p>
     </td>
