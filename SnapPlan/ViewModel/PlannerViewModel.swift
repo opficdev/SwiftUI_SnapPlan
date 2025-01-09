@@ -13,11 +13,11 @@ final class PlannerViewModel: ObservableObject {
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
     @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
     @Published var lastDate = Date()    //  selectDate()의 과거형
-    @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들
+    @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 로 수정 예정
     
     init() {
         startTimer()
-        setCalendarData(date: selectDate)
+        setCalendarData(date: today)
     }
     
     private var timerCancellable: AnyCancellable?
@@ -73,9 +73,7 @@ final class PlannerViewModel: ObservableObject {
         return calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: firstDateOfMonth) }}
     }
     
-    @discardableResult
-    func setCalendarData(date: Date) -> Int {
-        let tmp = calendarData
+    func setCalendarData(date: Date) {
         let lastMonth = calendar.date(byAdding: .month, value: -1, to: date)!
         let nextMonth = calendar.date(byAdding: .month, value: 1, to: date)!
         
@@ -83,10 +81,14 @@ final class PlannerViewModel: ObservableObject {
             guard let lhsFirst = lhs.first, let rhsFirst = rhs.first else { return false }
             return lhsFirst < rhsFirst
         }
-        if tmp.isEmpty {
-            return 0
-        }
-        return tmp[0][0] < calendarData[0][0] ? 0 : calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: date) }}!
+        
+        let index = findFirstDayofMonthIndex(date: date)!   //  이번달의 첫 날짜 인덱스
+        
+        let lastMonthData: [Date] = Array(calendarData[..<index].joined())
+        let thisMonthData: [Date] = Array(calendarData[index..<(index + 6)].joined())
+        let nextMonthData: [Date] = Array(calendarData[(index + 6)...].joined())
+        
+        calendarData = [lastMonthData] + [thisMonthData] + [nextMonthData]
     }
     
     func dateString(date: Date, component: Calendar.Component) -> String {
