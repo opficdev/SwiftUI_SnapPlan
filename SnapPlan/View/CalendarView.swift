@@ -13,15 +13,10 @@ struct CalendarView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var scrollId = (0,5) //  캘린더에 보여지는 최소, 최대 id
     @State private var calendarSpacing: CGFloat = 0  //  캘린더 행 간의 간격
-    @State private var weekHeight: CGFloat = 0  //  요일 보여주는 부분의 height
-    @State private var daysHeight: CGFloat = 0  //  날짜 보여주는 부분의 height
-    @State private var showCalendar = false // 전체 달력을 보여줄지 여부
+    @State private var daysHeight = CGFloat.zero  //  날짜 보여주는 부분의 height
+    @State private var showCalendar = true // 전체 달력을 보여줄지 여부
     @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
-    @State private var isScrolling = false
-    @State private var isLoading = false
-    @State private var scrollOffset = CGFloat.zero
-    @State private var baseOffset = CGFloat.zero
-    @State private var scrollViewOffsets = (CGFloat.zero, CGFloat.zero)
+
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -89,104 +84,55 @@ struct CalendarView: View {
                 }
                 .padding(.horizontal)
                 
-                VStack(spacing: 0) {
-                    HStack {
-                        ForEach(viewModel.daysOfWeek, id: \.self) { day in
-                            Spacer()
-                            Text(day)
-                                .foregroundStyle(Color.gray)
-                                .font(.caption)
-                            Spacer()
-                        }
-                    }
-                    .background(
-                        GeometryReader { geometry in
-                            Color.clear.onAppear {
-                                weekHeight = geometry.size.height
+                if showCalendar {
+                    VStack(spacing: 0) {
+                        HStack {
+                            ForEach(viewModel.daysOfWeek, id: \.self) { day in
+                                Spacer()
+                                Text(day)
+                                    .foregroundStyle(Color.gray)
+                                    .font(.caption)
+                                Spacer()
                             }
                         }
-                    )
-                    .padding(.vertical, 8)
-                    
-                    ScrollViewReader { proxy in
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: calendarSpacing) {
-                                ForEach(Array(zip(viewModel.calendarData.indices, viewModel.calendarData)), id: \.0) { idx, week in
-                                    HStack(spacing: 0) {
-                                        ForEach(week, id: \.self) { date in
-                                            Spacer()
-                                                .background(
-                                                    GeometryReader { geo in
-                                                        Color.clear.onAppear {
-                                                            calendarSpacing = geo.size.width
-                                                        }
-                                                    }
-                                                )
-                                            CalendarCell(date: date, wasPast: $wasPast)
-                                                .environmentObject(viewModel)
-                                            Spacer()
-                                        }
-                                    }
-                                    .id(idx)
-                                    .background(
-                                        GeometryReader { geo in
-                                            Color.clear.onAppear {
-                                                daysHeight = geo.size.height
-                                            }
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                        .opacity(isLoading ? 0 : 1)
-                        .onChange(of: showCalendar) { toggleOn in
-                            if toggleOn {
-                                viewModel.setCalendarData(date: viewModel.today)
-                                isLoading = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                    if let idx = viewModel.findFirstDayofMonthIndex(date: viewModel.today) {
-                                        proxy.scrollTo(idx, anchor: .top)
-                                    }
-                                    isLoading = false
-                                }
-                            }
-                        }
-                        .onChange(of: viewModel.selectDate) { newDate in
-                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.currentDate, components: [.year, .month]) {
-                                isScrolling = true; isLoading = true
-                                var stdIndex = 0
-                                if viewModel.isSameDate(date1: newDate, date2: viewModel.today, components: [.year, .month, .day]) {
-                                    stdIndex = viewModel.setCalendarData(date: viewModel.date(byAdding: .month, value: wasPast ? -1 : 1, to: newDate)!)
-                                }
-                                else {
-                                    stdIndex = viewModel.setCalendarData(date: newDate)
-                                }
-                                viewModel.currentDate = newDate
-                                
-                                DispatchQueue.main.async {
-                                    proxy.scrollTo(stdIndex, anchor: .top)
-                                    isLoading = false
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        if let newIndex = viewModel.findFirstDayofMonthIndex(date: newDate) {
-                                            withAnimation(.easeInOut) {
-                                                proxy.scrollTo(newIndex, anchor: .top)
-                                            }
-                                        }
-                                    }
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    isScrolling = false
-                                }
-                            }
-                        }
-                        .allowsHitTesting(!isScrolling)
+                        .padding(.vertical, 8)
                         
+                        ScrollViewReader { proxy in
+                            ScrollView(showsIndicators: false) {
+                                LazyVStack(spacing: 0) {
+                                    let calendarData = viewModel.calendarData
+                                    ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { index, month in
+                                        CalendarGrid(
+                                            wasPast: $wasPast,
+                                            monthData: month
+                                        )
+                                        .environmentObject(viewModel)
+                                        .id(index)
+                                        .onAppear {
+                                            if calendarData.count == 1 {
+                                                viewModel.setCalendarData(date: viewModel.today)
+                                                DispatchQueue.main.async {
+                                                    proxy.scrollTo(1, anchor: .top)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .background(
+                                    GeometryReader { geometry in
+                                        Color.clear.onAppear {
+                                            if daysHeight == CGFloat.zero {
+                                                daysHeight = geometry.size.height
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+                            .frame(height: daysHeight, alignment: .top)     //  .top으로 정렬해야 자연스러운 애니메이션
+//                            .allowsHitTesting(!isScrolling)
+                        }
                     }
                 }
-                .frame(height: showCalendar ? weekHeight + daysHeight * 6 + calendarSpacing * 5 + 16 : 0, alignment: .top)
-                //  height 구조: 요일 HStack의 height and 위아래 패딩 + 각 열의 height * 6(캘린더가 6행임) + 행 사이의 spacing(5개)
-                //  .top으로 정렬해야 자연스러운 애니메이션
-                .clipped()
             }
             .background(Color.calendarBackground)
         }
