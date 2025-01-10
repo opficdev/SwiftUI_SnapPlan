@@ -18,7 +18,7 @@ final class PlannerViewModel: ObservableObject {
     init() {
         startTimer()
 //        setCalendarData(date: today)
-        calendarData = [Array(calendarDates(date: today).joined())]
+        calendarData = [Array(calendarDates(date: today))]
     }
     
     private var timerCancellable: AnyCancellable?
@@ -69,23 +69,17 @@ final class PlannerViewModel: ObservableObject {
         return calendar.date(byAdding: byAdding, value: value, to: to)
     }
     
+    func setCalendarData(date from: Date) {
+        var data = [[Date]]()
+        
+        let lastMonthDay = calendar.date(byAdding: .month, value: -1, to: from)!
+        let nextMonthDay = calendar.date(byAdding: .month, value: 1, to: from)!
+        
+        data.append(calendarDates(date: lastMonthDay))
+        data.append(calendarDates(date: from))
+        data.append(calendarDates(date: nextMonthDay))
 
-    
-    func setCalendarData(date: Date) {
-        var tmpData = [[Date]]()
-        let lastYearMonth = calendar.date(byAdding: .month, value: -6, to: date)!   // 6개월 전
-        
-        for i in 0..<12 {
-            let month = calendar.date(byAdding: .month, value: i, to: lastYearMonth)!
-            tmpData.append(calendarDates(date: month).flatMap { $0 })
-        }
-        
-        calendarData = Array(Set(tmpData)).sorted { lhs, rhs in
-            guard let lhsFirst = lhs.first, let rhsFirst = rhs.first else { return false }
-            return lhsFirst < rhsFirst
-        }
-        
-        
+        calendarData = data
     }
     
     func dateString(date: Date, component: Calendar.Component) -> String {
@@ -113,18 +107,18 @@ final class PlannerViewModel: ObservableObject {
         return colorScheme == .light ? Color.black : Color.white
     }
     
-    func calendarDates(date: Date) -> [[Date]] {
+    func calendarDates(date: Date) -> [Date] {
         var dates: [[Date]] = []
 
         // 이번 달의 첫 번째 날짜와 마지막 날짜 계산
         guard let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date)),
-              let range = calendar.range(of: .day, in: .month, for: date) else { return dates }
+              let range = calendar.range(of: .day, in: .month, for: date) else { return Array(dates.joined()) }
         
         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth) - 1
         
         // 이전 달의 날짜들 계산
         if let previousMonth = calendar.date(byAdding: .month, value: -1, to: firstDayOfMonth),
-            let previousMonthRange = calendar.range(of: .day, in: .month, for: previousMonth) {
+           let previousMonthRange = calendar.range(of: .day, in: .month, for: previousMonth) {
             let previousMonthDays = Array(previousMonthRange.suffix(firstWeekday))
             var firstWeek: [Date] = []
             for day in previousMonthDays {
@@ -144,9 +138,8 @@ final class PlannerViewModel: ObservableObject {
             dates[dates.count - 1].append(calendar.date(byAdding: .day, value: day - 1, to: firstDayOfMonth)!)
         }
 
-        // 다음 달의 날짜들 추가 
-        var remainingDays = 49 - dates.flatMap { $0 } .count
-        if remainingDays >= 7 { remainingDays -= 7 }
+        // 다음 달의 날짜들 추가
+        let remainingDays = 42 - dates.flatMap { $0 }.count
         if remainingDays > 0, let nextMonth = calendar.date(byAdding: .month, value: 1, to: firstDayOfMonth){
             for day in 1...remainingDays {
                 if dates.last!.count == 7 {
@@ -155,8 +148,8 @@ final class PlannerViewModel: ObservableObject {
                 dates[dates.count - 1].append(calendar.date(byAdding: .day, value: day - 1, to: nextMonth)!)
             }
         }
-
-        return dates
+        
+        return Array(dates.joined())
     }
     
     deinit {
