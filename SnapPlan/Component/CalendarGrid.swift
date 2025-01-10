@@ -19,7 +19,7 @@ struct CalendarGrid: View {
     }
         
     var body: some View {
-        VStack(spacing: 0) {
+        LazyVStack(spacing: 0) {
             ForEach(0..<monthData.count / 7, id: \.self) { col in
                 HStack {
                     ForEach(0..<7) { row in
