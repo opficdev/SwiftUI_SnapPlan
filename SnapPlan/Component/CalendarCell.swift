@@ -48,7 +48,6 @@ struct CalendarCell: View {
             withAnimation(.easeInOut(duration: 0.2)) {
                 wasPast = viewModel.selectDate < date
                 viewModel.selectDate = date
-                viewModel.currentDate = date
             }
         }
     }
