@@ -117,7 +117,6 @@ struct CalendarView: View {
                             .onChange(of: viewModel.selectDate) { newDate in
                                 let lastMonth = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
                                 let nextMonth = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
-                                print(lastMonth, nextMonth, newDate)
                                 
                                 if viewModel.isSameDate(date1: lastMonth, date2: newDate, components: [.year, .month]) {
                                     withAnimation {
@@ -133,7 +132,6 @@ struct CalendarView: View {
                         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                         .frame(height: daysHeight == 0 ? screenWidth : daysHeight)
                         .onAppear {
-                            viewModel.setCalendarData(date: viewModel.today)
                             selection = 1
                         }
                     }
