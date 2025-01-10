@@ -100,7 +100,7 @@ final class PlannerViewModel: ObservableObject {
         if isSameDate(date1: date, date2: today, components: [.year, .month, .day]) {
             return Color.white
         }
-        if !isSameDate(date1: date, date2: selectDate, components: [.year, .month]) {
+        if !isSameDate(date1: date, date2: currentDate, components: [.year, .month]) {
             return Color.gray
         }
         return colorScheme == .light ? Color.black : Color.white
