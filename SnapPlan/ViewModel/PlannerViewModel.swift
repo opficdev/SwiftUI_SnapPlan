@@ -69,27 +69,23 @@ final class PlannerViewModel: ObservableObject {
         return calendar.date(byAdding: byAdding, value: value, to: to)
     }
     
-    func findFirstDayofMonthIndex(date: Date) -> Int? {
-        let firstDateOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
-        return calendarData.firstIndex { $0.contains { calendar.isDate($0, inSameDayAs: firstDateOfMonth) }}
-    }
+
     
     func setCalendarData(date: Date) {
-        let lastMonth = calendar.date(byAdding: .month, value: -1, to: date)!
-        let nextMonth = calendar.date(byAdding: .month, value: 1, to: date)!
+        var tmpData = [[Date]]()
+        let lastYearMonth = calendar.date(byAdding: .month, value: -6, to: date)!   // 6개월 전
         
-        calendarData = Array(Set(calendarDates(date: lastMonth) + calendarDates(date: date) + calendarDates(date: nextMonth))).sorted { lhs, rhs in
+        for i in 0..<12 {
+            let month = calendar.date(byAdding: .month, value: i, to: lastYearMonth)!
+            tmpData.append(calendarDates(date: month).flatMap { $0 })
+        }
+        
+        calendarData = Array(Set(tmpData)).sorted { lhs, rhs in
             guard let lhsFirst = lhs.first, let rhsFirst = rhs.first else { return false }
             return lhsFirst < rhsFirst
         }
         
-        let index = findFirstDayofMonthIndex(date: date)!   //  이번달의 첫 날짜 인덱스
         
-        let lastMonthData: [Date] = Array(calendarData[..<index].joined())
-        let thisMonthData: [Date] = Array(calendarData[index..<(index + 6)].joined())
-        let nextMonthData: [Date] = Array(calendarData[(index + 6)...].joined())
-        
-        calendarData = [lastMonthData] + [thisMonthData] + [nextMonthData]
     }
     
     func dateString(date: Date, component: Calendar.Component) -> String {
