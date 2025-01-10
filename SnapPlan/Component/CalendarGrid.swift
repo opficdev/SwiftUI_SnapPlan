@@ -12,7 +12,6 @@ struct CalendarGrid: View {
     @Binding var wasPast: Bool  //  이전 날짜인지 확인
     @State private var monthData: [Date]
     let screenWidth = UIScreen.main.bounds.width
-    let columns = Array(repeating: GridItem(.flexible()), count: 7)
     
     init(wasPast: Binding<Bool>, monthData: [Date]) {
         self._monthData = State(initialValue: monthData)
@@ -20,10 +19,16 @@ struct CalendarGrid: View {
     }
         
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 0) {
-            ForEach(monthData, id: \.self) { date in
-                CalendarCell(date: date, wasPast: $wasPast)
-                    .environmentObject(viewModel)
+        LazyVStack(spacing: 0) {
+            ForEach(0..<monthData.count / 7, id: \.self) { col in
+                HStack {
+                    ForEach(0..<7) { row in
+                        Spacer()
+                        CalendarCell(date: monthData[col * 7 + row], wasPast: $wasPast)
+                            .environmentObject(viewModel)
+                        Spacer()
+                    }
+                }
             }
         }
     }
