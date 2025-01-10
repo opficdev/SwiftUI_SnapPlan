@@ -7,15 +7,15 @@
 
 import Foundation
 import SwiftUI
+import SwiftUIIntrospect
 
 struct CalendarView: View {
     @EnvironmentObject private var viewModel: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
-    @State private var scrollId = (0,5) //  캘린더에 보여지는 최소, 최대 id
-    @State private var calendarSpacing: CGFloat = 0  //  캘린더 행 간의 간격
     @State private var daysHeight = CGFloat.zero  //  날짜 보여주는 부분의 height
-    @State private var showCalendar = true // 전체 달력을 보여줄지 여부
+    @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
+    @State private var selection = 1  //  선택된 달력의 tag
 
     
     let screenWidth = UIScreen.main.bounds.width
@@ -77,6 +77,7 @@ struct CalendarView: View {
                                     withAnimation {
                                         wasPast = viewModel.selectDate < viewModel.today
                                         viewModel.selectDate = viewModel.today
+                                        selection = 0
                                     }
                                 }
                             }
@@ -97,39 +98,43 @@ struct CalendarView: View {
                         }
                         .padding(.vertical, 8)
                         
-                        ScrollViewReader { proxy in
-                            ScrollView(showsIndicators: false) {
-                                LazyVStack(spacing: 0) {
-                                    let calendarData = viewModel.calendarData
-                                    ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { index, month in
-                                        CalendarGrid(
-                                            wasPast: $wasPast,
-                                            monthData: month
-                                        )
-                                        .environmentObject(viewModel)
-                                        .id(index)
-                                        .onAppear {
-                                            if calendarData.count == 1 {
-                                                viewModel.setCalendarData(date: viewModel.today)
-                                                DispatchQueue.main.async {
-                                                    proxy.scrollTo(1, anchor: .top)
-                                                }
-                                            }
+                        TabView(selection: $selection) {
+                            let calendarData = viewModel.calendarData
+                            ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, month in
+                                CalendarGrid(monthData: month, wasPast: $wasPast)
+                                    .environmentObject(viewModel)
+                                    .tag(idx)
+                            }
+                            .background(
+                                GeometryReader { geometry in
+                                    Color.clear.onAppear {
+                                        if daysHeight == 0 {
+                                            daysHeight = geometry.size.height
                                         }
                                     }
                                 }
-                                .background(
-                                    GeometryReader { geometry in
-                                        Color.clear.onAppear {
-                                            if daysHeight == CGFloat.zero {
-                                                daysHeight = geometry.size.height
-                                            }
-                                        }
+                            )
+                            .onChange(of: viewModel.selectDate) { newDate in
+                                let lastMonth = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
+                                let nextMonth = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
+                                print(lastMonth, nextMonth, newDate)
+                                
+                                if viewModel.isSameDate(date1: lastMonth, date2: newDate, components: [.year, .month]) {
+                                    withAnimation {
+                                        selection = 0
                                     }
-                                )
+                                }
+                                else if viewModel.isSameDate(date1: nextMonth, date2: newDate, components: [.year, .month]) {
+                                    selection = 2
+                                }
+                                viewModel.currentDate = newDate
                             }
-                            .frame(height: daysHeight, alignment: .top)     //  .top으로 정렬해야 자연스러운 애니메이션
-//                            .allowsHitTesting(!isScrolling)
+                        }
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                        .frame(height: daysHeight == 0 ? screenWidth : daysHeight)
+                        .onAppear {
+                            viewModel.setCalendarData(date: viewModel.today)
+                            selection = 1
                         }
                     }
                 }
