@@ -77,7 +77,7 @@ struct CalendarView: View {
                                     withAnimation {
                                         wasPast = viewModel.selectDate < viewModel.today
                                         viewModel.selectDate = viewModel.today
-                                        selection = 0
+                                        selection = 1
                                     }
                                 }
                             }
@@ -104,6 +104,7 @@ struct CalendarView: View {
                                 CalendarGrid(monthData: month, wasPast: $wasPast)
                                     .environmentObject(viewModel)
                                     .tag(idx)
+                                    
                             }
                             .background(
                                 GeometryReader { geometry in
@@ -119,14 +120,28 @@ struct CalendarView: View {
                                 let nextMonth = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
                                 
                                 if viewModel.isSameDate(date1: lastMonth, date2: newDate, components: [.year, .month]) {
-                                    withAnimation {
-                                        selection = 0
-                                    }
+                                    selection = 0
                                 }
                                 else if viewModel.isSameDate(date1: nextMonth, date2: newDate, components: [.year, .month]) {
                                     selection = 2
                                 }
                                 viewModel.currentDate = newDate
+                            }
+                            .onChange(of: selection) { value in
+                                var switchDate = viewModel.currentDate
+                                if value == 0 {
+                                    switchDate = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
+                                }
+                                else if value == 2 {
+                                    switchDate = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
+                                }
+                                if switchDate != viewModel.currentDate {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        viewModel.setCalendarData(date: switchDate)
+                                    }
+                                    selection = 1
+                                    viewModel.currentDate = switchDate
+                                }
                             }
                         }
                         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
