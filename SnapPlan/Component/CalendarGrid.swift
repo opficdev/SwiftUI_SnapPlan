@@ -13,13 +13,13 @@ struct CalendarGrid: View {
     @State private var monthData: [Date]
     let screenWidth = UIScreen.main.bounds.width
     
-    init(wasPast: Binding<Bool>, monthData: [Date]) {
+    init(monthData: [Date], wasPast: Binding<Bool>) {
         self._monthData = State(initialValue: monthData)
         self._wasPast = wasPast
     }
         
     var body: some View {
-        LazyVStack(spacing: 0) {
+        VStack(spacing: 0) {
             ForEach(0..<monthData.count / 7, id: \.self) { col in
                 HStack {
                     ForEach(0..<7) { row in
@@ -36,8 +36,8 @@ struct CalendarGrid: View {
 
 #Preview {
     CalendarGrid(
-        wasPast: .constant(false),
-        monthData: PlannerViewModel().calendarData[1]
+        monthData: PlannerViewModel().calendarData[1],
+        wasPast: .constant(false)
     )
     .environmentObject(PlannerViewModel())
 }
