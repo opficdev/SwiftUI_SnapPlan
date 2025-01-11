@@ -84,7 +84,7 @@ struct CalendarView: View {
             .padding(.horizontal)
             
             if showCalendar {
-                LazyVStack(spacing: 0) {
+                VStack(spacing: 0) {
                     HStack {
                         ForEach(viewModel.daysOfWeek, id: \.self) { day in
                             Spacer()
@@ -102,7 +102,26 @@ struct CalendarView: View {
                             CalendarGrid(monthData: month, wasPast: $wasPast)
                                 .environmentObject(viewModel)
                                 .tag(idx)
-                                
+                                .onAppear {
+                                    
+                                }
+                                .onDisappear {
+                                    if selection == 0 {
+                                        let lastDate = viewModel.date(byAdding: .month, value: -2, to: viewModel.currentDate)!
+                                        let lastMonth = viewModel.calendarDates(date: lastDate)
+                                        viewModel.calendarData.insert(lastMonth, at: 0)
+                                        viewModel.calendarData.removeLast()
+                                        viewModel.currentDate = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
+                                    }
+                                    else if selection == 2 {
+                                        let nextDate = viewModel.date(byAdding: .month, value: 2, to: viewModel.currentDate)!
+                                        let nextMonth = viewModel.calendarDates(date: nextDate)
+                                        viewModel.calendarData.append(nextMonth)
+                                        viewModel.calendarData.removeFirst()
+                                        viewModel.currentDate = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
+                                    }
+                                    selection = 1
+                                }
                         }
                         .background(
                             GeometryReader { geometry in
@@ -115,35 +134,16 @@ struct CalendarView: View {
                         )
                         .onChange(of: viewModel.selectDate) { newDate in
                             viewModel.currentDate = newDate
-                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.calendarData[1][15], components: [.year, .month]) {
-                                viewModel.setCalendarData(date: newDate)
-                            }
-                            DispatchQueue.main.async {
-                                selection = 1
-                            }
-                        }
-                        .onChange(of: selection) { value in
-                            if value == 0 {
-                                let lastDate = viewModel.date(byAdding: .month, value: -2, to: viewModel.currentDate)!
-                                let lastMonth = viewModel.calendarDates(date: lastDate)
-                                viewModel.calendarData.insert(lastMonth, at: 0)
-                                viewModel.calendarData.removeLast()
-                                viewModel.currentDate = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
-                            }
-                            else if value == 2 {
-                                let nextDate = viewModel.date(byAdding: .month, value: 2, to: viewModel.currentDate)!
-                                let nextMonth = viewModel.calendarDates(date: nextDate)
-                                viewModel.calendarData.append(nextMonth)
-                                viewModel.calendarData.removeFirst()
-                                viewModel.currentDate = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
-                            }
+//                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.calendarData[1][15], components: [.year, .month]) {
+//                                viewModel.setCalendarData(date: newDate)
+//                            }
                             DispatchQueue.main.async {
                                 selection = 1
                             }
                         }
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                    .frame(height: daysHeight == 0 ? screenWidth : daysHeight)
+//                    .frame(height: daysHeight == 0 ? screenWidth : daysHeight)
                     .onAppear {
                         DispatchQueue.main.async {
                             selection = 1
