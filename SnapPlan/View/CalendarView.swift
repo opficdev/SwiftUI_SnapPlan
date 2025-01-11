@@ -114,33 +114,25 @@ struct CalendarView: View {
                             }
                         )
                         .onChange(of: viewModel.selectDate) { newDate in
-                            let lastMonth = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
-                            let nextMonth = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
-                            
-                            if viewModel.isSameDate(date1: lastMonth, date2: newDate, components: [.year, .month]) {
-                                selection = 0
-                            }
-                            else if viewModel.isSameDate(date1: nextMonth, date2: newDate, components: [.year, .month]) {
-                                selection = 2
-                            }
-                            viewModel.currentDate = newDate
+
                         }
                         .onChange(of: selection) { value in
-                            var switchDate = viewModel.currentDate
                             if value == 0 {
-                                switchDate = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
+                                let lastDate = viewModel.date(byAdding: .month, value: -2, to: viewModel.currentDate)!
+                                let lastMonth = viewModel.calendarDates(date: lastDate)
+                                viewModel.calendarData.insert(lastMonth, at: 0)
+                                viewModel.calendarData.removeLast()
+                                viewModel.currentDate = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
                             }
                             else if value == 2 {
-                                switchDate = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
+                                let nextDate = viewModel.date(byAdding: .month, value: 2, to: viewModel.currentDate)!
+                                let nextMonth = viewModel.calendarDates(date: nextDate)
+                                viewModel.calendarData.append(nextMonth)
+                                viewModel.calendarData.removeFirst()
+                                viewModel.currentDate = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
                             }
-                            if switchDate != viewModel.currentDate {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    
-                                }
-                                DispatchQueue.main.async {
-                                    selection = 1
-                                }
-                                viewModel.currentDate = switchDate
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                selection = 1
                             }
                         }
                     }
