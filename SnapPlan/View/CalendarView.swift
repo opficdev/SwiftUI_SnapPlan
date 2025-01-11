@@ -84,7 +84,7 @@ struct CalendarView: View {
             .padding(.horizontal)
             
             if showCalendar {
-                VStack(spacing: 0) {
+                LazyVStack(spacing: 0) {
                     HStack {
                         ForEach(viewModel.daysOfWeek, id: \.self) { day in
                             Spacer()
