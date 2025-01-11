@@ -12,7 +12,6 @@ final class PlannerViewModel: ObservableObject {
     @Published var today = Date()
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
     @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
-    @Published var lastDate = Date()    //  selectDate()의 과거형
     @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 로 수정 예정
     
     init() {
@@ -36,6 +35,10 @@ final class PlannerViewModel: ObservableObject {
             .sink { [weak self] _ in
                 self?.today = Date()
             }
+    }
+    
+    func getFirstDayOfMonth(date: Date) -> Date {
+        return calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
     }
     
     func getHours(is12hoursFmt: Bool) -> [TimeData] {
@@ -110,9 +113,12 @@ final class PlannerViewModel: ObservableObject {
         var dates: [[Date]] = []
 
         // 이번 달의 첫 번째 날짜와 마지막 날짜 계산
-        guard let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date)),
-              let range = calendar.range(of: .day, in: .month, for: date) else { return Array(dates.joined()) }
+//        guard let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date)),
+        guard let range = calendar.range(of: .day, in: .month, for: date) else {
+            return Array(dates.joined())
+        }
         
+        let firstDayOfMonth = getFirstDayOfMonth(date: date)
         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth) - 1
         
         // 이전 달의 날짜들 계산
