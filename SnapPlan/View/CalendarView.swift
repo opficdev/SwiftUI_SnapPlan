@@ -114,7 +114,13 @@ struct CalendarView: View {
                             }
                         )
                         .onChange(of: viewModel.selectDate) { newDate in
-
+                            viewModel.currentDate = newDate
+                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.calendarData[1][15], components: [.year, .month]) {
+                                viewModel.setCalendarData(date: newDate)
+                            }
+                            DispatchQueue.main.async {
+                                selection = 1
+                            }
                         }
                         .onChange(of: selection) { value in
                             if value == 0 {
@@ -131,7 +137,7 @@ struct CalendarView: View {
                                 viewModel.calendarData.removeFirst()
                                 viewModel.currentDate = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            DispatchQueue.main.async {
                                 selection = 1
                             }
                         }
