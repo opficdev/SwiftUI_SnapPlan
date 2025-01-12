@@ -102,9 +102,6 @@ struct CalendarView: View {
                             CalendarGrid(monthData: month, wasPast: $wasPast)
                                 .environmentObject(viewModel)
                                 .tag(idx)
-                                .onAppear {
-                                    
-                                }
                                 .onDisappear {
                                     if selection == 0 {
                                         let lastDate = viewModel.date(byAdding: .month, value: -2, to: viewModel.currentDate)!
@@ -134,12 +131,12 @@ struct CalendarView: View {
                         )
                         .onChange(of: viewModel.selectDate) { newDate in
                             viewModel.currentDate = newDate
-//                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.calendarData[1][15], components: [.year, .month]) {
-//                                viewModel.setCalendarData(date: newDate)
-//                            }
-                            DispatchQueue.main.async {
-                                selection = 1
+                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.calendarData[1][15], components: [.year, .month]) {
+                                viewModel.setCalendarData(date: newDate)
                             }
+//                            DispatchQueue.main.async {
+                                selection = 1
+//                            }
                         }
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
