@@ -67,6 +67,7 @@ struct ScheduleView: View {
                                     }
                                     .font(.caption)
                                     .padding(.trailing, 2)
+                                    .foregroundStyle(Color.gray)
                                 }
                                 .frame(width: screenWidth / 7, alignment: .trailing)
                                 .background(
