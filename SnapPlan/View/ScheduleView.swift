@@ -79,6 +79,9 @@ struct ScheduleView: View {
                                         }
                                     }
                                 )
+                                .onAppear {
+                                    
+                                }
                             }
                         }
                         .border(Color.gray.opacity(0.5))
@@ -96,6 +99,11 @@ struct ScheduleView: View {
                                     }
                                 }
                                 .tag(idx)
+                                .onAppear {
+                                    withAnimation {
+                                        viewModel.selectDate = date
+                                    }
+                                }
                             }
                             .border(Color.gray.opacity(0.5))
                             .frame(width: screenWidth - timeZoneSize.width)
