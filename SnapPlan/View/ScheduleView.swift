@@ -20,8 +20,8 @@ struct ScheduleView: View {
     var body: some View {
         ZStack {
             Color.scheduleBackground.ignoresSafeArea()
+            let calendarData = viewModel.calendarData[1]
             VStack(spacing: 0) {
-                let calendarData = viewModel.calendarData.flatMap {$0}
                 HStack(spacing: 0) {
                     Text(is12TimeFmt ? "12시간제" : "24시간제")
                         .frame(width: screenWidth / 7)
@@ -47,7 +47,7 @@ struct ScheduleView: View {
                                         .foregroundColor(Color.white)
                                 }
                             }
-                            .id(idx)
+                            .tag(idx)
                         }
                         .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
                     }
@@ -98,16 +98,17 @@ struct ScheduleView: View {
                             }
                             .border(Color.gray.opacity(0.5))
                             .frame(width: screenWidth - timeZoneSize.width)
-                            
-                        }
-                        .onAppear {
-                            selection = calendarData.firstIndex(where: { viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) })!
                         }
                         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                         .border(Color.gray.opacity(0.5))
                     }
                 }
             }
+            .onAppear {
+               selection = calendarData.firstIndex(where: {
+                   viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) }
+               )!
+           }
         }
     }
 }
