@@ -34,9 +34,8 @@ struct CalendarView: View {
                         .bold()
                     Image(systemName: "chevron.\(showCalendar ? "up" : "down")")
                         .foregroundStyle(
-                            Color.black.opacity(
-                                showCalendar ? 1 : 0.5
-                            )
+                            (colorScheme == .light ? Color.black : Color.white)
+                                .opacity(showCalendar ? 1 : 0.5)
                         )
                 }
                 .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
