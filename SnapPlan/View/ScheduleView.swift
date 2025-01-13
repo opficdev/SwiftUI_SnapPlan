@@ -97,7 +97,10 @@ struct ScheduleView: View {
                                 }
                                 .tag(idx)
                                 .onAppear {
-                                    viewModel.selectDate = date
+                                    withAnimation {
+                                        viewModel.wasPast = viewModel.selectDate < date
+                                        viewModel.selectDate = date
+                                    }
                                 }
                             }
                             .border(Color.gray.opacity(0.5))

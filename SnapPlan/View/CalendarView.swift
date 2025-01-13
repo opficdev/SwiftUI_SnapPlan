@@ -13,7 +13,6 @@ struct CalendarView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var daysHeight = CGFloat.zero  //  날짜 보여주는 부분의 height
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
-    @State private var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     @State private var selection = 1  //  선택된 달력의 tag
 
     
@@ -73,7 +72,7 @@ struct CalendarView: View {
                         .onTapGesture{
                             if !viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) {
                                 withAnimation {
-                                    wasPast = viewModel.selectDate < viewModel.today
+                                    viewModel.wasPast = viewModel.selectDate < viewModel.today
                                     viewModel.selectDate = viewModel.today
                                     selection = 1
                                 }
@@ -99,7 +98,7 @@ struct CalendarView: View {
                     TabView(selection: $selection) {
                         let calendarData = viewModel.calendarData
                         ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, month in
-                            CalendarGrid(monthData: month, wasPast: $wasPast)
+                            CalendarGrid(monthData: month, wasPast: $viewModel.wasPast)
                                 .environmentObject(viewModel)
                                 .tag(idx)
                                 .onDisappear {

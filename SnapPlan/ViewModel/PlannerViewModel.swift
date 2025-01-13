@@ -13,6 +13,7 @@ final class PlannerViewModel: ObservableObject {
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
     @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
     @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 로 수정 예정
+    @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     
     init() {
         startTimer()
