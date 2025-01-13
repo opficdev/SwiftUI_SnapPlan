@@ -117,6 +117,21 @@ struct ScheduleView: View {
                     viewModel.selectDate = calendarData[value]
                 }
             }
+            .onChange(of: viewModel.selectDate) { value in
+                withAnimation {
+                    if !calendarData.contains(value) {
+                        for month in viewModel.calendarData {
+                            if month.contains(value) {
+                                calendarData = month
+                                break
+                            }
+                        }
+                    }
+                    selection = calendarData.firstIndex(where: {
+                        viewModel.isSameDate(date1: $0, date2: value, components: [.year, .month, .day]) }
+                    )!
+                }
+            }
         }
     }
 }
