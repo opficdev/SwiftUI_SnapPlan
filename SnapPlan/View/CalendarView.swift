@@ -11,10 +11,8 @@ import SwiftUI
 struct CalendarView: View {
     @EnvironmentObject private var viewModel: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
-    @State private var daysHeight = CGFloat.zero  //  날짜 보여주는 부분의 height
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var selection = 1  //  선택된 달력의 tag
-
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -119,27 +117,16 @@ struct CalendarView: View {
                                     selection = 1
                                 }
                         }
-                        .background(
-                            GeometryReader { geometry in
-                                Color.clear.onAppear {
-                                    if daysHeight == 0 {
-                                        daysHeight = geometry.size.height
-                                    }
-                                }
-                            }
-                        )
                         .onChange(of: viewModel.selectDate) { newDate in
                             viewModel.currentDate = newDate
                             if !viewModel.isSameDate(date1: newDate, date2: viewModel.calendarData[1][15], components: [.year, .month]) {
                                 viewModel.setCalendarData(date: newDate)
                             }
-//                            DispatchQueue.main.async {
-                                selection = 1
-//                            }
+                            selection = 1
                         }
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-//                    .frame(height: daysHeight == 0 ? screenWidth : daysHeight)
+                    .frame(height: screenWidth * 0.6)
                     .onAppear {
                         DispatchQueue.main.async {
                             selection = 1
