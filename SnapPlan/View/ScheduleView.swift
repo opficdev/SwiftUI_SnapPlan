@@ -79,9 +79,6 @@ struct ScheduleView: View {
                                         }
                                     }
                                 )
-                                .onAppear {
-                                    
-                                }
                             }
                         }
                         .border(Color.gray.opacity(0.5))
@@ -100,9 +97,7 @@ struct ScheduleView: View {
                                 }
                                 .tag(idx)
                                 .onAppear {
-                                    withAnimation {
-                                        viewModel.selectDate = date
-                                    }
+                                    viewModel.selectDate = date
                                 }
                             }
                             .border(Color.gray.opacity(0.5))
@@ -117,7 +112,12 @@ struct ScheduleView: View {
                selection = calendarData.firstIndex(where: {
                    viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) }
                )!
-           }
+            }
+            .onChange(of: viewModel.selectDate) { newDate in
+                selection = calendarData.firstIndex(where: {
+                    viewModel.isSameDate(date1: $0, date2: newDate, components: [.year, .month, .day]) }
+                )!
+            }
         }
     }
 }
