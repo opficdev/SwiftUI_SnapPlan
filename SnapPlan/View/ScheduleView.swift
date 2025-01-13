@@ -16,11 +16,11 @@ struct ScheduleView: View {
     @State private var timeZoneSize = CGSizeZero
     @State private var gap: CGFloat = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var selection = 0
+    @State private var calendarData = [Date]()
     
     var body: some View {
         ZStack {
             Color.scheduleBackground.ignoresSafeArea()
-            let calendarData = viewModel.calendarData[1]
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
                     Text(is12TimeFmt ? "12시간제" : "24시간제")
@@ -109,9 +109,10 @@ struct ScheduleView: View {
                 }
             }
             .onAppear {
-               selection = calendarData.firstIndex(where: {
+                calendarData = viewModel.calendarData[1]
+                selection = calendarData.firstIndex(where: {
                    viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) }
-               )!
+                )!
             }
             .onChange(of: viewModel.selectDate) { newDate in
                 selection = calendarData.firstIndex(where: {
