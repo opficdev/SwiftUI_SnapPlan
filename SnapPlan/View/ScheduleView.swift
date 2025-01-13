@@ -96,12 +96,6 @@ struct ScheduleView: View {
                                     }
                                 }
                                 .tag(idx)
-                                .onAppear {
-                                    withAnimation {
-                                        viewModel.wasPast = viewModel.selectDate < date
-                                        viewModel.selectDate = date
-                                    }
-                                }
                             }
                             .border(Color.gray.opacity(0.5))
                             .frame(width: screenWidth - timeZoneSize.width)
@@ -116,6 +110,12 @@ struct ScheduleView: View {
                 selection = calendarData.firstIndex(where: {
                    viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) }
                 )!
+            }
+            .onChange(of: selection) { value in
+                withAnimation {
+                    viewModel.wasPast = viewModel.selectDate < calendarData[value]
+                    viewModel.selectDate = calendarData[value]
+                }
             }
         }
     }
