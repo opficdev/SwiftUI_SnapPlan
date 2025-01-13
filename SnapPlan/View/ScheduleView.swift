@@ -114,11 +114,6 @@ struct ScheduleView: View {
                    viewModel.isSameDate(date1: $0, date2: viewModel.selectDate, components: [.year, .month, .day]) }
                 )!
             }
-            .onChange(of: viewModel.selectDate) { newDate in
-                selection = calendarData.firstIndex(where: {
-                    viewModel.isSameDate(date1: $0, date2: newDate, components: [.year, .month, .day]) }
-                )!
-            }
         }
     }
 }
