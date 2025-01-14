@@ -6,18 +6,16 @@
   <tr>
     <td align="center" width="200px">
       <img src="./Preview/main_light.png" width="200px">
-      <img src="./Preview/main_light_expand.png>" width="200px">
+      <img src="./Preview/main_light_expand.png" width="200px">
       <p><strong>라이트 모드</strong></p>
     </td>
     <td align="center" width="200px">
       <img src="./Preview/main_dark.png" width="200px">
-      <img src="./Preview/main_dark_expand.png>" width="200px">
+      <img src="./Preview/main_dark_expand.png" width="200px">
       <p><strong>다크 모드</strong></p>
     </td>
   </tr>
 </table>
-
-----
 
 ## 최소 iOS 버전
 - iOS 16
