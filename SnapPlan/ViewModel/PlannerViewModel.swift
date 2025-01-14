@@ -43,7 +43,7 @@ final class PlannerViewModel: ObservableObject {
     }
     
     func getHours(is12hoursFmt: Bool) -> [TimeData] {
-        let hours = Array(1...24) // 1에서 24까지 배열 생성
+        let hours = Array(0...24) // 1에서 24까지 배열 생성
         
         if is12hoursFmt {
             return hours.map { hour in
