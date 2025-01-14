@@ -29,8 +29,21 @@ final class PlannerViewModel: ObservableObject {
     var daysOfWeek: [String] {
         return calendar.shortWeekdaySymbols
     }
-    
+
     private func startTimer() {
+        if let nextMinute = calendar.date(
+            byAdding: .minute,
+            value: 1,
+            to: calendar.date(from: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: today))!) {
+            let secondsUntilNextMinute = nextMinute.timeIntervalSince(today)
+            DispatchQueue.main.asyncAfter(deadline: .now() + secondsUntilNextMinute) { [weak self] in
+                self?.today = Date()
+                self?.startTimerHelper()
+            }
+        }
+    }
+
+    private func startTimerHelper() {
         timerCancellable = Timer.publish(every: 60, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
