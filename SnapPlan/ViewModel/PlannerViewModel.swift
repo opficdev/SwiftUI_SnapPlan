@@ -31,38 +31,32 @@ final class PlannerViewModel: ObservableObject {
     }
 
     private func startTimer() {
-        if let nextMinute = calendar.date(
-            byAdding: .minute,
-            value: 1,
-            to: calendar.date(from: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: today))!) {
-            let secondsUntilNextMinute = nextMinute.timeIntervalSince(today)
-            DispatchQueue.main.asyncAfter(deadline: .now() + secondsUntilNextMinute) { [weak self] in
-                self?.today = Date()
-                self?.startTimerHelper()
-            }
-        }
-    }
-
-    private func startTimerHelper() {
-        timerCancellable = Timer.publish(every: 60, on: .main, in: .common)
+        timerCancellable = Timer.publish(every: 0.1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 self?.today = Date()
             }
     }
     
+    func isCollapsed(timeZoneHeight: CGFloat, gap: CGFloat, index: Int) -> Bool {
+        let height = CGFloat(index) * (timeZoneHeight + gap)    // 시간대의 높이
+        let offset = (timeZoneHeight + gap) * 24 * getRatioToMiniute()
+        
+        return height - timeZoneHeight <= offset && offset <= height + timeZoneHeight
+    }
+    
     func getHoursAndMiniute(is12hoursFmt: Bool) -> String {
-        var hour = calendar.component(.hour, from: today)
+        let hour = calendar.component(.hour, from: today)
         let miniute = calendar.component(.minute, from: today)
         if is12hoursFmt {
-            return "오" + (hour < 12 ? "전" : "후") + "\(hour % 12):" + String(format: "%02d", miniute)
+            return "오" + (hour < 12 ? "전" : "후") + " \(hour % 12):" + String(format: "%02d", miniute)
         }
         return "\(hour):" + String(format: "%02d", miniute)
     }
     
     func getRatioToMiniute() -> CGFloat {
         let startOfDay = calendar.startOfDay(for: today)
-        return  CGFloat(calendar.dateComponents([.minute], from: startOfDay, to: today).minute ?? 0) / 1440
+        return CGFloat(calendar.dateComponents([.minute], from: startOfDay, to: today).minute ?? 0) / 1440
     }
     
     func getFirstDayOfMonth(date: Date) -> Date {
