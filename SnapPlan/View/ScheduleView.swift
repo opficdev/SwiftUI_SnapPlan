@@ -58,28 +58,33 @@ struct ScheduleView: View {
                 
                 ScrollView(showsIndicators: false) {
                     HStack(spacing: 0) {
-                        VStack(alignment: .trailing, spacing: gap) {
-                            ForEach(viewModel.getHours(is12hoursFmt: is12TimeFmt)) { hour in
-                                HStack(spacing: 4) {
-                                    Group {
-                                        Text(hour.timePeriod)
-                                        Text(hour.time)
+                        ZStack(alignment: .topTrailing) {
+                            VStack(alignment: .trailing, spacing: gap) {
+                                ForEach(viewModel.getHours(is12hoursFmt: is12TimeFmt)) { hour in
+                                    HStack(spacing: 4) {
+                                        Group {
+                                            Text(hour.timePeriod)
+                                            Text(hour.time)
+                                        }
+                                        .font(.caption)
+                                        .padding(.trailing, 2)
+                                        .foregroundStyle(Color.gray)
                                     }
-                                    .font(.caption)
-                                    .padding(.trailing, 2)
-                                    .foregroundStyle(Color.gray)
-                                }
-                                .frame(width: screenWidth / 7, alignment: .trailing)
-                                .background(
-                                    GeometryReader { geometry in
-                                        Color.clear.onAppear {
-                                            if timeZoneSize == CGSizeZero {
-                                                timeZoneSize = geometry.size
+                                    .frame(width: screenWidth / 7, alignment: .trailing)
+                                    .background(
+                                        GeometryReader { geometry in
+                                            Color.clear.onAppear {
+                                                if timeZoneSize == CGSizeZero {
+                                                    timeZoneSize = geometry.size
+                                                }
                                             }
                                         }
-                                    }
-                                )
+                                    )
+                                }
                             }
+                            Text(viewModel.getHoursAndMiniute(is12hoursFmt: is12TimeFmt))
+                                .font(.caption)
+                                .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
                         }
                         .border(Color.gray.opacity(0.5))
                            
@@ -103,7 +108,7 @@ struct ScheduleView: View {
                                     .padding(
                                         .leading, viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? 2 : 0
                                     )
-                                    .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute(from: date))
+                                    .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
                                 }
                                 .tag(idx)
                             }
