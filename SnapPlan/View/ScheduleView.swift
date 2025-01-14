@@ -5,6 +5,8 @@
 //  Created by opfic on 1/1/25.
 //
 
+//  today가 업데이트 되었는데도 CurrentTimeBar의 핑크에서 그레이로 자동 변경되지 않는 현상 있음
+
 import SwiftUI
 
 struct ScheduleView: View {
@@ -61,10 +63,14 @@ struct ScheduleView: View {
                         HStack(spacing: 0) {
                             ZStack(alignment: .topTrailing) {
                                 VStack(alignment: .trailing, spacing: gap) {
-                                    ForEach(viewModel.getHours(is12hoursFmt: is12TimeFmt)) { hour in
+                                    let hours = viewModel.getHours(is12hoursFmt: is12TimeFmt)
+                                    ForEach(Array(zip(hours.indices, hours)), id: \.1.id) { index, hour in
                                         Text("\(hour.timePeriod) \(hour.time)")
                                             .font(.caption)
                                             .foregroundStyle(Color.gray)
+                                            .opacity(
+                                                viewModel.isCollapsed(timeZoneHeight: timeZoneSize.height, gap: gap, index: index) ? 0 : 1
+                                            )
                                             .padding(.trailing, 2)
                                             .frame(width: screenWidth / 7, alignment: .trailing)
                                             .background(
@@ -83,17 +89,6 @@ struct ScheduleView: View {
                                     .font(.caption)
                                     .padding(.trailing, 2)
                                     .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
-                                    .background(
-                                        GeometryReader { geometry in
-                                            Color.clear
-                                                .onAppear {
-                                                    //                                                timeProxy = geometry
-                                                }
-                                                .onChange(of: viewModel.today) { _ in
-                                                    //                                                timeProxy = geometry
-                                                }
-                                        }
-                                    )
                             }
                             
                             TabView(selection: $selection) {
