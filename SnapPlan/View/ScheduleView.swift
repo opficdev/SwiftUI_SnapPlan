@@ -56,67 +56,80 @@ struct ScheduleView: View {
                 }
                 .background(Color.calendarBackground)
                 
-                ScrollView(showsIndicators: false) {
-                    HStack(spacing: 0) {
-                        ZStack(alignment: .topTrailing) {
-                            VStack(alignment: .trailing, spacing: gap) {
-                                ForEach(viewModel.getHours(is12hoursFmt: is12TimeFmt)) { hour in
-                                    HStack(spacing: 4) {
-                                        Group {
-                                            Text(hour.timePeriod)
-                                            Text(hour.time)
-                                        }
-                                        .font(.caption)
-                                        .padding(.trailing, 2)
-                                        .foregroundStyle(Color.gray)
+                ScrollViewReader { proxy in
+                    ScrollView(showsIndicators: false) {
+                        HStack(spacing: 0) {
+                            ZStack(alignment: .topTrailing) {
+                                VStack(alignment: .trailing, spacing: gap) {
+                                    ForEach(viewModel.getHours(is12hoursFmt: is12TimeFmt)) { hour in
+                                        Text("\(hour.timePeriod) \(hour.time)")
+                                            .font(.caption)
+                                            .foregroundStyle(Color.gray)
+                                            .padding(.trailing, 2)
+                                            .frame(width: screenWidth / 7, alignment: .trailing)
+                                            .background(
+                                                GeometryReader { geometry in
+                                                    Color.clear.onAppear {
+                                                        if timeZoneSize == CGSizeZero {
+                                                            timeZoneSize = geometry.size
+                                                        }
+                                                    }
+                                                }
+                                            )
                                     }
-                                    .frame(width: screenWidth / 7, alignment: .trailing)
+                                }
+                                .border(Color.gray.opacity(0.5))
+                                Text(viewModel.getHoursAndMiniute(is12hoursFmt: is12TimeFmt))
+                                    .font(.caption)
+                                    .padding(.trailing, 2)
+                                    .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
                                     .background(
                                         GeometryReader { geometry in
-                                            Color.clear.onAppear {
-                                                if timeZoneSize == CGSizeZero {
-                                                    timeZoneSize = geometry.size
+                                            Color.clear
+                                                .onAppear {
+                                                    //                                                timeProxy = geometry
                                                 }
-                                            }
+                                                .onChange(of: viewModel.today) { _ in
+                                                    //                                                timeProxy = geometry
+                                                }
                                         }
                                     )
-                                }
                             }
-                            Text(viewModel.getHoursAndMiniute(is12hoursFmt: is12TimeFmt))
-                                .font(.caption)
-                                .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
-                        }
-                        .border(Color.gray.opacity(0.5))
-                           
-                        TabView(selection: $selection) {
-                            ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
-                                ZStack(alignment: .top) {
-                                    VStack(spacing: gap) {
-                                        ForEach(0...24, id: \.self) { index in
-                                            ZStack {
-                                                Rectangle()
-                                                    .frame(height: 1)
-                                                    .foregroundColor(Color.gray.opacity(0.5))
+                            
+                            TabView(selection: $selection) {
+                                ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
+                                    ZStack(alignment: .top) {
+                                        VStack(spacing: gap) {
+                                            ForEach(0...24, id: \.self) { index in
+                                                ZStack {
+                                                    Rectangle()
+                                                        .frame(height: 1)
+                                                        .foregroundColor(Color.gray.opacity(0.5))
+                                                }
+                                                .frame(height: timeZoneSize.height)
                                             }
-                                            .frame(height: timeZoneSize.height)
                                         }
+                                        CurrentTimeBar(
+                                            height: timeZoneSize.height,
+                                            showVerticalLine: viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day])
+                                        )
+                                        .padding(
+                                            .leading, viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? 2 : 0
+                                        )
+                                        .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
                                     }
-                                    CurrentTimeBar(
-                                        height: timeZoneSize.height,
-                                        showVerticalLine: viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day])
-                                    )
-                                    .padding(
-                                        .leading, viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? 2 : 0
-                                    )
-                                    .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
+                                    .tag(idx)
                                 }
-                                .tag(idx)
+                                .border(Color.gray.opacity(0.5))
+                                .frame(width: screenWidth - timeZoneSize.width)
                             }
+                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                             .border(Color.gray.opacity(0.5))
-                            .frame(width: screenWidth - timeZoneSize.width)
                         }
-                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                        .border(Color.gray.opacity(0.5))
+                        .id(0)
+                    }
+                    .onAppear {
+                        proxy.scrollTo(0, anchor: .bottom)
                     }
                 }
             }
