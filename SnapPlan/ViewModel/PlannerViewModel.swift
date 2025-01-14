@@ -38,6 +38,11 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
+    func getRatioToMiniute(from: Date) -> CGFloat {
+        let startOfDay = calendar.startOfDay(for: today)
+        return  CGFloat(calendar.dateComponents([.minute], from: startOfDay, to: today).minute ?? 0) / 1440
+    }
+    
     func getFirstDayOfMonth(date: Date) -> Date {
         return calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
     }
