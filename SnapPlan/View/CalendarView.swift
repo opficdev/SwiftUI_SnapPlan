@@ -32,11 +32,13 @@ struct CalendarView: View {
                     Text(viewModel.getCurrentMonthYear())
                         .font(.title)
                         .bold()
-                    Image(systemName: "chevron.\(showCalendar ? "up" : "down")")
+                    Image(systemName: "chevron.down")
                         .foregroundStyle(
                             (colorScheme == .light ? Color.black : Color.white)
                                 .opacity(showCalendar ? 1 : 0.5)
                         )
+                        .rotationEffect(.degrees(showCalendar ? -180 : 0))
+                        .animation(.easeInOut(duration: 0.3), value: showCalendar ? 180 : 0) // 애니메이션 적용
                 }
                 .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                 .background(
