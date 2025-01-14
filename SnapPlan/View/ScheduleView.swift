@@ -85,15 +85,25 @@ struct ScheduleView: View {
                            
                         TabView(selection: $selection) {
                             ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
-                                VStack(spacing: gap) {
-                                    ForEach(1...24, id: \.self) { index in
-                                        ZStack {
-                                            Rectangle()
-                                                .frame(height: 1)
-                                                .foregroundColor(Color.gray.opacity(0.5))
+                                ZStack(alignment: .top) {
+                                    VStack(spacing: gap) {
+                                        ForEach(0...24, id: \.self) { index in
+                                            ZStack {
+                                                Rectangle()
+                                                    .frame(height: 1)
+                                                    .foregroundColor(Color.gray.opacity(0.5))
+                                            }
+                                            .frame(height: timeZoneSize.height)
                                         }
-                                        .frame(height: timeZoneSize.height)
                                     }
+                                    CurrentTimeBar(
+                                        height: timeZoneSize.height,
+                                        showVerticalLine: viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day])
+                                    )
+                                    .padding(
+                                        .leading, viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? 2 : 0
+                                    )
+                                    .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute(from: date))
                                 }
                                 .tag(idx)
                             }
