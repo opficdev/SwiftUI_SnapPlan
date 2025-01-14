@@ -51,7 +51,16 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
-    func getRatioToMiniute(from: Date) -> CGFloat {
+    func getHoursAndMiniute(is12hoursFmt: Bool) -> String {
+        var hour = calendar.component(.hour, from: today)
+        let miniute = calendar.component(.minute, from: today)
+        if is12hoursFmt {
+            return "오" + (hour < 12 ? "전" : "후") + "\(hour % 12):" + String(format: "%02d", miniute)
+        }
+        return "\(hour):" + String(format: "%02d", miniute)
+    }
+    
+    func getRatioToMiniute() -> CGFloat {
         let startOfDay = calendar.startOfDay(for: today)
         return  CGFloat(calendar.dateComponents([.minute], from: startOfDay, to: today).minute ?? 0) / 1440
     }
