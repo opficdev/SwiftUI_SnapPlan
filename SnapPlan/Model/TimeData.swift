@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct TimeData: Identifiable {
     let id: UUID
     let time: String
