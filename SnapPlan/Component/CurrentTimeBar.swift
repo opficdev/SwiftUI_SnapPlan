@@ -9,23 +9,28 @@ import SwiftUI
 
 struct CurrentTimeBar: View {
     @State private var height: CGFloat
+    @State private var showVerticalLine: Bool
     
-    init(height: CGFloat) {
+    init(height: CGFloat, showVerticalLine: Bool) {
         self._height = State(initialValue: height)
+        self._showVerticalLine = State(initialValue: showVerticalLine)
     }
     
     var body: some View {
         HStack(spacing: 0) {
-            Rectangle()
-                .frame(width: 2, height: height)
-                .foregroundColor(.pink)
+            if showVerticalLine {
+                Rectangle()
+                    .frame(width: 2, height: height)
+                    .foregroundColor(showVerticalLine ? .pink : .gray)
+            }
             Rectangle()
                 .frame(height: 2)
-                .foregroundStyle(.pink)
+                .foregroundStyle(showVerticalLine ? .pink : .gray)
         }
+        .frame(height: height)
     }
 }
 
 #Preview {
-    CurrentTimeBar(height: 20)
+    CurrentTimeBar(height: 20, showVerticalLine: true)
 }
