@@ -8,9 +8,10 @@
 ## 특징
 - Firebase를 통한 사용자 데이터 저장
 - FirebaseAuth를 통한 사용자 인증
-- Combine를 현재 시각을 0.1초 단위로 최신화 (RxSwift로 대체 가능)
-- frame 측정을 위한 GeometryReader 사용 최소화
+- Combine를 현재 시각을 0.1초 단위로 최신화
+- frame 측정에 대한 GeometryReader 사용 최소화
 - 라이트 / 다크 모드 지원
+- 사용자의 드래그, 스크롤 모션에 대한 애니메이션 구현
 
 ## 앱 화면
 <table>
