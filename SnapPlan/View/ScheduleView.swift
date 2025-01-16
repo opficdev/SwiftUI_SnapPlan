@@ -5,8 +5,6 @@
 //  Created by opfic on 1/1/25.
 //
 
-//  today가 업데이트 되었는데도 CurrentTimeBar의 핑크에서 그레이로 자동 변경되지 않는 현상 있음
-
 import SwiftUI
 
 struct ScheduleView: View {
@@ -108,6 +106,7 @@ struct ScheduleView: View {
                                             height: timeZoneSize.height,
                                             showVerticalLine: viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day])
                                         )
+                                        .id(UUID())
                                         .padding(
                                             .leading, viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? 2 : 0
                                         )
