@@ -103,14 +103,23 @@ struct TimeLineView: View {
                                             ForEach(0...24, id: \.self) { index in
                                                 VStack {
                                                     Spacer()
+                                                        .onTapGesture {
+                                                            
+                                                        }
                                                     Rectangle()
                                                         .frame(height: 1)
                                                         .foregroundColor(Color.gray.opacity(0.5))
                                                     Spacer()
+                                                        .onTapGesture {
+                                                            
+                                                        }
                                                 }
                                                 .frame(height: timeZoneSize.height)
                                             }
                                         }
+                                        //  스케줄 표시
+                                        
+                                        
                                         CurrentTimeBar(
                                             height: timeZoneSize.height,
                                             showVerticalLine: viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day])
