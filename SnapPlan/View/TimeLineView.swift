@@ -94,10 +94,12 @@ struct TimeLineView: View {
                                     ZStack(alignment: .top) {
                                         VStack(spacing: gap) {
                                             ForEach(0...24, id: \.self) { index in
-                                                ZStack {
+                                                VStack {
+                                                    Spacer()
                                                     Rectangle()
                                                         .frame(height: 1)
                                                         .foregroundColor(Color.gray.opacity(0.5))
+                                                    Spacer()
                                                 }
                                                 .frame(height: timeZoneSize.height)
                                             }
