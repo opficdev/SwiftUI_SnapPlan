@@ -82,7 +82,14 @@ struct TimeLineView: View {
                                             )
                                     }
                                 }
-                                .border(Color.gray.opacity(0.5))
+                                .background(
+                                    HStack {
+                                        Spacer()
+                                        Rectangle()
+                                            .frame(width: 1)
+                                            .foregroundStyle(Color.gray.opacity(0.5))
+                                    }
+                                )
                                 Text(viewModel.getHoursAndMiniute(is12hoursFmt: is12TimeFmt))
                                     .font(.caption)
                                     .padding(.trailing, 2)
@@ -116,11 +123,17 @@ struct TimeLineView: View {
                                     }
                                     .tag(idx)
                                 }
-                                .border(Color.gray.opacity(0.5))
                                 .frame(width: screenWidth - timeZoneSize.width)
+                                .background(
+                                    HStack {
+                                        Rectangle()
+                                            .frame(width: 1)
+                                            .foregroundStyle(Color.gray.opacity(0.5))
+                                        Spacer()
+                                    }
+                                )
                             }
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                            .border(Color.gray.opacity(0.5))
                         }
                         .id(0)
                     }
