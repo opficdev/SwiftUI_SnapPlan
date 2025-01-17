@@ -6,3 +6,10 @@
 //
 
 import Foundation
+import FirebaseFirestore
+
+
+class FireStoreViewModel: ObservableObject {
+    let db = Firestore.firestore()
+    
+}
