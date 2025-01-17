@@ -17,10 +17,6 @@ struct PlannerView: View {
             TimeLineView()
                 .environmentObject(viewModel)
         }
-        .sheet(isPresented: .constant(true)) {
-//            .presentationDetents([.medium, .large])
-//            .presentationDragIndicator(.visible)
-        }
     }
 }
 
