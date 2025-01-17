@@ -17,6 +17,10 @@ struct PlannerView: View {
             ScheduleView()
                 .environmentObject(viewModel)
         }
+        .sheet(isPresented: .constant(true)) {
+//            .presentationDetents([.medium, .large])
+//            .presentationDragIndicator(.visible)
+        }
     }
 }
 
