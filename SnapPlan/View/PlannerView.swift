@@ -14,7 +14,7 @@ struct PlannerView: View {
         VStack(spacing: 0) {
             CalendarView()
                 .environmentObject(viewModel)
-            ScheduleView()
+            TimeLineView()
                 .environmentObject(viewModel)
         }
         .sheet(isPresented: .constant(true)) {

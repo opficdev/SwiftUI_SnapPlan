@@ -1,5 +1,5 @@
 //
-//  ScheduleView.swift
+//  TimeLineView.swift
 //  SnapPlan
 //
 //  Created by opfic on 1/1/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ScheduleView: View {
+struct TimeLineView: View {
     @EnvironmentObject private var viewModel: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
     let screenWidth = UIScreen.main.bounds.width
@@ -159,6 +159,6 @@ struct ScheduleView: View {
 }
 
 #Preview {
-    ScheduleView()
+    TimeLineView()
         .environmentObject(PlannerViewModel())
 }

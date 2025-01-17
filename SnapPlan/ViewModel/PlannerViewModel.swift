@@ -3,7 +3,7 @@
 //  SnapPlan
 //
 //  Created by opfic on 1/1/25.
-//  CalendarView와 ScheduleView에 사용되는 ViewModel
+//  CalendarView와 TimeLineView에 사용되는 ViewModel
 
 import SwiftUI
 import Combine
