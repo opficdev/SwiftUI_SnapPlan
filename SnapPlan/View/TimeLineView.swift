@@ -143,11 +143,14 @@ struct TimeLineView: View {
                                 )
                             }
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                            .simultaneousGesture(
+                                MagnificationGesture()
+                                    .onChanged { value in
+                                        
+                                    }
+                            )
                         }
                         .id(0)
-                    }
-                    .onAppear {
-                        proxy.scrollTo(0, anchor: .bottom)
                     }
                 }
             }
