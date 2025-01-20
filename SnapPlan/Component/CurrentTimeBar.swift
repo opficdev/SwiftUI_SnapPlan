@@ -21,11 +21,11 @@ struct CurrentTimeBar: View {
             if showVerticalLine {
                 Rectangle()
                     .frame(width: 2, height: height)
-                    .foregroundColor(showVerticalLine ? .pink : .gray)
+                    .foregroundColor(showVerticalLine ? Color.timeBar : Color.gray)
             }
             Rectangle()
                 .frame(height: 2)
-                .foregroundStyle(showVerticalLine ? .pink : .gray)
+                .foregroundStyle(showVerticalLine ? Color.timeBar : Color.gray)
         }
         .frame(height: height)
     }

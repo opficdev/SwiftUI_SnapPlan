@@ -15,7 +15,7 @@ struct LoginView: View {
     
     var body: some View {
         ZStack {
-            Color.loginView.ignoresSafeArea()
+            Color.calendar.ignoresSafeArea()
             VStack {
                 Spacer()
                 Group {

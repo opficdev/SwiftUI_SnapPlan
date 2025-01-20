@@ -20,7 +20,7 @@ struct TimeLineView: View {
     
     var body: some View {
         ZStack {
-            Color.scheduleBackground.ignoresSafeArea()
+            Color.timeLine.ignoresSafeArea()
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
                     Text(is12TimeFmt ? "12시간제" : "24시간제")
@@ -38,7 +38,7 @@ struct TimeLineView: View {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 8)
                                         .fill(
-                                            viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? Color.pink : Color.gray.opacity(0.5)
+                                            viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? Color.timeBar : Color.gray.opacity(0.5)
                                         )
                                         .frame(width: screenWidth / 14, height: screenWidth / 14)
                                     Text("\(DateFormatter.krWeekDay.string(from: date))")
@@ -54,7 +54,7 @@ struct TimeLineView: View {
                     .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 }
-                .background(Color.calendarBackground)
+                .background(Color.calendar)
                 
                 ScrollViewReader { proxy in
                     ScrollView(showsIndicators: false) {

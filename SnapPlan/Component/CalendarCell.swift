@@ -35,7 +35,7 @@ struct CalendarCell: View {
             
             if viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.pink)
+                    .fill(Color.timeBar)
                     .frame(width: screenWidth / 12, height: screenWidth / 12)
             }
             

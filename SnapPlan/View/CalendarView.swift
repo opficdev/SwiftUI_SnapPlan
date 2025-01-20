@@ -65,7 +65,8 @@ struct CalendarView: View {
                         .background(
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(
-                                    viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) ? Color.gray.opacity(0.5) : Color.pink
+                                    viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day])
+                                    ? Color.gray.opacity(0.5) : Color.timeBar
                                 )
                         )
                         .onTapGesture{
@@ -136,7 +137,7 @@ struct CalendarView: View {
                 }
             }
         }
-         .background(Color.calendarBackground)
+         .background(Color.calendar)
     }
 }
 
