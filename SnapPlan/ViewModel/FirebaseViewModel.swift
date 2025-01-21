@@ -1,0 +1,74 @@
+//
+//  FireStoreViewModel.swift
+//  SnapPlan
+//
+//  Created by opfic on 1/17/25.
+//
+
+import Foundation
+import FirebaseFirestore
+
+
+class FirebaseViewModel: ObservableObject {
+    private let db = Firestore.firestore()
+        
+    /// 특정 날짜에 `TimeData`를 추가하는 메소드
+    func addTimeData(for date: String, timeData: TimeData, completion: @escaping (Error?) -> Void) {
+        let docRef = db.collection("timeData").document(date)
+        
+        // Firestore에서 기존 데이터 가져오기
+        docRef.getDocument { document, error in
+            if let error = error {
+                completion(error)
+                return
+            }
+            
+            var existingData: [[String: Any]] = []
+            
+            if let data = document?.data(), let entries = data["entries"] as? [[String: Any]] {
+                existingData = entries
+            }
+            
+            let newEntry: [String: Any] = [
+                "id": timeData.id.uuidString,
+                "time": timeData.time,
+                "timePeriod": timeData.timePeriod
+            ]
+            
+            existingData.append(newEntry)
+            
+            docRef.setData(["entries": existingData]) { error in
+                completion(error)
+            }
+        }
+    }
+    
+    /// 특정 날짜의 '`TimeData`를 불러오는 메소드
+    func fetchTimeData(for date: String, completion: @escaping ([TimeData]?, Error?) -> Void) {
+        let docRef = db.collection("timeData").document(date)
+        
+        docRef.getDocument { document, error in
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            
+            guard let document = document, document.exists,
+                  let data = document.data(), let entries = data["entries"] as? [[String: Any]] else {
+                completion(nil, nil) // 데이터가 없으면 nil 반환
+                return
+            }
+            
+            let timeDataList: [TimeData] = entries.compactMap { entry in
+                guard let idString = entry["id"] as? String,
+//                      let id = UUID(uuidString: idString),
+                      let time = entry["time"] as? String,
+                      let timePeriod = entry["timePeriod"] as? String else { return nil }
+                
+                return TimeData(time: time, timePeriod: timePeriod)
+            }
+            
+            completion(timeDataList.isEmpty ? nil : timeDataList, nil)
+        }
+    }
+}

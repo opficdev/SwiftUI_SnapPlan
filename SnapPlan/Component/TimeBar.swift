@@ -1,5 +1,5 @@
 //
-//  CurrentTimeBar.swift
+//  TimeBar.swift
 //  SnapPlan
 //
 //  Created by opfic on 1/14/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CurrentTimeBar: View {
+struct TimeBar: View {
     @State private var height: CGFloat
     @State private var showVerticalLine: Bool
     
@@ -32,5 +32,5 @@ struct CurrentTimeBar: View {
 }
 
 #Preview {
-    CurrentTimeBar(height: 20, showVerticalLine: true)
+    TimeBar(height: 20, showVerticalLine: true)
 }
