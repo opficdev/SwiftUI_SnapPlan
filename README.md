@@ -33,7 +33,7 @@
 </table>
 
 
-## Firebase 구조
+## Firestore 구조
 ```
 User (컬렉션)
 │  
