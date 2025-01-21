@@ -169,12 +169,7 @@ struct TimeLineView: View {
             .onChange(of: viewModel.selectDate) { value in
                 withAnimation {
                     if !calendarData.contains(value) {
-                        for month in viewModel.calendarData {
-                            if month.contains(value) {
-                                calendarData = month
-                                break
-                            }
-                        }
+                        calendarData = viewModel.calendarDates(date: value)
                     }
                     selection = calendarData.firstIndex(where: {
                         viewModel.isSameDate(date1: $0, date2: value, components: [.year, .month, .day]) }
