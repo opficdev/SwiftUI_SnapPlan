@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import FirebaseAuth
+import FirebaseFirestore
 import GoogleSignIn
 import GoogleSignInSwift
 
@@ -84,7 +85,30 @@ extension LoginViewModel {
         
         let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
         
-        let _ = try await Auth.auth().signIn(with: credential)
+        let result = try await Auth.auth().signIn(with: credential)
+        
+        saveUserToFirestore(user: result.user)
+        
         signedIn = true
+    }
+    
+    private func saveUserToFirestore(user: User) {
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(user.uid)
+        
+        let userData: [String: Any] = [
+            "uid": user.uid,
+            "email": user.email ?? "",
+            "displayName": user.displayName ?? "",
+            "signedAt": FieldValue.serverTimestamp()
+        ]
+        
+        userRef.setData(userData, merge: true) { error in
+            if let error = error {
+                print("Error saving user: \(error.localizedDescription)")
+            } else {
+                print("User saved successfully!")
+            }
+        }
     }
 }
