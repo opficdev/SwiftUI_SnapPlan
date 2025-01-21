@@ -9,14 +9,13 @@ import Foundation
 import FirebaseFirestore
 
 
-class FirebaseViewModel: ObservableObject {
+final class FirebaseViewModel: ObservableObject {
     private let db = Firestore.firestore()
         
     /// 특정 날짜에 `TimeData`를 추가하는 메소드
-    func addTimeData(for date: String, timeData: TimeData, completion: @escaping (Error?) -> Void) {
-        let docRef = db.collection("timeData").document(date)
+    func addTimeData(for userId: String, date: String, timeData: TimeData, completion: @escaping (Error?) -> Void) {
+        let docRef = db.collection("timeData").document(userId).collection("dates").document(date)
         
-        // Firestore에서 기존 데이터 가져오기
         docRef.getDocument { document, error in
             if let error = error {
                 completion(error)
@@ -44,8 +43,8 @@ class FirebaseViewModel: ObservableObject {
     }
     
     /// 특정 날짜의 '`TimeData`를 불러오는 메소드
-    func fetchTimeData(for date: String, completion: @escaping ([TimeData]?, Error?) -> Void) {
-        let docRef = db.collection("timeData").document(date)
+    func fetchTimeData(for userId: String, date: String, completion: @escaping ([TimeData]?, Error?) -> Void) {
+        let docRef = db.collection("timeData").document(userId).collection("dates").document(date)
         
         docRef.getDocument { document, error in
             if let error = error {
