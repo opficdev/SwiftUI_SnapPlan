@@ -18,15 +18,18 @@ struct LoginView: View {
             Color.calendar.ignoresSafeArea()
             VStack {
                 Spacer()
-                if colorScheme == .light {
-                    Image("light_logo")
-                        .resizable()
-                        .scaledToFit()
+                Group {
+                    if colorScheme == .light {
+                        Image("light_logo")
+                            .resizable()
+                    }
+                    else {
+                        Image("dark_logo")
+                            .resizable()
+                    }
                 }
-                else {
-                    Image("dark_logo")
-                        .resizable()
-                }
+                .scaledToFit()
+                .frame(width: screenWidth / 5)
                 Spacer()
                 Group {
                     if colorScheme == .light {
