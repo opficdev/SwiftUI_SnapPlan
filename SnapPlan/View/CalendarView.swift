@@ -56,29 +56,28 @@ struct CalendarView: View {
                 }
                 Spacer()
                 
-                Group {
-                    Text(viewModel.dateString(date: viewModel.today, component: .day))
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(Color.white)
-                        .frame(width: screenWidth / 14, height: screenWidth / 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(
-                                    viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day])
-                                    ? Color.gray.opacity(0.5) : Color.timeBar
-                                )
-                        )
-                        .onTapGesture{
-                            if !viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) {
-                                withAnimation {
-                                    viewModel.wasPast = viewModel.selectDate < viewModel.today
-                                    viewModel.selectDate = viewModel.today
-                                    selection = 1
-                                }
+                
+                Text(viewModel.dateString(date: viewModel.today, component: .day))
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color.white)
+                    .frame(width: screenWidth / 14, height: screenWidth / 14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(
+                                viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day])
+                                ? Color.gray.opacity(0.5) : Color.timeBar
+                            )
+                    )
+                    .onTapGesture{
+                        if !viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                            withAnimation {
+                                viewModel.wasPast = viewModel.selectDate < viewModel.today
+                                viewModel.selectDate = viewModel.today
+                                selection = 1
                             }
                         }
-                }
+                    }
             }
             .padding(.horizontal)
             
