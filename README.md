@@ -9,7 +9,7 @@
 - iOS 16
 
 ## 특징
-- Firebase를 통한 사용자 데이터 저장
+- Firestore를 통한 사용자 데이터 저장
 - FirebaseAuth를 통한 사용자 인증
 - Combine를 현재 시각을 0.1초 단위로 최신화
 - frame 측정에 대한 GeometryReader 사용 최소화
