@@ -8,19 +8,25 @@
 import SwiftUI
 
 struct PlannerView: View {
-    @StateObject var viewModel = PlannerViewModel()
+    @StateObject var plannerVM = PlannerViewModel()
+    @StateObject var firebaseVM = FirebaseViewModel()
+    @EnvironmentObject var loginVM: LoginViewModel
     
     var body: some View {
-        VStack(spacing: 0) {
-            CalendarView()
-                .environmentObject(viewModel)
-            TimeLineView()
-                .environmentObject(viewModel)
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                CalendarView()
+                    .environmentObject(plannerVM)
+                    .environmentObject(loginVM)
+                TimeLineView()
+                    .environmentObject(plannerVM)
+            }
         }
     }
 }
 
 #Preview {
     PlannerView()
+        .environmentObject(LoginViewModel())
 }
 
