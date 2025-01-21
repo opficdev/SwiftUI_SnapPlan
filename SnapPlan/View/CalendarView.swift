@@ -9,7 +9,8 @@ import Foundation
 import SwiftUI
 
 struct CalendarView: View {
-    @EnvironmentObject private var viewModel: PlannerViewModel
+    @EnvironmentObject private var plannerVM: PlannerViewModel
+    @EnvironmentObject private var loginVM: LoginViewModel
     @Environment(\.colorScheme) var colorScheme
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var selection = 1  //  선택된 달력의 tag
@@ -26,10 +27,12 @@ struct CalendarView: View {
                     .foregroundStyle(Color.gray)
                     .padding(EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 8)) //  월 보여주는거 때문에 16 - 8
                     .onTapGesture {
-                        
+                        Task {
+                            await loginVM.signOutGoogle()
+                        }
                     }
                 HStack(spacing: 4) {
-                    Text(viewModel.getCurrentMonthYear())
+                    Text(plannerVM.getCurrentMonthYear())
                         .font(.title)
                         .bold()
                     Image(systemName: "chevron.down")
@@ -57,7 +60,7 @@ struct CalendarView: View {
                 Spacer()
                 
                 
-                Text(viewModel.dateString(date: viewModel.today, component: .day))
+                Text(plannerVM.dateString(date: plannerVM.today, component: .day))
                     .font(.subheadline)
                     .fontWeight(.bold)
                     .foregroundStyle(Color.white)
@@ -65,15 +68,15 @@ struct CalendarView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 8)
                             .fill(
-                                viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day])
+                                plannerVM.isSameDate(date1: plannerVM.today, date2: plannerVM.selectDate, components: [.year, .month, .day])
                                 ? Color.gray.opacity(0.5) : Color.timeBar
                             )
                     )
                     .onTapGesture{
-                        if !viewModel.isSameDate(date1: viewModel.today, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+                        if !plannerVM.isSameDate(date1: plannerVM.today, date2: plannerVM.selectDate, components: [.year, .month, .day]) {
                             withAnimation {
-                                viewModel.wasPast = viewModel.selectDate < viewModel.today
-                                viewModel.selectDate = viewModel.today
+                                plannerVM.wasPast = plannerVM.selectDate < plannerVM.today
+                                plannerVM.selectDate = plannerVM.today
                                 selection = 1
                             }
                         }
@@ -84,7 +87,7 @@ struct CalendarView: View {
             if showCalendar {
                 VStack(spacing: 0) {
                     HStack {
-                        ForEach(viewModel.daysOfWeek, id: \.self) { day in
+                        ForEach(plannerVM.daysOfWeek, id: \.self) { day in
                             Spacer()
                             Text(day)
                                 .foregroundStyle(Color.gray)
@@ -95,33 +98,33 @@ struct CalendarView: View {
                     .padding(.vertical, 8)
                     
                     TabView(selection: $selection) {
-                        let calendarData = viewModel.calendarData
+                        let calendarData = plannerVM.calendarData
                         ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, month in
-                            CalendarGrid(monthData: month, wasPast: $viewModel.wasPast)
-                                .environmentObject(viewModel)
+                            CalendarGrid(monthData: month, wasPast: $plannerVM.wasPast)
+                                .environmentObject(plannerVM)
                                 .tag(idx)
                                 .onDisappear {
                                     if selection == 0 {
-                                        let lastDate = viewModel.date(byAdding: .month, value: -2, to: viewModel.currentDate)!
-                                        let lastMonth = viewModel.calendarDates(date: lastDate)
-                                        viewModel.calendarData.insert(lastMonth, at: 0)
-                                        viewModel.calendarData.removeLast()
-                                        viewModel.currentDate = viewModel.date(byAdding: .month, value: -1, to: viewModel.currentDate)!
+                                        let lastDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
+                                        let lastMonth = plannerVM.calendarDates(date: lastDate)
+                                        plannerVM.calendarData.insert(lastMonth, at: 0)
+                                        plannerVM.calendarData.removeLast()
+                                        plannerVM.currentDate = plannerVM.date(byAdding: .month, value: -1, to: plannerVM.currentDate)!
                                     }
                                     else if selection == 2 {
-                                        let nextDate = viewModel.date(byAdding: .month, value: 2, to: viewModel.currentDate)!
-                                        let nextMonth = viewModel.calendarDates(date: nextDate)
-                                        viewModel.calendarData.append(nextMonth)
-                                        viewModel.calendarData.removeFirst()
-                                        viewModel.currentDate = viewModel.date(byAdding: .month, value: 1, to: viewModel.currentDate)!
+                                        let nextDate = plannerVM.date(byAdding: .month, value: 2, to: plannerVM.currentDate)!
+                                        let nextMonth = plannerVM.calendarDates(date: nextDate)
+                                        plannerVM.calendarData.append(nextMonth)
+                                        plannerVM.calendarData.removeFirst()
+                                        plannerVM.currentDate = plannerVM.date(byAdding: .month, value: 1, to: plannerVM.currentDate)!
                                     }
                                     selection = 1
                                 }
                         }
-                        .onChange(of: viewModel.selectDate) { newDate in
-                            viewModel.currentDate = newDate
-                            if !viewModel.isSameDate(date1: newDate, date2: viewModel.calendarData[1][15], components: [.year, .month]) {
-                                viewModel.setCalendarData(date: newDate)
+                        .onChange(of: plannerVM.selectDate) { newDate in
+                            plannerVM.currentDate = newDate
+                            if !plannerVM.isSameDate(date1: newDate, date2: plannerVM.calendarData[1][15], components: [.year, .month]) {
+                                plannerVM.setCalendarData(date: newDate)
                             }
                             selection = 1
                         }
