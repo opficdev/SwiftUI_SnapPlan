@@ -31,3 +31,25 @@
     </td>
   </tr>
 </table>
+
+
+## Firebase 구조
+```
+User (컬렉션)
+│  
+├── user1 (문서)  ⬅️ FirebaseAuth로 자동 연동
+│   │  
+│   ├── timeData (컬렉션)
+│   │   ├── 2025-01-21 (문서)
+│   │   │   ├── entries: [{id: ..., time: ..., timePeriod: ...}]
+│   │   ├── 2025-01-22 (문서)
+│   │  
+│   ├── 12timeFmt: true / false (필드)
+│  
+├── user2 (문서)
+│   ├── timeData (컬렉션)
+│   │   ├── 2025-01-21 (문서)
+│   │   ├── 2025-01-22 (문서)
+│   │  
+│   ├── 12timeFmt: true / false (필드)
+```
