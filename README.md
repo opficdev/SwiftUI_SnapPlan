@@ -11,7 +11,7 @@
 ## 특징
 - Firestore를 통한 사용자 데이터 저장
 - FirebaseAuth를 통한 사용자 인증
-- Combine를 현재 시각을 0.1초 단위로 최신화
+- Combine을 사용해 현재 시각을 0.1초 단위로 최신화
 - frame 측정에 대한 GeometryReader 사용 최소화
 - 라이트 / 다크 모드 지원
 - 사용자의 드래그, 스크롤 모션에 대한 애니메이션 구현
@@ -37,7 +37,7 @@
 ```
 User (컬렉션)
 │  
-├── user1 (문서)  ⬅️ FirebaseAuth로 자동 연동
+├── user1 (문서)  ⬅️ FirebaseAuth와 자동 연동
 │   │  
 │   ├── timeData (컬렉션)
 │   │   ├── 2025-01-21 (문서)
