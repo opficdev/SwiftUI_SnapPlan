@@ -12,11 +12,12 @@ struct TimeLineView: View {
     @Environment(\.colorScheme) var colorScheme
     let screenWidth = UIScreen.main.bounds.width
         
-    @State private var is12TimeFmt = true  //  후에 firebase에 저장 및 가져와야함
+    @State private var is12TimeFmt = true  // firebase에 저장 및 가져와야함
     @State private var timeZoneSize = CGSizeZero
-    @State private var gap: CGFloat = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var selection = 0
     @State private var calendarData = [Date]()
+    @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
+    @State private var lastGap = UIScreen.main.bounds.width / 24
     
     var body: some View {
         ZStack {
@@ -120,7 +121,7 @@ struct TimeLineView: View {
                                         //  스케줄 표시
                                         
                                         
-                                        CurrentTimeBar(
+                                        TimeBar(
                                             height: timeZoneSize.height,
                                             showVerticalLine: viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day])
                                         )
@@ -145,8 +146,11 @@ struct TimeLineView: View {
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                             .simultaneousGesture(
                                 MagnificationGesture()
-                                    .onChanged { value in
-                                        
+                                    .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
+                                        gap = min(screenWidth / 2, max(lastGap * value, screenWidth / 24))
+                                    }
+                                    .onEnded { _ in
+                                        lastGap = max(gap, screenWidth / 24)
                                     }
                             )
                         }
