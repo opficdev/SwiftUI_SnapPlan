@@ -18,6 +18,7 @@ struct TimeLineView: View {
     @State private var calendarData = [Date]()
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
+    @State private var offsetX: CGFloat = 0
     
     var body: some View {
         ZStack {
@@ -147,7 +148,7 @@ struct TimeLineView: View {
                             .simultaneousGesture(
                                 MagnificationGesture()
                                     .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
-                                        gap = min(screenWidth / 2, max(lastGap * value, screenWidth / 24))
+                                        gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
                                     }
                                     .onEnded { _ in
                                         lastGap = max(gap, screenWidth / 24)
