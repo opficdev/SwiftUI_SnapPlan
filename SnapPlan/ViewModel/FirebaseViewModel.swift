@@ -59,7 +59,8 @@ final class FirebaseViewModel: ObservableObject {
             }
             
             let timeDataList: [TimeData] = entries.compactMap { entry in
-                guard let idString = entry["id"] as? String,
+//                guard let idString = entry["id"] as? String,
+                guard let _ = entry["id"] as? String,
 //                      let id = UUID(uuidString: idString),
                       let time = entry["time"] as? String,
                       let timePeriod = entry["timePeriod"] as? String else { return nil }
