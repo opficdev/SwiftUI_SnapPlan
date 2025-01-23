@@ -1,5 +1,5 @@
 //
-//  TimeBox.swift
+//  ScheduleBox.swift
 //  SnapPlan
 //
 //  Created by opfic on 1/21/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TimeBox: View {
+struct ScheduleBox: View {
     @Binding var isChanging: Bool
     @State private var isVisible = true
     
@@ -60,5 +60,5 @@ struct TimeBox: View {
 }
 
 #Preview {
-    TimeBox(isChanging: .constant(false))
+    ScheduleBox(isChanging: .constant(false))
 }
