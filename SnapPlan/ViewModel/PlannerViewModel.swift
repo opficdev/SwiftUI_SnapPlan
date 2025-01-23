@@ -12,7 +12,7 @@ final class PlannerViewModel: ObservableObject {
     @Published var today = Date()
     @Published var selectDate = Date() //  캘린더에서 선택된 날짜
     @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
-    @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 로 수정 예정
+    @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 형태
     @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     
     init() {
@@ -38,9 +38,18 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
+    
+    /// 해당 스케줄의 시작 offset과 duration을 반환
+    func getTimeBoxOffset(from data: ScheduleData, timeZoneHeight: CGFloat, gap: CGFloat) -> (CGFloat, CGFloat) {
+        let startOffset = getOffsetFromMiniute(for: data.timeLine.0, timeZoneHeight: timeZoneHeight, gap: gap)
+        let endOffset = getOffsetFromMiniute(for: data.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap)
+        
+        return (startOffset, endOffset - startOffset)
+    }
+    
     func isCollapsed(timeZoneHeight: CGFloat, gap: CGFloat, index: Int) -> Bool {
-        let height = CGFloat(index) * (timeZoneHeight + gap)    // 시간대의 높이
-        let offset = (timeZoneHeight + gap) * 24 * getRatioToMiniute()
+        let height = CGFloat(index) * (timeZoneHeight + gap)
+        let offset = getOffsetFromMiniute(for: today, timeZoneHeight: timeZoneHeight, gap: gap)
         
         return height - timeZoneHeight <= offset && offset <= height + timeZoneHeight
     }
@@ -54,9 +63,9 @@ final class PlannerViewModel: ObservableObject {
         return "\(hour):" + String(format: "%02d", miniute)
     }
     
-    func getRatioToMiniute() -> CGFloat {
-        let startOfDay = calendar.startOfDay(for: today)
-        return CGFloat(calendar.dateComponents([.minute], from: startOfDay, to: today).minute ?? 0) / 1440
+    func getOffsetFromMiniute(for date: Date, timeZoneHeight: CGFloat, gap: CGFloat) -> CGFloat {
+        let startOfDay = calendar.startOfDay(for: date)
+        return CGFloat(calendar.dateComponents([.minute], from: startOfDay, to: date).minute ?? 0) * (timeZoneHeight + gap) * 24 / 1440
     }
     
     func getFirstDayOfMonth(date: Date) -> Date {
@@ -64,7 +73,7 @@ final class PlannerViewModel: ObservableObject {
     }
     
     func getHours(is12hoursFmt: Bool) -> [TimeData] {
-        let hours = Array(0...24) // 1에서 24까지 배열 생성
+        let hours = Array(0...24)
         
         if is12hoursFmt {
             return hours.map { hour in
