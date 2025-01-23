@@ -9,13 +9,20 @@ import SwiftUI
 
 struct ScheduleBox: View {
     @Binding var isChanging: Bool
+    @State private var height: CGFloat
     @State private var isVisible = true
+    
+    init(height: CGFloat, isChanging: Binding<Bool>) {
+        self._height = State(initialValue: height)
+        self._isChanging = isChanging
+    }
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
+            Group {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.cyan.opacity(isVisible ? 0.4 : 0.1))
+                    .frame(height: height)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(Color.cyan, lineWidth: 2)
@@ -31,34 +38,36 @@ struct ScheduleBox: View {
                     }
                 
                 VStack {
-                    VStack {
-                        Circle()
-                            .fill(Color.timeLine)
-                            .frame(width: 16, height: 16)
-                            .overlay(
-                                Circle().stroke(Color.cyan, lineWidth: 2) // 테두리 추가
-                            )
-                            .offset(x: geometry.size.width * 0.1, y: -8)
-                    }
-                    .frame(width: geometry.size.width, alignment: .leading)
-                    
-                    Spacer()
-                    VStack {
-                        Circle()
-                            .fill(Color.timeLine)
-                            .frame(width: 16, height: 16)
-                            .overlay(
-                                Circle().stroke(Color.cyan, lineWidth: 2) // 테두리 추가
-                            )
-                            .offset(x: -geometry.size.width * 0.1, y: 8)
-                    }
-                    .frame(width: geometry.size.width, alignment: .trailing)
+                    Circle()
+                        .fill(Color.timeLine)
+                        .frame(width: 16, height: 16)
+                        .overlay(
+                            Circle().stroke(Color.cyan, lineWidth: 2) // 테두리 추가
+                        )
+                        .offset(x: geometry.size.width * 0.1, y: -8)
                 }
+                .frame(width: geometry.size.width, alignment: .leading)
+                    
+                VStack {
+                    Circle()
+                        .fill(Color.timeLine)
+                        .frame(width: 16, height: 16)
+                        .overlay(
+                            Circle().stroke(Color.cyan, lineWidth: 2) // 테두리 추가
+                        )
+                        .offset(x: -geometry.size.width * 0.1, y: 8)
+                }
+                .frame(width: geometry.size.width, alignment: .trailing)
+                .offset(y: height - 16)
             }
+            .offset(y: -8)
         }
     }
 }
 
 #Preview {
-    ScheduleBox(isChanging: .constant(false))
+    ScheduleBox(
+        height: 100,
+        isChanging: .constant(false)
+    )
 }
