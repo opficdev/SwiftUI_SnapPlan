@@ -7,9 +7,11 @@
 
 import Foundation
 
-struct ScheduleData {
+struct ScheduleData: Identifiable {
+    let id = UUID()
     var title: String
     var timeLine: (Date, Date)
+    var isChanging = false
     
     mutating func setTitle(newTitle: String) {
         self.title = newTitle
