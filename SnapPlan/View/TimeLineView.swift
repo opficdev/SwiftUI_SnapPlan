@@ -18,7 +18,38 @@ struct TimeLineView: View {
     @State private var calendarData = [Date]()
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
-    @State private var offsetX: CGFloat = 0
+    @State private var schedules = [ScheduleData]()
+    
+    init() {
+        // 테스트 코드
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: Date())
+        
+        let initialSchedules = [
+            ScheduleData(
+                title: "1. Meeting",
+                timeLine: (
+                    calendar.date(byAdding: .minute, value: 40, to: startOfDay)!,
+                    calendar.date(byAdding: .minute, value: 70, to: startOfDay)!
+                )
+            ),
+//            ScheduleData(
+//                title: "2. Lunch Break",
+//                timeLine: (
+//                    calendar.date(byAdding: .minute, value: 120, to: startOfDay)!,
+//                    calendar.date(byAdding: .minute, value: 180, to: startOfDay)!
+//                )
+//            ),
+            ScheduleData(
+                title: "3. Project Review",
+                timeLine: (
+                    calendar.date(byAdding: .minute, value: 600, to: startOfDay)!,
+                    calendar.date(byAdding: .minute, value: 720, to: startOfDay)!
+                )
+            )
+        ]
+        _schedules = State(initialValue: initialSchedules)
+    }
     
     var body: some View {
         ZStack {
@@ -95,9 +126,14 @@ struct TimeLineView: View {
                                 Text(viewModel.getHoursAndMiniute(is12hoursFmt: is12TimeFmt))
                                     .font(.caption)
                                     .padding(.trailing, 2)
-                                    .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
+                                    .offset(y: viewModel.getOffsetFromMiniute(
+                                        for: viewModel.today,
+                                        timeZoneHeight: timeZoneSize.height,
+                                        gap: gap)
+                                    )
                             }
                             
+                            //  좌우로 드래그 가능한 TimeLine
                             TabView(selection: $selection) {
                                 ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
                                     ZStack(alignment: .top) {
@@ -119,9 +155,21 @@ struct TimeLineView: View {
                                                 .frame(height: timeZoneSize.height)
                                             }
                                         }
-                                        //  스케줄 표시
                                         
-                                        
+                                        //  스케줄 목록을 표시하는 ScheduleBox
+                                        ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, schedule in
+                                            let (startOffset, boxHeight) = viewModel.getTimeBoxOffset(
+                                                from: schedule,
+                                                timeZoneHeight: timeZoneSize.height,
+                                                gap: gap
+                                            )
+                                            ScheduleBox(
+                                                height: boxHeight,
+                                                isChanging: $schedules[idx].isChanging)
+                                                .offset(y: timeZoneSize.height + startOffset)
+                                        }
+         
+                                        //  현 시간 표시하는 TimeBar
                                         TimeBar(
                                             height: timeZoneSize.height,
                                             showVerticalLine: viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day])
@@ -130,7 +178,11 @@ struct TimeLineView: View {
                                         .padding(
                                             .leading, viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) ? 2 : 0
                                         )
-                                        .offset(y: (timeZoneSize.height + gap) * 24 * viewModel.getRatioToMiniute())
+                                        .offset(y: viewModel.getOffsetFromMiniute(
+                                            for: viewModel.today,
+                                            timeZoneHeight: timeZoneSize.height,
+                                            gap: gap)
+                                        )
                                     }
                                     .tag(idx)
                                 }
