@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         unsetenv("GRPC_TRACE") // GRPC_TRACE 환경 변수 제거
         
         // Firebase 디버그 로그 활성화
-        FirebaseConfiguration.shared.setLoggerLevel(.debug)
+//        FirebaseConfiguration.shared.setLoggerLevel(.debug)
         
         return true
     }
