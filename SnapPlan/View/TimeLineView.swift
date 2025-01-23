@@ -20,37 +20,6 @@ struct TimeLineView: View {
     @State private var lastGap = UIScreen.main.bounds.width / 24
     @State private var schedules = [ScheduleData]()
     
-    init() {
-        // 테스트 코드
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: Date())
-        
-        let initialSchedules = [
-            ScheduleData(
-                title: "1. Meeting",
-                timeLine: (
-                    calendar.date(byAdding: .minute, value: 40, to: startOfDay)!,
-                    calendar.date(byAdding: .minute, value: 70, to: startOfDay)!
-                )
-            ),
-//            ScheduleData(
-//                title: "2. Lunch Break",
-//                timeLine: (
-//                    calendar.date(byAdding: .minute, value: 120, to: startOfDay)!,
-//                    calendar.date(byAdding: .minute, value: 180, to: startOfDay)!
-//                )
-//            ),
-            ScheduleData(
-                title: "3. Project Review",
-                timeLine: (
-                    calendar.date(byAdding: .minute, value: 600, to: startOfDay)!,
-                    calendar.date(byAdding: .minute, value: 720, to: startOfDay)!
-                )
-            )
-        ]
-        _schedules = State(initialValue: initialSchedules)
-    }
-    
     var body: some View {
         ZStack {
             Color.timeLine.ignoresSafeArea()
