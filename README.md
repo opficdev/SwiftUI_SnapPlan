@@ -20,14 +20,32 @@
 <table>
   <tr>
     <td align="center" width="200px">
+      <img src="./Preview/login_light.png" width="200px">
+      <p><strong>로그인 (라이트 모드)</strong></p>
+    </td>
+    <td align="center" width="200px">
+      <img src="./Preview/login_dark.png" width="200px">
+      <p><strong>로그인 (다크 모드)</strong></p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="200px">
       <img src="./Preview/main_light.png" width="200px">
-      <img src="./Preview/main_light_expand.png" width="200px">
-      <p><strong>라이트 모드</strong></p>
+      <p><strong>메인 화면 (라이트 모드)</strong></p>
     </td>
     <td align="center" width="200px">
       <img src="./Preview/main_dark.png" width="200px">
+      <p><strong>메인 화면 (다크 모드)</strong></p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="200px">
+      <img src="./Preview/main_light_expand.png" width="200px">
+      <p><strong>캘린더 확장 (라이트 모드)</strong></p>
+    </td>
+    <td align="center" width="200px">
       <img src="./Preview/main_dark_expand.png" width="200px">
-      <p><strong>다크 모드</strong></p>
+      <p><strong>캘린더 확장 (다크 모드)</strong></p>
     </td>
   </tr>
 </table>
