@@ -21,11 +21,11 @@ struct ScheduleBox: View {
         GeometryReader { geometry in
             Group {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.cyan.opacity(isVisible ? 0.4 : 0.1))
+                    .fill(Color.scheduleBox.opacity(isVisible ? 0.8 : 0.6))
                     .frame(height: height)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.cyan, lineWidth: 2)
+                            .stroke(Color.scheduleBox, lineWidth: 2)
                     )
                     .onAppear {
                         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -36,13 +36,18 @@ struct ScheduleBox: View {
                             }
                         }
                     }
+                    .onChange(of: isChanging) { value in
+                        if !value {
+                            isVisible = true
+                        }
+                    }
                 
                 VStack {
                     Circle()
                         .fill(Color.timeLine)
                         .frame(width: 16, height: 16)
                         .overlay(
-                            Circle().stroke(Color.cyan, lineWidth: 2) // 테두리 추가
+                            Circle().stroke(Color.scheduleBox, lineWidth: 2) // 테두리 추가
                         )
                         .offset(x: geometry.size.width * 0.1, y: -8)
                 }
@@ -53,7 +58,7 @@ struct ScheduleBox: View {
                         .fill(Color.timeLine)
                         .frame(width: 16, height: 16)
                         .overlay(
-                            Circle().stroke(Color.cyan, lineWidth: 2) // 테두리 추가
+                            Circle().stroke(Color.scheduleBox, lineWidth: 2) // 테두리 추가
                         )
                         .offset(x: -geometry.size.width * 0.1, y: 8)
                 }
