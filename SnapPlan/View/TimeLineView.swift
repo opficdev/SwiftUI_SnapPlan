@@ -134,8 +134,13 @@ struct TimeLineView: View {
                                             )
                                             ScheduleBox(
                                                 height: boxHeight,
-                                                isChanging: $schedules[idx].isChanging)
+                                                isChanging: $schedules[idx].isChanging
+                                            )
                                                 .offset(y: timeZoneSize.height + startOffset)
+                                                .onTapGesture {
+                                                    schedules.indices.forEach { schedules[$0].isChanging = false }
+                                                    schedules[idx].isChanging.toggle()
+                                                }
                                         }
          
                                         //  현 시간 표시하는 TimeBar
