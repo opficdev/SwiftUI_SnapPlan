@@ -24,7 +24,7 @@ struct TimeBar: View {
                     .foregroundColor(showVerticalLine ? Color.timeBar : Color.gray)
             }
             Rectangle()
-                .frame(height: 2)
+                .frame(height: showVerticalLine ? 2 : 1)
                 .foregroundStyle(showVerticalLine ? Color.timeBar : Color.gray)
         }
         .frame(height: height)
