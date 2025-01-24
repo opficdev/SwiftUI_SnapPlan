@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TimeBar: View {
+    @Environment(\.colorScheme) var colorScheme
     @State private var height: CGFloat
     @State private var showVerticalLine: Bool
     
@@ -17,15 +18,31 @@ struct TimeBar: View {
     }
     
     var body: some View {
-        HStack(spacing: 0) {
-            if showVerticalLine {
-                Rectangle()
-                    .frame(width: 2, height: height)
-                    .foregroundColor(showVerticalLine ? Color.timeBar : Color.gray)
+        ZStack(alignment: .leading) {
+            HStack(spacing: 0) {
+                Group {
+                    if showVerticalLine {
+                        Rectangle()
+                            .frame(width: 2, height: height)
+                            .foregroundStyle(showVerticalLine ? Color.timeBar : Color.gray)
+                    }
+                    Rectangle()
+                        .frame(height: showVerticalLine ? 2 : 1)
+                        .foregroundStyle(showVerticalLine ? Color.timeBar : Color.gray)
+                }
+                .overlay {
+                    if showVerticalLine && colorScheme == .dark {
+                        Rectangle()
+                            .stroke(Color.white, lineWidth: 0.5)
+                    }
+                }
             }
-            Rectangle()
-                .frame(height: showVerticalLine ? 2 : 1)
-                .foregroundStyle(showVerticalLine ? Color.timeBar : Color.gray)
+            if showVerticalLine && colorScheme == .dark {
+                Rectangle()
+                    .fill(Color.timeBar)
+                    .frame(width: 4, height: 1.5)
+                    .offset(x: 1)
+            }
         }
         .frame(height: height)
     }
