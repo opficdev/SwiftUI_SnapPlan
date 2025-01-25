@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DF379BC12D44891800E10867 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = DF379BC02D44891800E10867 /* SwiftUIIntrospect */; };
 		DF4E0FC12D3AA28500024F67 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E0FC02D3AA28500024F67 /* FirebaseAuth */; };
 		DF4E0FC32D3AA28500024F67 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E0FC22D3AA28500024F67 /* FirebaseCore */; };
 		DF4E0FC52D3AA28500024F67 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E0FC42D3AA28500024F67 /* FirebaseFirestore */; };
@@ -60,6 +61,7 @@
 				DF4E0FC92D3AA28500024F67 /* FirebaseStorage in Frameworks */,
 				DF4E0FC52D3AA28500024F67 /* FirebaseFirestore in Frameworks */,
 				DF6B55012D2399A3006BB54A /* GoogleSignIn in Frameworks */,
+				DF379BC12D44891800E10867 /* SwiftUIIntrospect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +114,7 @@
 				DF4E0FC42D3AA28500024F67 /* FirebaseFirestore */,
 				DF4E0FC62D3AA28500024F67 /* FirebaseMessaging */,
 				DF4E0FC82D3AA28500024F67 /* FirebaseStorage */,
+				DF379BC02D44891800E10867 /* SwiftUIIntrospect */,
 			);
 			productName = SwiftUI_SnapPlan;
 			productReference = DF4F8AF52D228F2700ACA504 /* SnapPlan.app */;
@@ -143,6 +146,7 @@
 			packageReferences = (
 				DF6B54FF2D2399A3006BB54A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				DF4E0FBF2D3AA28500024F67 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				DF379BBF2D44891800E10867 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DF4F8AF62D228F2700ACA504 /* Products */;
@@ -403,6 +407,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		DF379BBF2D44891800E10867 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
 		DF4E0FBF2D3AA28500024F67 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -422,6 +434,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		DF379BC02D44891800E10867 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF379BBF2D44891800E10867 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = SwiftUIIntrospect;
+		};
 		DF4E0FC02D3AA28500024F67 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DF4E0FBF2D3AA28500024F67 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
