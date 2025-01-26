@@ -7,7 +7,7 @@
 
 import SwiftUI
 import SwiftUIIntrospect
-import UIKit
+
 
 struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
@@ -27,7 +27,7 @@ struct PlannerView: View {
                 .presentationDetents([.fraction(0.1), .fraction(0.4), .fraction(0.99)])
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled(true)
-                .applyBackgroundInteraction() // ✅ iOS 버전에 따라 다른 동작 적용
+                .applyBackgroundInteraction() // iOS 버전에 따라 다른 동작 적용
         }
     }
 }
@@ -43,22 +43,9 @@ extension View {
             // iOS 16: `introspect`를 사용하여 UIKit로 제어
             self.introspect(.sheet, on: .iOS(.v16)) { controller in
                 if let sheet = controller as? UISheetPresentationController {
-                // 커스텀 detent 생성 (0.1, 0.4, 0.99 크기)
-                    let smallDetent = UISheetPresentationController.Detent.custom { context in
-                        return context.maximumDetentValue * 0.1
+                    if let maxDetent = sheet.detents.max(by: { $0.identifier.rawValue < $1.identifier.rawValue }) {
+                        sheet.largestUndimmedDetentIdentifier = maxDetent.identifier
                     }
-                    let mediumDetent = UISheetPresentationController.Detent.custom { context in
-                        return context.maximumDetentValue * 0.4
-                    }
-                    let largeDetent = UISheetPresentationController.Detent.custom { context in
-                        return context.maximumDetentValue * 0.99
-                    }
-
-                    // detents 배열에 커스텀 detent 추가
-                    sheet.detents = [smallDetent, mediumDetent, largeDetent]
-
-                    // largestUndimmedDetentIdentifier를 마지막 detent로 설정 (0.99)
-                    sheet.largestUndimmedDetentIdentifier = largeDetent.identifier
                 }
             }
         }
