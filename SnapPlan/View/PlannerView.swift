@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftUIIntrospect
+import UIKit
 
 struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
@@ -14,45 +15,82 @@ struct PlannerView: View {
     @EnvironmentObject var loginVM: LoginViewModel
     
     var body: some View {
-        VStack(spacing: 0) {
-            CalendarView()
-                .environmentObject(plannerVM)
-                .environmentObject(loginVM)
-            TimeLineView()
-                .environmentObject(plannerVM)
-        }
-        .sheet(isPresented: .constant(true)) {
-            ScheduleView(schedules: .constant(nil))
-                .presentationDetents([.fraction(0.1), .fraction(0.4), .fraction(0.99)])
-                .presentationDragIndicator(.visible)
-                .interactiveDismissDisabled(true)
-                .applyBackgroundInteraction()
+        ZStack(alignment: .bottomTrailing) {
+            VStack(spacing: 0) {
+                CalendarView()
+                    .environmentObject(plannerVM)
+                    .environmentObject(loginVM)
+                TimeLineView()
+                    .environmentObject(plannerVM)
+            }
+//                    .sheet(isPresented: .constant(true)) {
+//                        ScheduleView(schedules: .constant(nil))
+//                            .presentationDetents([.fraction(0.1), .fraction(0.4), .fraction(0.99)])
+//                            .presentationDragIndicator(.visible)
+//                            .interactiveDismissDisabled(true)
+//                            .presentationBackgroundInteraction(.enabled)
+//                    }
+            
+            UIKitSheetWrapper()
         }
     }
 }
 
-extension View {
-    /// iOS 16.4 이상에서는 `.presentationBackgroundInteraction(.enabled)`,
-    /// iOS 16.0~16.3에서는 `swiftui-introspect`를 사용하여 UIKit에서 직접 제어
-    @ViewBuilder
-    func applyBackgroundInteraction() -> some View {
-        if #available(iOS 16.4, *) {
-            self.presentationBackgroundInteraction(.enabled)
+struct UIKitSheetWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        let rootController = UIViewController()
+        rootController.view.backgroundColor = .clear
+
+        DispatchQueue.main.async {
+            let sheetVC = MainViewController()
+            sheetVC.modalPresentationStyle = .overFullScreen
+            sheetVC.modalTransitionStyle = .crossDissolve
+            rootController.present(sheetVC, animated: true)
         }
-        else {
-            self.introspect(.sheet, on: .iOS(.v16)) { controller in //  controller: UIPresentationController
-//                if let sheet = controller.sheetPresentationController {
-//                    sheet.prefersGrabberVisible = true
-//                    sheet.largestUndimmedDetentIdentifier = .medium
-//                    controller.isModalInPresentation = true // 배경 터치 방지 (위로 드래그 제한)
-//                }
-                
-                controller.largestUndimmedDetentIdentifier = .medium
-                controller.isAccessibilityElement = true
-            }
+        return rootController
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+
+class MainViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .clear // ✅ 배경 투명 유지
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        presentSheet()
+    }
+
+    func presentSheet() {
+        let scheduleVC = ScheduleViewController()
+        if let sheet = scheduleVC.sheetPresentationController {
+            sheet.detents = [
+                .custom(resolver: { context in 0.1 * context.maximumDetentValue }),
+                .custom(resolver: { context in 0.4 * context.maximumDetentValue }),
+                .custom(resolver: { context in 0.99 * context.maximumDetentValue })
+            ]
+            sheet.prefersGrabberVisible = true // ✅ .presentationDragIndicator(.visible)
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
+            sheet.prefersEdgeAttachedInCompactHeight = false
         }
+
+        // 시트의 뷰가 터치 이벤트를 가로채지 않도록 설정
+        scheduleVC.view.isUserInteractionEnabled = false
+        present(scheduleVC, animated: true)
     }
 }
+
+class ScheduleViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        isModalInPresentation = true // ✅ SwiftUI의 .interactiveDismissDisabled(true)와 동일
+    }
+}
+
 #Preview {
     PlannerView()
         .environmentObject(LoginViewModel())
