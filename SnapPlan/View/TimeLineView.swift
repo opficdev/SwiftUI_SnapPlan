@@ -138,8 +138,13 @@ struct TimeLineView: View {
                                             )
                                                 .offset(y: timeZoneSize.height + startOffset)
                                                 .onTapGesture {
-                                                    schedules.indices.forEach { schedules[$0].isChanging = false }
-                                                    schedules[idx].isChanging.toggle()
+                                                    if schedules[idx].isChanging {
+                                                        schedules[idx].isChanging = false
+                                                    }
+                                                    else {
+                                                        schedules.indices.forEach { schedules[$0].isChanging = false }
+                                                        schedules[idx].isChanging = true
+                                                    }
                                                 }
                                         }
          
