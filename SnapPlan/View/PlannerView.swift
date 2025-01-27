@@ -25,8 +25,8 @@ struct PlannerView: View {
         .sheet(isPresented: .constant(true)) {
             ScheduleView(schedule: .constant(nil))
                 .presentationDetents(
-                    firebaseVM.isScheduleExist() ?
-                    [.fraction(0.4), .fraction(0.99)] : [.fraction(0.1)]
+                    firebaseVM.isScheduleExist ?
+                    [.fraction(0.4), .fraction(0.99)] : [.fraction(0.07)]
                 )
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled(true)
@@ -38,6 +38,13 @@ struct PlannerView: View {
                     }
                 }
         }
+        .onAppear {
+            firebaseVM.checkScheduleExist(for: loginVM.userId, date: plannerVM.selectDate)
+        }
+        .onChange(of: plannerVM.selectDate) { newDate in
+            firebaseVM.checkScheduleExist(for: loginVM.userId, date: newDate)
+        }
+        
     }
 }
 
