@@ -21,6 +21,7 @@ struct PlannerView: View {
                 .environmentObject(loginVM)
             TimeLineView()
                 .environmentObject(plannerVM)
+                .padding(.bottom, UIScreen.main.bounds.height * 0.07)
         }
         .sheet(isPresented: .constant(true)) {
             ScheduleView(schedule: .constant(nil))
