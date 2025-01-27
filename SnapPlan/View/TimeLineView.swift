@@ -32,32 +32,25 @@ struct TimeLineView: View {
                             is12TimeFmt.toggle()
                         }
                     
-                    TabView(selection: $selection) {
-                        ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
-                            HStack {
-                                Text(viewModel.dateString(date: date, component: .day))
-                                    .font(.callout)
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(
-                                            viewModel.isSameDate(
-                                                date1: date,
-                                                date2: viewModel.today,
-                                                components: [.year, .month, .day]) ? Color.timeBar : Color.gray.opacity(0.5)
-                                        )
-                                        .frame(width: screenWidth / 14, height: screenWidth / 14)
-                                    Text("\(DateFormatter.krWeekDay.string(from: date))")
-                                        .font(.callout)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(Color.white)
-                                }
-                            }
-                            .tag(idx)
+                    HStack {
+                        Text(viewModel.dateString(date: viewModel.selectDate, component: .day))
+                            .font(.callout)
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(
+                                    viewModel.isSameDate(
+                                        date1: viewModel.selectDate,
+                                        date2: viewModel.today,
+                                        components: [.year, .month, .day]) ? Color.timeBar : Color.gray.opacity(0.5)
+                                )
+                                .frame(width: screenWidth / 14, height: screenWidth / 14)
+                            Text("\(DateFormatter.krWeekDay.string(from: viewModel.selectDate))")
+                                .font(.callout)
+                                .fontWeight(.bold)
+                                .foregroundColor(Color.white)
                         }
-                        .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
                     }
-                    .frame(width: screenWidth - timeZoneSize.width, height: screenWidth / 10)
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    .frame(width: screenWidth * 6 / 7, height: screenWidth / 10)
                 }
                 .background(Color.calendar)
                 
@@ -75,7 +68,8 @@ struct TimeLineView: View {
                                                 .opacity(
                                                     viewModel.isCollapsed(
                                                         timeZoneHeight: timeZoneSize.height,
-                                                        gap: gap, index: index) ? 0 : 1
+                                                        gap: gap,
+                                                        index: index) ? 0 : 1
                                                 )
                                                 .padding(.trailing, 2)
                                                 .frame(width: screenWidth / 7, alignment: .trailing)
@@ -94,9 +88,10 @@ struct TimeLineView: View {
                                         .font(.caption)
                                         .padding(.trailing, 2)
                                         .offset(y: viewModel.getOffsetFromMiniute(
-                                            for: viewModel.today,
-                                            timeZoneHeight: timeZoneSize.height,
-                                            gap: gap)
+                                                for: viewModel.today,
+                                                timeZoneHeight: timeZoneSize.height,
+                                                gap: gap
+                                            )
                                         )
                                 }
                                 
