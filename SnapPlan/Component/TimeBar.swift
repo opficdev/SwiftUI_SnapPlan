@@ -31,13 +31,13 @@ struct TimeBar: View {
                         .foregroundStyle(showVerticalLine ? Color.timeBar : Color.gray)
                 }
                 .overlay {
-                    if showVerticalLine && colorScheme == .dark {
+                    if showVerticalLine {
                         Rectangle()
                             .stroke(Color.white, lineWidth: 0.5)
                     }
                 }
             }
-            if showVerticalLine && colorScheme == .dark {
+            if showVerticalLine {
                 Rectangle()
                     .fill(Color.timeBar)
                     .frame(width: 4, height: 1.5)
