@@ -58,7 +58,7 @@ final class PlannerViewModel: ObservableObject {
         let hour = calendar.component(.hour, from: today)
         let miniute = calendar.component(.minute, from: today)
         if is12hoursFmt {
-            return "오" + (hour < 12 ? "전" : "후") + " \(hour % 12):" + String(format: "%02d", miniute)
+            return "오" + (hour < 12 ? "전" : "후") + " \(hour == 12 ? 12 : hour % 12):" + String(format: "%02d", miniute)
         }
         return "\(hour):" + String(format: "%02d", miniute)
     }
