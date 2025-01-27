@@ -42,28 +42,30 @@ struct ScheduleBox: View {
                         }
                     }
                 
-                VStack {
-                    Circle()
-                        .fill(Color.timeLine)
-                        .frame(width: 16, height: 16)
-                        .overlay(
-                            Circle().stroke(Color.scheduleBox, lineWidth: 2) // 테두리 추가
-                        )
-                        .offset(x: geometry.size.width * 0.1, y: -8)
-                }
-                .frame(width: geometry.size.width, alignment: .leading)
+                if isChanging {
+                    VStack {
+                        Circle()
+                            .fill(Color.timeLine)
+                            .frame(width: 16, height: 16)
+                            .overlay(
+                                Circle().stroke(Color.scheduleBox, lineWidth: 2) // 테두리 추가
+                            )
+                            .offset(x: geometry.size.width * 0.1, y: -8)
+                    }
+                    .frame(width: geometry.size.width, alignment: .leading)
                     
-                VStack {
-                    Circle()
-                        .fill(Color.timeLine)
-                        .frame(width: 16, height: 16)
-                        .overlay(
-                            Circle().stroke(Color.scheduleBox, lineWidth: 2) // 테두리 추가
-                        )
-                        .offset(x: -geometry.size.width * 0.1, y: 8)
+                    VStack {
+                        Circle()
+                            .fill(Color.timeLine)
+                            .frame(width: 16, height: 16)
+                            .overlay(
+                                Circle().stroke(Color.scheduleBox, lineWidth: 2) // 테두리 추가
+                            )
+                            .offset(x: -geometry.size.width * 0.1, y: 8)
+                    }
+                    .frame(width: geometry.size.width, alignment: .trailing)
+                    .offset(y: height - 16)
                 }
-                .frame(width: geometry.size.width, alignment: .trailing)
-                .offset(y: height - 16)
             }
             .offset(y: -8)
         }
