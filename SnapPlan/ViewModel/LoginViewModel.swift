@@ -16,6 +16,7 @@ import GoogleSignInSwift
 @MainActor
 final class LoginViewModel: ObservableObject {
     @Published var signedIn = Auth.auth().currentUser != nil
+    @Published var userId = Auth.auth().currentUser?.uid
     
     func signInGoogle() async {
         do {
