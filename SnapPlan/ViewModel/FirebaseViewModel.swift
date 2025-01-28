@@ -11,36 +11,6 @@ import FirebaseFirestore
 
 final class FirebaseViewModel: ObservableObject {
     private let db = Firestore.firestore()
-    
-    @Published var isScheduleExist = true
-       
-   func checkScheduleExist(for userId: String?, date: Date) {
-       guard let userId = userId else {
-           self.isScheduleExist = false
-           return
-       }
-       
-       let dateFormatter = DateFormatter()
-       dateFormatter.dateFormat = "yyyy-MM-dd"
-       let dateString = dateFormatter.string(from: date)
-       
-       fetchTimeData(for: userId, date: dateString) { timeDataArr, error in
-           DispatchQueue.main.async {
-               if let error = error {
-                   print("Error fetching time data: \(error.localizedDescription)")
-                   self.isScheduleExist = false
-                   return
-               }
-               
-               if let timeDataArr = timeDataArr, !timeDataArr.isEmpty {
-                   self.isScheduleExist = true
-               }
-               else {
-                   self.isScheduleExist = false
-               }
-           }
-       }
-   }
         
     /// 특정 날짜에 `TimeData`를 추가하는 메소드
     func addTimeData(for userId: String, date: String, timeData: TimeData, completion: @escaping (Error?) -> Void) {
