@@ -10,10 +10,10 @@ import SwiftUI
 
 struct CalendarView: View {
     @EnvironmentObject private var plannerVM: PlannerViewModel
-    @EnvironmentObject private var loginVM: LoginViewModel
     @Environment(\.colorScheme) var colorScheme
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var selection = 1  //  선택된 달력의 tag
+    @Binding var showSideBar: Bool
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -28,7 +28,7 @@ struct CalendarView: View {
                     .padding(EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 8)) //  월 보여주는거 때문에 16 - 8
                     .onTapGesture {
                         Task {
-                            await loginVM.signOutGoogle()
+                            showSideBar = true
                         }
                     }
                 HStack(spacing: 4) {
@@ -144,6 +144,8 @@ struct CalendarView: View {
 }
 
 #Preview {
-    CalendarView()
+    CalendarView(
+        showSideBar: .constant(false)
+    )
         .environmentObject(PlannerViewModel())
 }
