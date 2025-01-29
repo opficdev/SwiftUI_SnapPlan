@@ -19,13 +19,9 @@ struct PlannerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            CalendarView(
-                showSideBar: $showSideBar
-            )
+            CalendarView(showSideBar: $showSideBar)
                 .environmentObject(plannerVM)
-            TimeLineView(
-                didSelectSchedule: $didSelectSchedule
-            )
+            TimeLineView(didSelectSchedule: $didSelectSchedule)
                 .environmentObject(plannerVM)
         }
         .sheet(isPresented: .constant(true)) {
@@ -47,12 +43,13 @@ struct PlannerView: View {
         }
     }
     
+    //  특정 조건에 따라 detent 설정
     private func getDetent() -> Set<PresentationDetent> {
         if didSelectSchedule {
-            return [.fraction(0.4), .fraction(0.9)]
+            return [.fraction(0.4), .fraction(0.99)]
         }
         if tapButton {
-            return [.fraction(0.9)]
+            return [.fraction(0.99)]
         }
         return [.fraction(0.07)]
     }
