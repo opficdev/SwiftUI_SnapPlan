@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ScheduleView: View {
     @Binding var schedule: TimeData?
+    @Binding var tapButton: Bool
     let colorArr = [
         Color.macBlue,
         Color.macPurple,
@@ -19,11 +20,10 @@ struct ScheduleView: View {
         Color.macGreen
     ]
     @State private var title = ""
-    @State private var addSchedule = false
 
     var body: some View {
         VStack {
-            if schedule == nil {
+            if !tapButton {
                 HStack {
                     Text("선택된 이벤트 없음")
                         .font(.footnote)
@@ -31,7 +31,7 @@ struct ScheduleView: View {
                         .padding(.leading)
                     Spacer()
                     Button(action: {
-                        addSchedule = false
+                        tapButton = true
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .symbolRenderingMode(.palette)
@@ -44,26 +44,29 @@ struct ScheduleView: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        addSchedule = false
+                        tapButton = false
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .symbolRenderingMode(.palette)
                             .foregroundStyle(Color.white, Color.gray)
-                            .font(.system(size: 24))
-                            .rotationEffect(.degrees(30))
+                            .font(.system(size: 30))
+                            .rotationEffect(.degrees(45))
                     }
                 }
                 TextField("제목", text: $title)
                 
                     
             }
+            Spacer()
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .padding()
     }
 }
 
 #Preview {
     ScheduleView(
-        schedule: .constant(nil)
+        schedule: .constant(nil),
+        tapButton: .constant(false)
     )
 }
