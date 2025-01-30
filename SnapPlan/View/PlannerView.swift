@@ -16,6 +16,7 @@ struct PlannerView: View {
     @State private var showSideBar = false
     @State private var didSelectSchedule = false
     @State private var tapButton = false
+    @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     
     var body: some View {
         VStack(spacing: 0) {
@@ -27,13 +28,13 @@ struct PlannerView: View {
         .sheet(isPresented: .constant(true)) {
             ScheduleView(
                 schedule: .constant(nil),
-                tapButton: $tapButton
+                tapButton: $tapButton,
+                currentDetent: $currentDetent
             )
-            .ignoresSafeArea(.keyboard)
-            .presentationDetents(getDetent())
+            .presentationDetents(currentDetent)
             .presentationDragIndicator(.visible)
             .interactiveDismissDisabled(true)
-            .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in
+            .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌
                 if let sheet = controller as? UISheetPresentationController {
                     if let maxDetent = sheet.detents.max(by: { $0.identifier.rawValue < $1.identifier.rawValue }) {
                         sheet.largestUndimmedDetentIdentifier = maxDetent.identifier
@@ -41,17 +42,6 @@ struct PlannerView: View {
                 }
             }
         }
-    }
-    
-    //  특정 조건에 따라 detent 설정
-    private func getDetent() -> Set<PresentationDetent> {
-        if didSelectSchedule {
-            return [.fraction(0.4), .fraction(0.99)]
-        }
-        if tapButton {
-            return [.fraction(0.99)]
-        }
-        return [.fraction(0.07)]
     }
 }
 
