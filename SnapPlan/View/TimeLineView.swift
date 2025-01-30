@@ -11,6 +11,7 @@ struct TimeLineView: View {
     @EnvironmentObject private var viewModel: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
     let screenWidth = UIScreen.main.bounds.width
+    @Binding var didSelectSchedule: Bool
         
     @State private var is12TimeFmt = true  // firebase에 저장 및 가져와야함
     @State private var timeZoneSize = CGSizeZero
@@ -23,7 +24,7 @@ struct TimeLineView: View {
     var body: some View {
         ZStack {
             Color.timeLine.ignoresSafeArea()
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 0) {
                     Text(is12TimeFmt ? "12시간제" : "24시간제")
                         .frame(width: screenWidth / 7)
@@ -54,8 +55,8 @@ struct TimeLineView: View {
                 }
                 .background(Color.calendar)
                 
-                ScrollViewReader { proxy in
-                    ZStack(alignment: .leading) {
+                ZStack(alignment: .leading) {
+                    ScrollViewReader { proxy in
                         ScrollView(showsIndicators: false) {
                             HStack(spacing: 0) {
                                 ZStack(alignment: .topTrailing) {
@@ -88,10 +89,10 @@ struct TimeLineView: View {
                                         .font(.caption)
                                         .padding(.trailing, 2)
                                         .offset(y: viewModel.getOffsetFromMiniute(
-                                                for: viewModel.today,
-                                                timeZoneHeight: timeZoneSize.height,
-                                                gap: gap
-                                            )
+                                            for: viewModel.today,
+                                            timeZoneHeight: timeZoneSize.height,
+                                            gap: gap
+                                        )
                                         )
                                 }
                                 
@@ -131,6 +132,7 @@ struct TimeLineView: View {
                                                 )
                                                 .offset(y: timeZoneSize.height + startOffset)
                                                 .onTapGesture {
+                                                    didSelectSchedule.toggle()
                                                     if schedules[idx].isChanging {
                                                         schedules[idx].isChanging = false
                                                     }
@@ -138,6 +140,7 @@ struct TimeLineView: View {
                                                         schedules.indices.forEach { schedules[$0].isChanging = false }
                                                         schedules[idx].isChanging = true
                                                     }
+                                                    
                                                 }
                                             }
                                             
@@ -185,16 +188,18 @@ struct TimeLineView: View {
                                         }
                                 )
                             }
-                            .id(0)
-                        }
-                        HStack {
-                            Rectangle()
-                                .frame(width: 1)
-                                .foregroundStyle(Color.gray.opacity(0.5))
-                                .offset(x: timeZoneSize.width)
                         }
                     }
+                    Rectangle()
+                        .frame(width: 1)
+                        .foregroundStyle(Color.gray)
+                        .offset(x: timeZoneSize.width)
+                    
                 }
+                Rectangle()
+                    .frame(width: 1, height: UIScreen.main.bounds.height * 0.07)
+                    .foregroundStyle(Color.gray)
+                    .offset(x: timeZoneSize.width)
             }
             .onAppear {
                 calendarData = viewModel.calendarData[1]
@@ -229,6 +234,8 @@ struct TimeLineView: View {
 }
 
 #Preview {
-    TimeLineView()
+    TimeLineView(
+        didSelectSchedule: .constant(false)
+    )
         .environmentObject(PlannerViewModel())
 }
