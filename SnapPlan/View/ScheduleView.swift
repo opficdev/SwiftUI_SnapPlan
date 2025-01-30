@@ -10,6 +10,7 @@ import SwiftUI
 struct ScheduleView: View {
     @Binding var schedule: TimeData?
     @Binding var tapButton: Bool
+    @Binding var currentDetent: Set<PresentationDetent>
     let colorArr = [
         Color.macBlue,
         Color.macPurple,
@@ -20,6 +21,7 @@ struct ScheduleView: View {
         Color.macGreen
     ]
     @State private var title = ""
+    @FocusState private var keyboardFocus: Bool
 
     var body: some View {
         VStack {
@@ -32,6 +34,7 @@ struct ScheduleView: View {
                     Spacer()
                     Button(action: {
                         tapButton = true
+                        currentDetent = [.fraction(0.4)]  //  이거 없으면 키보드에 의해 sheet가 밀림
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .symbolRenderingMode(.palette)
@@ -43,23 +46,42 @@ struct ScheduleView: View {
             else {
                 HStack {
                     Spacer()
-                    Button(action: {
-                        tapButton = false
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .symbolRenderingMode(.palette)
-                            .foregroundStyle(Color.white, Color.gray)
-                            .font(.system(size: 30))
-                            .rotationEffect(.degrees(45))
+                    if title.isEmpty {
+                        Button(action: {
+                            currentDetent = [.fraction(0.07)]
+                            tapButton = false
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(Color.white, Color.gray)
+                                .font(.system(size: 30))
+                                .rotationEffect(.degrees(45))
+                        }
+                    }
+                    else {
+                        Button(action: {
+                            currentDetent = [.fraction(0.07)]
+                            tapButton = false
+                        }) {
+                            Text("완료")
+                                .foregroundStyle(Color.white)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color.macBlue)
+                                )
+                        }
                     }
                 }
                 TextField("제목", text: $title)
-                
-                    
+                    .font(.title)
+                    .focused($keyboardFocus)
+                    .textSelection(.enabled)
+                    .onAppear {
+                        keyboardFocus = true
+                    }
             }
             Spacer()
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
         .padding()
     }
 }
@@ -67,6 +89,7 @@ struct ScheduleView: View {
 #Preview {
     ScheduleView(
         schedule: .constant(nil),
-        tapButton: .constant(false)
+        tapButton: .constant(false),
+        currentDetent: .constant(Set([.fraction(0.07)]))
     )
 }
