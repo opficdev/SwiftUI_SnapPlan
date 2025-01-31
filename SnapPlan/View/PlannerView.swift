@@ -33,7 +33,6 @@ struct PlannerView: View {
             )
             .presentationDetents(currentDetent)
             .presentationDragIndicator(.visible)
-            .interactiveDismissDisabled(true)
             .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌
                 if let sheet = controller as? UISheetPresentationController {
                     if let maxDetent = sheet.detents.max(by: { $0.identifier.rawValue < $1.identifier.rawValue }) {
