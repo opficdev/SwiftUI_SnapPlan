@@ -29,6 +29,7 @@ struct ScheduleView: View {
                     Spacer()
                     Button(action: {
                         tapButton = true
+                        keyboardFocus = true
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .symbolRenderingMode(.palette)
@@ -78,7 +79,6 @@ struct ScheduleView: View {
             }
         }
         .onAppear {
-            keyboardFocus = true
             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notificiaton in
                 if let keyboardFrame = notificiaton.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
                     let screenHeight = UIScreen.main.bounds.height
@@ -86,8 +86,10 @@ struct ScheduleView: View {
                 }
             }
             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
-                currentDetent = [.fraction(0.95), .fraction(0.4)] // 키보드가 내려가면 다시 99%로
-           }
+                if tapButton {
+                    currentDetent = [.fraction(0.95), .fraction(0.4)] // 키보드가 내려가면 다시 95%로
+                }
+            }
         }
         .onTapGesture {
             keyboardFocus = false
