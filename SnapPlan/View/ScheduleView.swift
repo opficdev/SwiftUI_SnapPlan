@@ -13,14 +13,15 @@ struct ScheduleView: View {
         Color.macOrange, Color.macYellow, Color.macGreen
     ]
     @Binding var schedule: TimeData?
-    @Binding var tapButton: Bool
+    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
+    @State private var selectedDetent: PresentationDetent = .fraction(0.07)
     @State private var title = ""
     @FocusState private var keyboardFocus: Bool
 
     var body: some View {
         VStack {
-            if !tapButton {
+            if !addSchedule {
                 HStack {
                     Text("선택된 이벤트 없음")
                         .font(.footnote)
@@ -28,8 +29,13 @@ struct ScheduleView: View {
                         .padding(.leading)
                     Spacer()
                     Button(action: {
-                        tapButton = true
+                        addSchedule = true
                         keyboardFocus = true
+                        currentDetent = currentDetent.union([.large])
+                        selectedDetent = .large
+                        DispatchQueue.main.async {
+                            currentDetent = currentDetent.subtracting([.fraction(0.07)])
+                        }
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .symbolRenderingMode(.palette)
@@ -43,8 +49,12 @@ struct ScheduleView: View {
                     Spacer()
                     if title.isEmpty {
                         Button(action: {
-                            currentDetent = [.fraction(0.07)]
-                            tapButton = false
+                            addSchedule = false
+                            currentDetent = currentDetent.union([.fraction(0.07)])
+                            selectedDetent = .fraction(0.07)
+                            DispatchQueue.main.async {
+                                currentDetent = currentDetent.subtracting([.large])
+                            }
                         }) {
                             Image(systemName: "plus.circle.fill")
                                 .symbolRenderingMode(.palette)
@@ -55,8 +65,12 @@ struct ScheduleView: View {
                     }
                     else {
                         Button(action: {
-                            currentDetent = [.fraction(0.07)]
-                            tapButton = false
+                            addSchedule = false
+                            currentDetent = currentDetent.union([.fraction(0.07)])
+                            selectedDetent = .fraction(0.07)
+                            DispatchQueue.main.async {
+                                currentDetent = currentDetent.subtracting([.large])
+                            }
                         }) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 5)
@@ -77,33 +91,21 @@ struct ScheduleView: View {
                 }
                 .scrollDisabled(!keyboardFocus) // 키보드가 내려가면 스크롤 비활성화
             }
-        }
-        .onAppear {
-            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notificiaton in
-                if let keyboardFrame = notificiaton.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                    let screenHeight = UIScreen.main.bounds.height
-                    currentDetent = [.fraction((screenHeight * 0.95 - keyboardFrame.height) / screenHeight), .fraction(0.1)]
-                }
-            }
-            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
-                if tapButton {
-                    currentDetent = [.fraction(0.95), .fraction(0.4)] // 키보드가 내려가면 다시 95%로
-                }
-            }
+            Spacer()
         }
         .onTapGesture {
-            keyboardFocus = false
-            currentDetent = [.fraction(0.95), .fraction(0.4)]
+            if keyboardFocus {
+                keyboardFocus = false
+                currentDetent = [.large, .fraction(0.4)]
+            }
         }
-        .interactiveDismissDisabled(true)  //
-        .presentationDetents(currentDetent)
+        .presentationDetents(currentDetent, selection: $selectedDetent)
         .padding()
     }
 }
 
 #Preview {
     ScheduleView(
-        schedule: .constant(nil),
-        tapButton: .constant(false)
+        schedule: .constant(nil)
     )
 }
