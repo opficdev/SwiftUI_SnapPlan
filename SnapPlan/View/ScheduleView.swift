@@ -14,9 +14,8 @@ struct ScheduleView: View {
     ]
     @Binding var schedule: TimeData?
     @Binding var tapButton: Bool
-    @Binding var currentDetent: Set<PresentationDetent>
+    @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var title = ""
-    @State private var keyboardHeight = CGFloat.zero
     @FocusState private var keyboardFocus: Bool
 
     var body: some View {
@@ -30,7 +29,6 @@ struct ScheduleView: View {
                     Spacer()
                     Button(action: {
                         tapButton = true
-                        currentDetent = [.large]
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .symbolRenderingMode(.palette)
@@ -74,18 +72,29 @@ struct ScheduleView: View {
                         .font(.title)
                         .focused($keyboardFocus)
                         .textSelection(.enabled)
-                        .onAppear {
-                            keyboardFocus = true
-                        }
                     Divider()
                 }
-                .scrollDisabled(!keyboardFocus)
+                .scrollDisabled(!keyboardFocus) // 키보드가 내려가면 스크롤 비활성화
             }
+        }
+        .onAppear {
+            keyboardFocus = true
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notificiaton in
+                if let keyboardFrame = notificiaton.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                    let screenHeight = UIScreen.main.bounds.height
+                    currentDetent = [.fraction((screenHeight * 0.95 - keyboardFrame.height) / screenHeight), .fraction(0.1)]
+                }
+            }
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                currentDetent = [.fraction(0.95), .fraction(0.4)] // 키보드가 내려가면 다시 99%로
+           }
         }
         .onTapGesture {
             keyboardFocus = false
+            currentDetent = [.fraction(0.95), .fraction(0.4)]
         }
-        .interactiveDismissDisabled(keyboardFocus)
+        .interactiveDismissDisabled(true)  //
+        .presentationDetents(currentDetent)
         .padding()
     }
 }
@@ -93,7 +102,6 @@ struct ScheduleView: View {
 #Preview {
     ScheduleView(
         schedule: .constant(nil),
-        tapButton: .constant(false),
-        currentDetent: .constant(Set([.fraction(0.07)]))
+        tapButton: .constant(false)
     )
 }
