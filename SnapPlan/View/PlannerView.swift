@@ -16,7 +16,7 @@ struct PlannerView: View {
     @State private var showSideBar = false
     @State private var didSelectSchedule = false
     @State private var tapButton = false
-    @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
+    
     
     var body: some View {
         VStack(spacing: 0) {
@@ -28,10 +28,8 @@ struct PlannerView: View {
         .sheet(isPresented: .constant(true)) {
             ScheduleView(
                 schedule: .constant(nil),
-                tapButton: $tapButton,
-                currentDetent: $currentDetent
+                tapButton: $tapButton
             )
-            .presentationDetents(currentDetent)
             .presentationDragIndicator(.visible)
             .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌
                 if let sheet = controller as? UISheetPresentationController {
