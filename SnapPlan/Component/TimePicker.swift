@@ -8,11 +8,44 @@
 import SwiftUI
 
 struct TimePicker: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var selectedTime: Date
+       
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+       VStack {
+           DatePicker(
+               "",
+               selection: $selectedTime,
+               displayedComponents: .hourAndMinute
+           )
+           .datePickerStyle(.wheel)
+           .labelsHidden()
+
+           Button(action: {
+               dismiss()
+           }) {
+               ZStack {
+                   RoundedRectangle(cornerRadius: 10)
+                          .fill(Color.macBlue)
+                          .frame(height: 35)
+                   Text("확인")
+                       .foregroundStyle(Color.white)
+               }
+           }
+       }
+       .padding()
+       .background(Color.calendar)
+    }
+    
+    private var formattedTime: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "hh:mm a"
+        return formatter.string(from: selectedTime)
     }
 }
 
 #Preview {
-    TimePicker()
+    TimePicker(
+        selectedTime: .constant(Date())
+    )
 }
