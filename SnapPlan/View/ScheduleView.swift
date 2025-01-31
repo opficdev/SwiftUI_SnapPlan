@@ -8,19 +8,15 @@
 import SwiftUI
 
 struct ScheduleView: View {
+    let colorArr = [
+        Color.macBlue, Color.macPurple, Color.macPink, Color.macRed,
+        Color.macOrange, Color.macYellow, Color.macGreen
+    ]
     @Binding var schedule: TimeData?
     @Binding var tapButton: Bool
     @Binding var currentDetent: Set<PresentationDetent>
-    let colorArr = [
-        Color.macBlue,
-        Color.macPurple,
-        Color.macPink,
-        Color.macRed,
-        Color.macOrange,
-        Color.macYellow,
-        Color.macGreen
-    ]
     @State private var title = ""
+    @State private var keyboardHeight = CGFloat.zero
     @FocusState private var keyboardFocus: Bool
 
     var body: some View {
@@ -34,11 +30,11 @@ struct ScheduleView: View {
                     Spacer()
                     Button(action: {
                         tapButton = true
-                        currentDetent = [.fraction(0.4)]  //  이거 없으면 키보드에 의해 sheet가 밀림
+                        currentDetent = [.large]
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .symbolRenderingMode(.palette)
-                            .foregroundStyle(Color.white, Color.gray)
+                            .foregroundStyle(Color.white, Color.gray.opacity(0.2))
                             .font(.system(size: 30))
                     }
                 }
@@ -53,7 +49,7 @@ struct ScheduleView: View {
                         }) {
                             Image(systemName: "plus.circle.fill")
                                 .symbolRenderingMode(.palette)
-                                .foregroundStyle(Color.white, Color.gray)
+                                .foregroundStyle(Color.white, Color.gray.opacity(0.2))
                                 .font(.system(size: 30))
                                 .rotationEffect(.degrees(45))
                         }
@@ -63,25 +59,33 @@ struct ScheduleView: View {
                             currentDetent = [.fraction(0.07)]
                             tapButton = false
                         }) {
-                            Text("완료")
-                                .foregroundStyle(Color.white)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(Color.macBlue)
-                                )
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 5)
+                                    .fill(Color.gray.opacity(0.2))
+                                    .frame(width: 40, height: 30)
+                                Text("완료")
+                                    .foregroundStyle(Color.white)
+                            }
                         }
                     }
                 }
-                TextField("제목", text: $title)
-                    .font(.title)
-                    .focused($keyboardFocus)
-                    .textSelection(.enabled)
-                    .onAppear {
-                        keyboardFocus = true
-                    }
+                ScrollView {
+                    TextField("제목", text: $title)
+                        .font(.title)
+                        .focused($keyboardFocus)
+                        .textSelection(.enabled)
+                        .onAppear {
+                            keyboardFocus = true
+                        }
+                    Divider()
+                }
+                .scrollDisabled(!keyboardFocus)
             }
-            Spacer()
         }
+        .onTapGesture {
+            keyboardFocus = false
+        }
+        .interactiveDismissDisabled(keyboardFocus)
         .padding()
     }
 }
