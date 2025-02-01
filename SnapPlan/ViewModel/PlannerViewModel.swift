@@ -54,13 +54,33 @@ final class PlannerViewModel: ObservableObject {
         return height - timeZoneHeight <= offset && offset <= height + timeZoneHeight
     }
     
-    func getHoursAndMiniute(for date: Date, is12hoursFmt: Bool) -> String {
-        let hour = calendar.component(.hour, from: date)
-        let miniute = calendar.component(.minute, from: date)
-        if is12hoursFmt {
-            return "오" + (hour < 12 ? "전" : "후") + " \(hour == 12 ? 12 : hour % 12):" + String(format: "%02d", miniute)
+    func getDateString(for date: Date, components: Set<Calendar.Component>, is12hoursFmt: Bool = true) -> String {
+        let calendar = Calendar.current
+        let dateComponents = calendar.dateComponents(components, from: date)
+        
+        var dateString = ""
+
+        if let year = dateComponents.year {
+            dateString += "\(year)년 "
         }
-        return "\(hour):" + String(format: "%02d", miniute)
+        if let month = dateComponents.month {
+            dateString += "\(month)월 "
+        }
+        if let day = dateComponents.day {
+            dateString += "\(day)일 "
+        }
+        if components.contains(.hour) || components.contains(.minute) {
+            if let hour = dateComponents.hour, let minute = dateComponents.minute {
+                let formattedHour = is12hoursFmt ? (hour == 12 ? 12 : hour % 12) : hour
+                let period = is12hoursFmt ? (hour < 12 ? "오전" : "오후") : ""
+                dateString += "\(period) \(formattedHour):" + String(format: "%02d", minute) + " "
+            }
+        }
+        if let second = dateComponents.second {
+            dateString += "\(second)초 "
+        }
+        
+        return dateString.trimmingCharacters(in: .whitespaces)
     }
     
     func getOffsetFromMiniute(for date: Date, timeZoneHeight: CGFloat, gap: CGFloat) -> CGFloat {
