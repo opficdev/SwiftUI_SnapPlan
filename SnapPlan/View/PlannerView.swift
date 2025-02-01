@@ -16,7 +16,6 @@ struct PlannerView: View {
     @State private var showSideBar = false
     @State private var didSelectSchedule = false
     
-    
     var body: some View {
         VStack(spacing: 0) {
             CalendarView(showSideBar: $showSideBar)
@@ -26,6 +25,7 @@ struct PlannerView: View {
         }
         .sheet(isPresented: .constant(true)) {
             ScheduleView(schedule: .constant(nil))
+                .environmentObject(plannerVM)
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled(true)   //  사용자가 임의로 sheet를 완전히 내리는 것을 방지
                 .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌
