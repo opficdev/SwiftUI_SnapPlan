@@ -105,9 +105,7 @@ struct ScheduleView: View {
                             .foregroundStyle(Color.gray)
                         VStack {
                             HStack {
-                                Text(plannerVM.getHoursAndMiniute(
-                                    for: startTime, is12hoursFmt: true)
-                                )
+                                Text(plannerVM.getDateString(for: startTime, components: [.hour, .minute]))
                                 .foregroundStyle(tapStartTime ? Color.blue : Color.primary)
                                 .onTapGesture {
                                     tapStartTime.toggle()
@@ -116,14 +114,17 @@ struct ScheduleView: View {
                                 Image(systemName: "arrow.right")
                                     .foregroundStyle(Color.gray)
                                     .padding(.horizontal)
-                                Text(plannerVM.getHoursAndMiniute(
-                                    for: endTime, is12hoursFmt: true)
-                                )
+                                Text(plannerVM.getDateString(for: endTime, components: [.hour, .minute]))
                                 .foregroundStyle(tapEndTime ? Color.blue : Color.primary)
                                 .onTapGesture {
                                     tapEndTime.toggle()
                                     tapStartTime = false
                                 }
+                            }
+                            HStack {
+//                                Text(
+//
+//                                )
                             }
                         }
                         Spacer()

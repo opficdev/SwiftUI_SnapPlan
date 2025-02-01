@@ -86,8 +86,10 @@ struct TimeLineView: View {
                                         }
                                     }
                                     Text(
-                                        viewModel.getHoursAndMiniute(
-                                            for: viewModel.today, is12hoursFmt: is12TimeFmt
+                                        viewModel.getDateString(
+                                            for: viewModel.today,
+                                            components: [.hour, .minute],
+                                            is12hoursFmt: is12TimeFmt
                                         )
                                     )
                                         .font(.caption)
