@@ -85,7 +85,11 @@ struct TimeLineView: View {
                                                 )
                                         }
                                     }
-                                    Text(viewModel.getHoursAndMiniute(is12hoursFmt: is12TimeFmt))
+                                    Text(
+                                        viewModel.getHoursAndMiniute(
+                                            for: viewModel.today, is12hoursFmt: is12TimeFmt
+                                        )
+                                    )
                                         .font(.caption)
                                         .padding(.trailing, 2)
                                         .offset(y: viewModel.getOffsetFromMiniute(
@@ -93,7 +97,7 @@ struct TimeLineView: View {
                                             timeZoneHeight: timeZoneSize.height,
                                             gap: gap
                                         )
-                                        )
+                                    )
                                 }
                                 
                                 //  좌우로 드래그 가능한 TimeLine
@@ -104,14 +108,14 @@ struct TimeLineView: View {
                                                 ForEach(0...24, id: \.self) { index in
                                                     VStack {
                                                         Spacer()
-                                                            .onTapGesture {
+                                                            .onTapGesture { //  [현재시간 - 30분, 현재시간]
                                                                 
                                                             }
                                                         Rectangle()
                                                             .frame(height: 1)
                                                             .foregroundColor(Color.gray.opacity(0.5))
                                                         Spacer()
-                                                            .onTapGesture {
+                                                            .onTapGesture { //  [현재시간, 현재시간 + 30분]
                                                                 
                                                             }
                                                     }
