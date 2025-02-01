@@ -53,7 +53,7 @@ struct ScheduleView: View {
                             currentDetent = currentDetent.union([.fraction(0.07)])
                             selectedDetent = .fraction(0.07)
                             DispatchQueue.main.async {
-                                currentDetent = currentDetent.subtracting([.large])
+                                currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
                             }
                         }) {
                             Image(systemName: "plus.circle.fill")
@@ -69,7 +69,7 @@ struct ScheduleView: View {
                             currentDetent = currentDetent.union([.fraction(0.07)])
                             selectedDetent = .fraction(0.07)
                             DispatchQueue.main.async {
-                                currentDetent = currentDetent.subtracting([.large])
+                                currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
                             }
                         }) {
                             ZStack {
