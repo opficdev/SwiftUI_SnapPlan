@@ -13,12 +13,24 @@ struct ScheduleView: View {
         Color.macOrange, Color.macYellow, Color.macGreen
     ]
     @Binding var schedule: TimeData?
-    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
+    @EnvironmentObject private var plannerVM: PlannerViewModel
+//    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
+    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
     @State private var title = ""
+    @State private var startTime: Date
+    @State private var endTime: Date
+    @State private var tapStartTime = false
+    @State private var tapEndTime = false
     @FocusState private var keyboardFocus: Bool
-
+    
+    init(schedule: Binding<TimeData?>) {
+        self._schedule = schedule
+        let now = Date()
+        self._startTime = State(initialValue: now)
+        self._endTime = State(initialValue: now.addingTimeInterval(1800))
+    }
     var body: some View {
         VStack {
             if !addSchedule {
@@ -84,10 +96,38 @@ struct ScheduleView: View {
                 }
                 ScrollView {
                     TextField("제목", text: $title)
-                        .font(.title)
+                        .font(.headline)
                         .focused($keyboardFocus)
                         .textSelection(.enabled)
                     Divider()
+                    HStack(spacing: 10) {
+                        Image(systemName: "clock")
+                            .foregroundStyle(Color.gray)
+                        VStack {
+                            HStack {
+                                Text(plannerVM.getHoursAndMiniute(
+                                    for: startTime, is12hoursFmt: true)
+                                )
+                                .foregroundStyle(tapStartTime ? Color.blue : Color.primary)
+                                .onTapGesture {
+                                    tapStartTime.toggle()
+                                    tapEndTime = false
+                                }
+                                Image(systemName: "arrow.right")
+                                    .foregroundStyle(Color.gray)
+                                    .padding(.horizontal)
+                                Text(plannerVM.getHoursAndMiniute(
+                                    for: endTime, is12hoursFmt: true)
+                                )
+                                .foregroundStyle(tapEndTime ? Color.blue : Color.primary)
+                                .onTapGesture {
+                                    tapEndTime.toggle()
+                                    tapStartTime = false
+                                }
+                            }
+                        }
+                        Spacer()
+                    }
                 }
                 .scrollDisabled(!keyboardFocus) // 키보드가 내려가면 스크롤 비활성화
             }
@@ -101,6 +141,28 @@ struct ScheduleView: View {
         }
         .presentationDetents(currentDetent, selection: $selectedDetent)
         .padding()
+        .sheet(isPresented: $tapStartTime) {
+            DateTimePicker(
+                selectedTime: $startTime,
+                component: .hourAndMinute
+            )
+            .onChange(of: startTime) { value in
+                if startTime > endTime {
+                    endTime = startTime.addingTimeInterval(1800)
+                }
+            }
+        }
+        .sheet(isPresented: $tapEndTime) {
+            DateTimePicker(
+                selectedTime: $endTime,
+                component: .hourAndMinute
+            )
+            .onChange(of: endTime) { value in
+                if endTime < startTime {
+                    startTime = endTime
+                }
+            }
+        }
     }
 }
 
@@ -108,4 +170,5 @@ struct ScheduleView: View {
     ScheduleView(
         schedule: .constant(nil)
     )
+    .environmentObject(PlannerViewModel())
 }
