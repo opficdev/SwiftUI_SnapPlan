@@ -54,9 +54,9 @@ final class PlannerViewModel: ObservableObject {
         return height - timeZoneHeight <= offset && offset <= height + timeZoneHeight
     }
     
-    func getHoursAndMiniute(is12hoursFmt: Bool) -> String {
-        let hour = calendar.component(.hour, from: today)
-        let miniute = calendar.component(.minute, from: today)
+    func getHoursAndMiniute(for date: Date, is12hoursFmt: Bool) -> String {
+        let hour = calendar.component(.hour, from: date)
+        let miniute = calendar.component(.minute, from: date)
         if is12hoursFmt {
             return "오" + (hour < 12 ? "전" : "후") + " \(hour == 12 ? 12 : hour % 12):" + String(format: "%02d", miniute)
         }
