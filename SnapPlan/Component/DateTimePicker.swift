@@ -7,16 +7,22 @@
 
 import SwiftUI
 
-struct TimePicker: View {
+struct DateTimePicker: View {
     @Environment(\.dismiss) var dismiss
     @Binding var selectedTime: Date
+    @State private var component: DatePickerComponents
+    
+    init(selectedTime: Binding<Date>, component: DatePickerComponents) {
+        self._selectedTime = selectedTime
+        self._component = State(initialValue: component)
+    }
        
     var body: some View {
        VStack {
            DatePicker(
                "",
                selection: $selectedTime,
-               displayedComponents: .hourAndMinute
+               displayedComponents: component
            )
            .datePickerStyle(.wheel)
            .labelsHidden()
@@ -45,7 +51,8 @@ struct TimePicker: View {
 }
 
 #Preview {
-    TimePicker(
-        selectedTime: .constant(Date())
+    DateTimePicker(
+        selectedTime: .constant(Date()),
+        component: .hourAndMinute
     )
 }
