@@ -12,10 +12,11 @@ struct ScheduleView: View {
         Color.macBlue, Color.macPurple, Color.macPink, Color.macRed,
         Color.macOrange, Color.macYellow, Color.macGreen
     ]
+    let screenWidth = UIScreen.main.bounds.width
     @Binding var schedule: TimeData?
     @EnvironmentObject private var plannerVM: PlannerViewModel
-//    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
-    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
+    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
+//    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
     @State private var title = ""
@@ -23,6 +24,9 @@ struct ScheduleView: View {
     @State private var endTime: Date
     @State private var tapStartTime = false
     @State private var tapEndTime = false
+    @State private var tapStartDate = false
+    @State private var tapEndDate = false
+    @State private var pickerHeight = CGFloat.zero
     @FocusState private var keyboardFocus: Bool
     
     init(schedule: Binding<TimeData?>) {
@@ -100,20 +104,21 @@ struct ScheduleView: View {
                         .focused($keyboardFocus)
                         .textSelection(.enabled)
                     Divider()
-                    HStack(spacing: 10) {
+                    HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "clock")
                             .foregroundStyle(Color.gray)
-                        VStack {
-                            HStack {
+                        VStack(alignment: .leading) {
+                            HStack(spacing: 0) {
                                 Text(plannerVM.getDateString(for: startTime, components: [.hour, .minute]))
                                 .foregroundStyle(tapStartTime ? Color.blue : Color.primary)
                                 .onTapGesture {
                                     tapStartTime.toggle()
                                     tapEndTime = false
                                 }
+                                .frame(width: screenWidth / 4, alignment: .leading)
                                 Image(systemName: "arrow.right")
                                     .foregroundStyle(Color.gray)
-                                    .padding(.horizontal)
+                                    .frame(width: screenWidth / 10, alignment: .leading)
                                 Text(plannerVM.getDateString(for: endTime, components: [.hour, .minute]))
                                 .foregroundStyle(tapEndTime ? Color.blue : Color.primary)
                                 .onTapGesture {
@@ -121,10 +126,21 @@ struct ScheduleView: View {
                                     tapStartTime = false
                                 }
                             }
-                            HStack {
-//                                Text(
-//
-//                                )
+                            HStack(spacing: 0) {
+                                Text(
+                                    plannerVM.getDateString(for: startTime, components: [.month, .day])
+                                )
+                                .foregroundStyle(tapStartDate ? Color.blue : Color.primary)
+                                .onTapGesture {
+                                    tapStartDate.toggle()
+                                    tapEndDate = false
+                                }
+                                .frame(width: screenWidth / 4 + screenWidth / 10, alignment: .leading)
+                                if !plannerVM.isSameDate(date1: startTime, date2: endTime, components: [.year, .month, .day]) {
+                                    Text(
+                                        plannerVM.getDateString(for: endTime, components: [.month, .day])
+                                    )
+                                }
                             }
                         }
                         Spacer()
@@ -163,6 +179,13 @@ struct ScheduleView: View {
                     startTime = endTime
                 }
             }
+        }
+        .sheet(isPresented: $tapStartDate) {
+            DateTimePicker(
+                selectedTime: $plannerVM.selectDate,
+                component: .date,
+                style: .graphical
+            )
         }
     }
 }
