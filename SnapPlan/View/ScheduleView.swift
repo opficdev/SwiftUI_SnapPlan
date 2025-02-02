@@ -15,8 +15,8 @@ struct ScheduleView: View {
     let screenWidth = UIScreen.main.bounds.width
     @Binding var schedule: TimeData?
     @EnvironmentObject private var plannerVM: PlannerViewModel
-    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
-//    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
+//    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
+    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
     @State private var title = ""
@@ -27,6 +27,7 @@ struct ScheduleView: View {
     @State private var tapStartDate = false
     @State private var tapEndDate = false
     @State private var pickerHeight = CGFloat.zero
+    @State private var allDay = false
     @FocusState private var keyboardFocus: Bool
     
     init(schedule: Binding<TimeData?>) {
@@ -99,51 +100,65 @@ struct ScheduleView: View {
                     }
                 }
                 ScrollView {
-                    TextField("제목", text: $title)
-                        .font(.headline)
-                        .focused($keyboardFocus)
-                        .textSelection(.enabled)
-                    Divider()
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "clock")
-                            .foregroundStyle(Color.gray)
-                        VStack(alignment: .leading) {
-                            HStack(spacing: 0) {
-                                Text(plannerVM.getDateString(for: startTime, components: [.hour, .minute]))
-                                .foregroundStyle(tapStartTime ? Color.blue : Color.primary)
-                                .onTapGesture {
-                                    tapStartTime.toggle()
-                                    tapEndTime = false
+                    VStack(alignment: .leading) {
+                        TextField("제목", text: $title)
+                            .font(.headline)
+                            .focused($keyboardFocus)
+                            .textSelection(.enabled)
+                        Divider()
+                            .padding(.vertical)
+                        HStack(alignment: .top) {
+                            Image(systemName: "clock")
+                                .foregroundStyle(Color.gray)
+                                .frame(width: 25)
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack(spacing: 0) {
+                                    Text(plannerVM.getDateString(for: startTime, components: [.hour, .minute]))
+                                        .foregroundStyle(tapStartTime ? Color.blue : Color.primary)
+                                        .onTapGesture {
+                                            tapStartTime.toggle()
+                                            tapEndTime = false
+                                        }
+                                        .frame(width: screenWidth / 4, alignment: .leading)
+                                    Image(systemName: "arrow.right")
+                                        .foregroundStyle(Color.gray)
+                                        .frame(width: screenWidth / 10, alignment: .leading)
+                                    Text(plannerVM.getDateString(for: endTime, components: [.hour, .minute]))
+                                        .foregroundStyle(tapEndTime ? Color.blue : Color.primary)
+                                        .onTapGesture {
+                                            tapEndTime.toggle()
+                                            tapStartTime = false
+                                        }
                                 }
-                                .frame(width: screenWidth / 4, alignment: .leading)
-                                Image(systemName: "arrow.right")
-                                    .foregroundStyle(Color.gray)
-                                    .frame(width: screenWidth / 10, alignment: .leading)
-                                Text(plannerVM.getDateString(for: endTime, components: [.hour, .minute]))
-                                .foregroundStyle(tapEndTime ? Color.blue : Color.primary)
-                                .onTapGesture {
-                                    tapEndTime.toggle()
-                                    tapStartTime = false
-                                }
-                            }
-                            HStack(spacing: 0) {
-                                Text(
-                                    plannerVM.getDateString(for: startTime, components: [.month, .day])
-                                )
-                                .foregroundStyle(tapStartDate ? Color.blue : Color.primary)
-                                .onTapGesture {
-                                    tapStartDate.toggle()
-                                    tapEndDate = false
-                                }
-                                .frame(width: screenWidth / 4 + screenWidth / 10, alignment: .leading)
-                                if !plannerVM.isSameDate(date1: startTime, date2: endTime, components: [.year, .month, .day]) {
+                                HStack(spacing: 0) {
                                     Text(
-                                        plannerVM.getDateString(for: endTime, components: [.month, .day])
+                                        plannerVM.getDateString(for: startTime, components: [.month, .day])
                                     )
+                                    .foregroundStyle(tapStartDate ? Color.blue : Color.primary)
+                                    .onTapGesture {
+                                        tapStartDate.toggle()
+                                        tapEndDate = false
+                                    }
+                                    .frame(width: screenWidth / 4 + screenWidth / 10, alignment: .leading)
+                                    if !plannerVM.isSameDate(date1: startTime, date2: endTime, components: [.year, .month, .day]) {
+                                        Text(
+                                            plannerVM.getDateString(for: endTime, components: [.month, .day])
+                                        )
+                                    }
                                 }
                             }
+                            Spacer()
                         }
-                        Spacer()
+                        HStack {
+                            Image(systemName: "repeat")
+                                .foregroundStyle(Color.gray)
+                                .frame(width: 25)
+                            Toggle("종일", isOn: $allDay)
+                                .toggleStyle(SwitchToggleStyle(tint: Color.blue))
+                                .frame(width: screenWidth / 4)
+                        }
+                        Divider()
+                            .padding(.vertical)
                     }
                 }
                 .scrollDisabled(!keyboardFocus) // 키보드가 내려가면 스크롤 비활성화
