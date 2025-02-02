@@ -7,16 +7,17 @@
 
 import SwiftUI
 
-struct DateTimePicker: View {
+struct DateTimePicker<S: DatePickerStyle>: View {
     @Environment(\.dismiss) var dismiss
     @Binding var selectedTime: Date
-    @Binding var pickerHeight: CGFloat
-    @State private var component: DatePickerComponents
+    @State private var pickerHeight = CGFloat.zero
+    let component: DatePickerComponents
+    let style: S
     
-    init(selectedTime: Binding<Date>, pickerHeight: Binding<CGFloat>,component: DatePickerComponents) {
+    init(selectedTime: Binding<Date>, component: DatePickerComponents, style: S = .wheel) {
         self._selectedTime = selectedTime
-        self._pickerHeight = pickerHeight
-        self._component = State(initialValue: component)
+        self.component = component
+        self.style = style
     }
        
     var body: some View {
@@ -26,7 +27,7 @@ struct DateTimePicker: View {
                 selection: $selectedTime,
                 displayedComponents: component
             )
-            .datePickerStyle(.wheel)
+            .datePickerStyle(style)
             .labelsHidden()
             
             Button(action: {
@@ -46,10 +47,11 @@ struct DateTimePicker: View {
             GeometryReader { geometry in
                 Color.calendar.onAppear {
                     pickerHeight = geometry.size.height
-                    print(pickerHeight)
                 }
             }
         )
+        .presentationDragIndicator(.visible)
+        .presentationDetents([.height(pickerHeight)])
     }
     
     private var formattedTime: String {
@@ -62,7 +64,6 @@ struct DateTimePicker: View {
 #Preview {
     DateTimePicker(
         selectedTime: .constant(Date()),
-        pickerHeight: .constant(0),
         component: .hourAndMinute
     )
 }
