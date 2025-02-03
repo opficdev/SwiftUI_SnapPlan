@@ -79,6 +79,9 @@ final class PlannerViewModel: ObservableObject {
         if let second = dateComponents.second {
             dateString += "\(second)초 "
         }
+        if let weekday = dateComponents.weekday {
+            dateString += DateFormatter.krWeekDay.string(from: date)
+        }
         
         return dateString.trimmingCharacters(in: .whitespaces)
     }
