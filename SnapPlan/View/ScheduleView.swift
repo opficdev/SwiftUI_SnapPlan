@@ -22,12 +22,15 @@ struct ScheduleView: View {
     @State private var title = ""
     @State private var startTime: Date
     @State private var endTime: Date
-    @State private var tapStartTime = false
-    @State private var tapEndTime = false
-    @State private var tapStartDate = false
-    @State private var tapEndDate = false
+    
+    @State private var tapStartTime = false //  시작 시간 탭 여부
+    @State private var tapEndTime = false   //  종료 시간 탭 여부
+    @State private var tapStartDate = false //  시작 날짜 탭 여부
+    @State private var tapEndDate = false   //  종료 날짜 탭
+    @State private var allDay = false       //  종일 여부
+    @State private var tapRepeat = false    //  반복 탭 여부
+    
     @State private var pickerHeight = CGFloat.zero
-    @State private var allDay = false
     @FocusState private var keyboardFocus: Bool
     
     init(schedule: Binding<TimeData?>) {
@@ -157,6 +160,16 @@ struct ScheduleView: View {
                                 .toggleStyle(SwitchToggleStyle(tint: Color.blue))
                                 .frame(width: screenWidth / 4)
                         }
+                        HStack {
+                            Image(systemName: "repeat")
+                                .foregroundStyle(Color.gray)
+                                .frame(width: 25)
+                            Text("반복")
+                                .foregroundStyle(tapRepeat ? Color.blue : Color.primary)
+                                .onTapGesture {
+                                    tapRepeat.toggle()
+                                }
+                        }
                         Divider()
                             .padding(.vertical)
                     }
@@ -201,6 +214,9 @@ struct ScheduleView: View {
                 component: .date,
                 style: .graphical
             )
+        }
+        .sheet(isPresented: $tapEndDate) {
+            
         }
     }
 }
