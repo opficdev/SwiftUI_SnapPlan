@@ -27,33 +27,34 @@ struct RepeatSetting: View {
                 Text("매일")
                     .onTapGesture {
                         selectedOption = .everyDay
+                        dismiss()
                     }
                     .foregroundStyle(selectedOption == .everyDay ? Color.blue : Color.primary)
                 Text("매주")
                     .onTapGesture {
                         selectedOption = .everyWeek
+                        dismiss()
                     }
                     .foregroundStyle(selectedOption == .everyWeek ? Color.blue : Color.primary)
                 Text("2주")
                     .onTapGesture {
                         selectedOption = .every2Week
+                        dismiss()
                     }
                     .foregroundStyle(selectedOption == .every2Week ? Color.blue : Color.primary)
                 Text("매달")
                     .onTapGesture {
                         selectedOption = .everyMonth
+                        dismiss()
                     }
                     .foregroundStyle(selectedOption == .everyMonth ? Color.blue : Color.primary)
                 Text("매년")
                     .onTapGesture {
                         selectedOption = .everyYear
+                        dismiss()
                     }
                     .foregroundStyle(selectedOption == .everyYear ? Color.blue : Color.primary)
             }
-            .onTapGesture {
-                dismiss()
-            }
-            .border(Color.blue)
             .padding(.leading, screenWidth / 5)
             Divider()
             Text("사용자 지정")
