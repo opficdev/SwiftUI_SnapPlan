@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RepeatSetting: View {
+struct ScheduleCycleView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var plannerVM: PlannerViewModel
     let screenWidth = UIScreen.main.bounds.width
@@ -25,15 +25,12 @@ struct RepeatSetting: View {
             }
             Divider()
             Group {
-                HStack {
-                    Text("매일")
-                        .onTapGesture {
-                            selectedOption = .everyDay
-                            dismiss()
-                        }
-                        .foregroundStyle(selectedOption == .everyDay ? Color.blue : Color.primary)
-                    Text("")
-                }
+                Text("매일")
+                    .onTapGesture {
+                        selectedOption = .everyDay
+                        dismiss()
+                    }
+                    .foregroundStyle(selectedOption == .everyDay ? Color.blue : Color.primary)
                 Text("매주")
                     .onTapGesture {
                         selectedOption = .everyWeek
@@ -86,6 +83,6 @@ struct RepeatSetting: View {
 }
 
 #Preview {
-    RepeatSetting()
+    ScheduleCycleView()
         .environmentObject(PlannerViewModel())
 }
