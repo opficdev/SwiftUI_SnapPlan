@@ -15,7 +15,7 @@ struct ScheduleCycleView: View {
     @State private var selectedOption: CycleOption = .none
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 30) {
             if selectedOption != .none {
                 Text("반복 안함")
                     .onTapGesture {
