@@ -12,7 +12,7 @@ struct ScheduleCycleView: View {
     @EnvironmentObject var plannerVM: PlannerViewModel
     let screenWidth = UIScreen.main.bounds.width
     @State private var sheetHeight = CGFloat.zero
-    @State private var selectedOption: RepeatOption = .none
+    @State private var selectedOption: CycleOption = .none
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -22,6 +22,7 @@ struct ScheduleCycleView: View {
                         selectedOption = .none
                         dismiss()
                     }
+                    .padding(.leading, screenWidth / 5)
             }
             Divider()
             Group {
@@ -31,30 +32,56 @@ struct ScheduleCycleView: View {
                         dismiss()
                     }
                     .foregroundStyle(selectedOption == .everyDay ? Color.blue : Color.primary)
-                Text("매주")
-                    .onTapGesture {
-                        selectedOption = .everyWeek
-                        dismiss()
-                    }
-                    .foregroundStyle(selectedOption == .everyWeek ? Color.blue : Color.primary)
-                Text("2주")
-                    .onTapGesture {
-                        selectedOption = .every2Week
-                        dismiss()
-                    }
-                    .foregroundStyle(selectedOption == .every2Week ? Color.blue : Color.primary)
-                Text("매달")
-                    .onTapGesture {
-                        selectedOption = .everyMonth
-                        dismiss()
-                    }
-                    .foregroundStyle(selectedOption == .everyMonth ? Color.blue : Color.primary)
-                Text("매년")
-                    .onTapGesture {
-                        selectedOption = .everyYear
-                        dismiss()
-                    }
-                    .foregroundStyle(selectedOption == .everyYear ? Color.blue : Color.primary)
+                HStack {
+                    Text("매 평일")
+                        .onTapGesture {
+                            selectedOption = .everyWeekDays
+                            dismiss()
+                        }
+                        .foregroundStyle(selectedOption == .everyWeekDays ? Color.blue : Color.primary)
+                    Text("월~금")
+                        .foregroundStyle(Color.gray)
+                }
+                HStack {
+                    Text("매주")
+                        .onTapGesture {
+                            selectedOption = .everyWeek
+                            dismiss()
+                        }
+                        .foregroundStyle(selectedOption == .everyWeek ? Color.blue : Color.primary)
+                    Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.weekday]))
+                        .foregroundStyle(Color.gray)
+                }
+                HStack {
+                    Text("매 2주")
+                        .onTapGesture {
+                            selectedOption = .every2Week
+                            dismiss()
+                        }
+                        .foregroundStyle(selectedOption == .every2Week ? Color.blue : Color.primary)
+                    Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.weekday]))
+                        .foregroundStyle(Color.gray)
+                }
+                HStack {
+                    Text("매달")
+                        .onTapGesture {
+                            selectedOption = .everyMonth
+                            dismiss()
+                        }
+                        .foregroundStyle(selectedOption == .everyMonth ? Color.blue : Color.primary)
+                    Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.day]))
+                        .foregroundStyle(Color.gray)
+                }
+                HStack {
+                    Text("매년")
+                        .onTapGesture {
+                            selectedOption = .everyYear
+                            dismiss()
+                        }
+                        .foregroundStyle(selectedOption == .everyYear ? Color.blue : Color.primary)
+                    Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.month, .day]))
+                        .foregroundStyle(Color.gray)
+                }
             }
             .padding(.leading, screenWidth / 5)
             Divider()
@@ -77,8 +104,8 @@ struct ScheduleCycleView: View {
         .presentationDetents([.height(sheetHeight)])
     }
     
-    enum RepeatOption {
-        case none, everyDay, everyWeek, every2Week, everyMonth, everyYear, custom
+    enum CycleOption {
+        case none, everyDay, everyWeekDays, everyWeek, every2Week, everyMonth, everyYear, custom
     }
 }
 
