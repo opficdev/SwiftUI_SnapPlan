@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RepeatSetting: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var plannerVM: PlannerViewModel
     let screenWidth = UIScreen.main.bounds.width
     @State private var sheetHeight = CGFloat.zero
     @State private var selectedOption: RepeatOption = .none
@@ -24,12 +25,15 @@ struct RepeatSetting: View {
             }
             Divider()
             Group {
-                Text("매일")
-                    .onTapGesture {
-                        selectedOption = .everyDay
-                        dismiss()
-                    }
-                    .foregroundStyle(selectedOption == .everyDay ? Color.blue : Color.primary)
+                HStack {
+                    Text("매일")
+                        .onTapGesture {
+                            selectedOption = .everyDay
+                            dismiss()
+                        }
+                        .foregroundStyle(selectedOption == .everyDay ? Color.blue : Color.primary)
+                    Text("")
+                }
                 Text("매주")
                     .onTapGesture {
                         selectedOption = .everyWeek
@@ -83,4 +87,5 @@ struct RepeatSetting: View {
 
 #Preview {
     RepeatSetting()
+        .environmentObject(PlannerViewModel())
 }

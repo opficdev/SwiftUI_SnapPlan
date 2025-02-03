@@ -217,6 +217,7 @@ struct ScheduleView: View {
         }
         .sheet(isPresented: $tapRepeat) {
             RepeatSetting()
+                .environmentObject(plannerVM)
         }
     }
 }
