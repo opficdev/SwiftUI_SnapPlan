@@ -15,8 +15,8 @@ struct ScheduleView: View {
     let screenWidth = UIScreen.main.bounds.width
     @Binding var schedule: TimeData?
     @EnvironmentObject private var plannerVM: PlannerViewModel
-//    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
-    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
+    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
+//    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
     @State private var title = ""
@@ -215,8 +215,8 @@ struct ScheduleView: View {
                 style: .graphical
             )
         }
-        .sheet(isPresented: $tapEndDate) {
-            
+        .sheet(isPresented: $tapRepeat) {
+            RepeatSetting()
         }
     }
 }
