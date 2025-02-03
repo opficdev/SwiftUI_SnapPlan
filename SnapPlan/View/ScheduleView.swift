@@ -150,7 +150,7 @@ struct ScheduleView: View {
                             Spacer()
                         }
                         HStack {
-                            Image(systemName: "repeat")
+                            Image(systemName: "sun.lefthalf.filled")
                                 .foregroundStyle(Color.gray)
                                 .frame(width: 25)
                             Toggle("종일", isOn: $allDay)
