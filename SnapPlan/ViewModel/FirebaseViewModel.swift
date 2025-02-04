@@ -12,8 +12,8 @@ import FirebaseFirestore
 final class FirebaseViewModel: ObservableObject {
     private let db = Firestore.firestore()
         
-    /// 특정 날짜에 `TimeData`를 추가하는 메소드
-    func addTimeData(for userId: String, date: String, timeData: TimeData, completion: @escaping (Error?) -> Void) {
+    /// 특정 날짜에 `ScheduleData`를 추가하는 메소드
+    func addTimeData(for userId: String, date: String, schedule: ScheduleData, completion: @escaping (Error?) -> Void) {
         let docRef = db.collection("timeData").document(userId).collection("dates").document(date)
         
         docRef.getDocument { document, error in
@@ -29,9 +29,12 @@ final class FirebaseViewModel: ObservableObject {
             }
             
             let newEntry: [String: Any] = [
-                "id": timeData.id.uuidString,
-                "time": timeData.time,
-                "timePeriod": timeData.timePeriod
+                "title": schedule.title,
+                "timeLine": schedule.timeLine,
+                "cycleOption": schedule.cycleOption,
+                "location": schedule.location,
+                "description": schedule.description,
+                "color": schedule.color
             ]
             
             existingData.append(newEntry)
@@ -43,7 +46,7 @@ final class FirebaseViewModel: ObservableObject {
     }
     
     /// 특정 날짜의 '`TimeData`를 불러오는 메소드
-    func fetchTimeData(for userId: String, date: String, completion: @escaping ([TimeData]?, Error?) -> Void) {
+    func fetchTimeData(for userId: String, date: String, completion: @escaping ([ScheduleData]?, Error?) -> Void) {
         let docRef = db.collection("timeData").document(userId).collection("dates").document(date)
         
         docRef.getDocument { document, error in
@@ -58,14 +61,21 @@ final class FirebaseViewModel: ObservableObject {
                 return
             }
             
-            let timeDataList: [TimeData] = entries.compactMap { entry in
-//                guard let idString = entry["id"] as? String,
-                guard let _ = entry["id"] as? String,
-//                      let id = UUID(uuidString: idString),
-                      let time = entry["time"] as? String,
-                      let timePeriod = entry["timePeriod"] as? String else { return nil }
-                
-                return TimeData(time: time, timePeriod: timePeriod)
+            let timeDataList: [ScheduleData] = entries.compactMap { entry in
+                guard let title = entry["title"] as? String,
+                      let timeLine = entry["timeLine"] as? (Date, Date),
+                      let cycleOption = entry["cycleOption"] as? ScheduleData.CycleOption,
+                      let location = entry["location"] as? String,
+                      let description = entry["description"] as? String,
+                      let color = entry["color"] as? Int else { return nil }
+                return ScheduleData(
+                    title: title,
+                    timeLine: timeLine,
+                    cycleOption: cycleOption,
+                    location: location,
+                    description: description,
+                    color: color
+                )
             }
             
             completion(timeDataList.isEmpty ? nil : timeDataList, nil)

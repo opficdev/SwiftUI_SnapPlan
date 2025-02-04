@@ -57,15 +57,25 @@ User (컬렉션)
 │  
 ├── user1 (문서)  ⬅️ FirebaseAuth와 자동 연동
 │   │  
-│   ├── timeData (컬렉션)
+│   ├── ScheduleData (컬렉션)
 │   │   ├── 2025-01-21 (문서)
-│   │   │   ├── entries: [{id: ..., time: ..., timePeriod: ...}]
+│   │   │   ├── entries: [{
+│   │   │   │       id: UUID,  ⬅️ 일정 ID
+│   │   │   │       title: String,  ⬅️ 일정 제목
+│   │   │   │       timeLine: { start: Date, end: Date },  ⬅️ 일정 시간 범위
+│   │   │   │       isChanging: Boolean,  ⬅️ 일정 시간 변경 여부
+│   │   │   │       cycleOption: String,  ⬅️ 일정 반복 주기
+│   │   │   │       location: String,  ⬅️ 일정 장소
+│   │   │   │       description: String,  ⬅️ 일정 설명
+│   │   │   │       color: Int  ⬅️ 일정 색상 (Color 배열 인덱스)
+│   │   │   │     }]
+│   │   │       
 │   │   ├── 2025-01-22 (문서)
 │   │  
 │   ├── 12timeFmt: true / false (필드)
 │  
 ├── user2 (문서)
-│   ├── timeData (컬렉션)
+│   ├── ScheduleData (컬렉션)
 │   │   ├── 2025-01-21 (문서)
 │   │   ├── 2025-01-22 (문서)
 │   │  

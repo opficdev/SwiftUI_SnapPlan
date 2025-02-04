@@ -13,7 +13,7 @@ struct ScheduleView: View {
         Color.macOrange, Color.macYellow, Color.macGreen
     ]
     let screenWidth = UIScreen.main.bounds.width
-    @Binding var schedule: TimeData?
+    @Binding var schedule: ScheduleData?
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @State private var addSchedule = false  //  스케줄 버튼 탭 여부
 //    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
@@ -33,7 +33,7 @@ struct ScheduleView: View {
     @State private var pickerHeight = CGFloat.zero
     @FocusState private var keyboardFocus: Bool
     
-    init(schedule: Binding<TimeData?>) {
+    init(schedule: Binding<ScheduleData?>) {
         self._schedule = schedule
         let now = Date()
         self._startTime = State(initialValue: now)
@@ -216,7 +216,7 @@ struct ScheduleView: View {
             )
         }
         .sheet(isPresented: $tapRepeat) {
-            ScheduleCycleView()
+            ScheduleCycleView(schedule: $schedule)
                 .environmentObject(plannerVM)
         }
     }
