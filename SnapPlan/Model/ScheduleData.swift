@@ -8,10 +8,30 @@
 import Foundation
 
 struct ScheduleData: Identifiable {
-    let id = UUID()
-    var title: String
-    var timeLine: (Date, Date)
-    var isChanging = false
+    let id = UUID() //  UUID
+    var title: String   // 일정 제목
+    var timeLine: (Date, Date)  // 일정 시간 범위
+    var isChanging = false  // 일정 시간 변경 중인지 확인
+    var cycleOption: CycleOption    // 일정 반복 주기
+    var location: String // 일정 장소
+    var description: String  // 일정 설명
+    var color: Int  // 일정 색상(뷰에서 사용할 Color 배열의 인덱스임)
+    
+    init(
+        title: String,
+        timeLine: (Date, Date),
+        cycleOption: CycleOption = .none,
+        location: String = "",
+        description: String = "",
+        color: Int = 0
+    ) {
+        self.title = title
+        self.timeLine = timeLine
+        self.cycleOption = cycleOption
+        self.location = location
+        self.description = description
+        self.color = color
+    }
     
     mutating func setTitle(newTitle: String) {
         self.title = newTitle
@@ -24,5 +44,13 @@ struct ScheduleData: Identifiable {
         if let endTime = newTimeLine.1 {
             self.timeLine.1 = endTime
         }
+    }
+    
+    mutating func setCycleOption(newCycleOption: CycleOption) {
+        self.cycleOption = newCycleOption
+    }
+    
+    enum CycleOption {
+        case none, everyDay, everyWeekDays, everyWeek, every2Week, everyMonth, everyYear, custom
     }
 }
