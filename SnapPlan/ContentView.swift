@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel = LoginViewModel()
+    @StateObject private var viewModel = FirebaseViewModel()
     
     var body: some View {
         if viewModel.signedIn {

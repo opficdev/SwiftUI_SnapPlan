@@ -11,8 +11,7 @@ import SwiftUIIntrospect
 
 struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
-    @StateObject var firebaseVM = FirebaseViewModel()
-    @EnvironmentObject var loginVM: LoginViewModel
+    @EnvironmentObject var firebaseVM: FirebaseViewModel
     @State private var showSideBar = false
     @State private var didSelectSchedule = false
     
@@ -41,6 +40,6 @@ struct PlannerView: View {
 
 #Preview {
     PlannerView()
-        .environmentObject(LoginViewModel())
+        .environmentObject(FirebaseViewModel())
 }
 
