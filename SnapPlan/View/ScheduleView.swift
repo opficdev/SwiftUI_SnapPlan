@@ -4,6 +4,7 @@
 //
 //  Created by opfic on 1/17/25.
 //
+//  MARK: 메인 뷰에서 sheet에 올라오는 뷰
 
 import SwiftUI
 
@@ -15,30 +16,48 @@ struct ScheduleView: View {
     let screenWidth = UIScreen.main.bounds.width
     @Binding var schedule: ScheduleData?
     @EnvironmentObject private var plannerVM: PlannerViewModel
-    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
-//    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
-    @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
-    @State private var selectedDetent: PresentationDetent = .fraction(0.07)
-    @State private var title = ""
+    
+    @State private var title: String
     @State private var startTime: Date
     @State private var endTime: Date
+    @State private var location: String
+    @State private var description: String
     
+    @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
+    @State private var selectedDetent: PresentationDetent = .fraction(0.07)
+    @State private var addSchedule = true  //  스케줄 버튼 탭 여부
     @State private var tapStartTime = false //  시작 시간 탭 여부
     @State private var tapEndTime = false   //  종료 시간 탭 여부
     @State private var tapStartDate = false //  시작 날짜 탭 여부
     @State private var tapEndDate = false   //  종료 날짜 탭
     @State private var allDay = false       //  종일 여부
     @State private var tapRepeat = false    //  반복 탭 여부
+    @State private var tapLocation = false  //  위치 탭 여부
+    @State private var descriptionFocus = false   //  설명 탭 여부
     
-    @State private var pickerHeight = CGFloat.zero
-    @FocusState private var keyboardFocus: Bool
+    @State private var descriptionHeight = CGFloat(17)
+    @FocusState private var titleFocus: Bool
     
     init(schedule: Binding<ScheduleData?>) {
         self._schedule = schedule
-        let now = Date()
-        self._startTime = State(initialValue: now)
-        self._endTime = State(initialValue: now.addingTimeInterval(1800))
+        
+        if schedule.wrappedValue == nil { // Binding 내부 값 확인
+            let now = Date()
+            self._startTime = State(initialValue: now)
+            self._endTime = State(initialValue: now.addingTimeInterval(1800))
+            self._title = State(initialValue: "")
+            self._location = State(initialValue: "")
+            self._description = State(initialValue: "")
+        }
+        else {
+            self._startTime = State(initialValue: schedule.wrappedValue!.timeLine.0)
+            self._endTime = State(initialValue: schedule.wrappedValue!.timeLine.1)
+            self._title = State(initialValue: schedule.wrappedValue!.title)
+            self._location = State(initialValue: schedule.wrappedValue!.location)
+            self._description = State(initialValue: schedule.wrappedValue!.description)
+        }
     }
+    
     var body: some View {
         VStack {
             if !addSchedule {
@@ -50,7 +69,7 @@ struct ScheduleView: View {
                     Spacer()
                     Button(action: {
                         addSchedule = true
-                        keyboardFocus = true
+                        titleFocus = true
                         currentDetent = currentDetent.union([.large])
                         selectedDetent = .large
                         DispatchQueue.main.async {
@@ -106,7 +125,7 @@ struct ScheduleView: View {
                     VStack(alignment: .leading) {
                         TextField("제목", text: $title)
                             .font(.headline)
-                            .focused($keyboardFocus)
+                            .focused($titleFocus)
                             .textSelection(.enabled)
                         Divider()
                             .padding(.vertical)
@@ -172,17 +191,40 @@ struct ScheduleView: View {
                         }
                         Divider()
                             .padding(.vertical)
+                        HStack {
+                            Image(systemName: "map")
+                                .foregroundStyle(Color.gray)
+                            if location.isEmpty {
+                                Text("위치")  //  NavigationStack 구현 예정
+                                    .foregroundStyle(Color.gray)
+                            }
+                            else {
+                                Text(location)
+                            }
+                        }
+                        Divider()
+                            .padding(.vertical)
+                        UIKitTextEditor(
+                            text: $description,
+                            isFocused: $descriptionFocus,
+                            minHeight: $descriptionHeight,
+                            placeholder: "설명"
+                        )
+                        .frame(height: descriptionHeight)
+                        Divider()
+                            .padding(.vertical)
                     }
                 }
-                .scrollDisabled(!keyboardFocus) // 키보드가 내려가면 스크롤 비활성화
+                .scrollDisabled(!titleFocus) // 키보드가 내려가면 스크롤 비활성화
             }
             Spacer()
         }
         .onTapGesture {
-            if keyboardFocus {
-                keyboardFocus = false
+            if titleFocus {
+                titleFocus = false
                 currentDetent = [.large, .fraction(0.4)]
             }
+            descriptionFocus = false
         }
         .presentationDetents(currentDetent, selection: $selectedDetent)
         .padding()
