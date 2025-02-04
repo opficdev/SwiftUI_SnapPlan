@@ -113,9 +113,7 @@ struct TimeLineView: View {
                                                             .onTapGesture { //  [현재시간 - 30분, 현재시간]
                                                                 
                                                             }
-                                                        Rectangle()
-                                                            .frame(height: 1)
-                                                            .foregroundColor(Color.gray.opacity(0.5))
+                                                        Divider()
                                                         Spacer()
                                                             .onTapGesture { //  [현재시간, 현재시간 + 30분]
                                                                 
