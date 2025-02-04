@@ -24,11 +24,9 @@ struct UIKitTextEditor: UIViewRepresentable {
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView()
         textView.delegate = context.coordinator
-        textView.font = UIFont.systemFont(ofSize: 17)
-        textView.textColor = .black
-        textView.tintColor = UIColor(Color.pink)
+        textView.font = UIFont.preferredFont(forTextStyle: .body)
         textView.textContainer.lineFragmentPadding = 0
-    
+        textView.textColor = UIColor.label
         textView.autocorrectionType = .no
         updatePlaceholder(textView)
         return textView
@@ -60,7 +58,7 @@ struct UIKitTextEditor: UIViewRepresentable {
         }
         else if textView.textColor == .gray {
             textView.text = nil
-            textView.textColor = .black
+            textView.textColor = .label
         }
     }
     
@@ -83,7 +81,7 @@ struct UIKitTextEditor: UIViewRepresentable {
             parent.isFocused = true
             if textView.textColor == .gray {
                 textView.text = nil
-                textView.textColor = .black
+                textView.textColor = .label
             }
         }
         
