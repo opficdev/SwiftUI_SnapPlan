@@ -13,13 +13,12 @@ struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
     @EnvironmentObject var firebaseVM: FirebaseViewModel
     @State private var showSideBar = false
-    @State private var didSelectSchedule = false
     
     var body: some View {
         VStack(spacing: 0) {
             CalendarView(showSideBar: $showSideBar)
                 .environmentObject(plannerVM)
-            TimeLineView(didSelectSchedule: $didSelectSchedule)
+            TimeLineView()
                 .environmentObject(plannerVM)
         }
         .sheet(isPresented: .constant(true)) {

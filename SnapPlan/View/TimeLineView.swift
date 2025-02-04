@@ -9,17 +9,16 @@ import SwiftUI
 
 struct TimeLineView: View {
     @EnvironmentObject private var viewModel: PlannerViewModel
+    @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
-    let screenWidth = UIScreen.main.bounds.width
-    @Binding var didSelectSchedule: Bool
-        
-    @State private var is12TimeFmt = true  // firebase에 저장 및 가져와야함
+    @State private var is12TimeFmt = true
     @State private var timeZoneSize = CGSizeZero
     @State private var selection = 0
     @State private var calendarData = [Date]()
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
     @State private var schedules = [ScheduleData]()
+    let screenWidth = UIScreen.main.bounds.width
     
     var body: some View {
         ZStack {
@@ -136,7 +135,6 @@ struct TimeLineView: View {
                                                 )
                                                 .offset(y: timeZoneSize.height + startOffset)
                                                 .onTapGesture {
-                                                    didSelectSchedule.toggle()
                                                     if schedules[idx].isChanging {
                                                         schedules[idx].isChanging = false
                                                     }
@@ -234,12 +232,40 @@ struct TimeLineView: View {
                 }
             }
         }
+//        .onAppear {
+//            firebaseVM.fetch12Time { value, error in
+//                if let error = error {
+//                    print("12timeFmt 불러오기 실패")
+//                    print(error)
+//                    firebaseVM.set12TimeFmt(timeFmt: true) { error in
+//                        if let error = error {
+//                            print(error)
+//                        } else {
+//                            print("정상적으로 12시간제 저장")
+//                        }
+//                    }
+//                }
+//                else if let value = value {
+//                    DispatchQueue.main.async {
+//                        is12TimeFmt = value
+//                    }
+//                }
+//            }
+//        }
+//        .onChange(of: is12TimeFmt) { value in
+//            firebaseVM.set12TimeFmt(timeFmt: value) { error in
+//                if let error = error {
+//                    print(error)
+//                }
+//                else {
+//                    print("정상적으로 12시간제 재저장")
+//                }
+//            }
+//        }
     }
 }
 
 #Preview {
-    TimeLineView(
-        didSelectSchedule: .constant(false)
-    )
+    TimeLineView()
         .environmentObject(PlannerViewModel())
 }
