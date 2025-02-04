@@ -86,7 +86,6 @@ struct UIKitTextEditor: UIViewRepresentable {
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
-            parent.isFocused = false
             if textView.text.isEmpty {
                 textView.text = parent.placeholder
                 textView.textColor = .gray
