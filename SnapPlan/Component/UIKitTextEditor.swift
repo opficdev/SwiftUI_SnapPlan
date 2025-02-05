@@ -30,7 +30,7 @@ struct UIKitTextEditor: UIViewRepresentable {
         textView.textContainer.lineFragmentPadding = 0
         textView.textColor = UIColor.label
         textView.autocorrectionType = .no
-        textView.isScrollEnabled = false  // 스크롤 비활성화하여 높이 조정 가능하게 만듦
+        textView.isScrollEnabled = false
         updatePlaceholder(textView)
         return textView
     }
@@ -45,12 +45,7 @@ struct UIKitTextEditor: UIViewRepresentable {
             uiView.resignFirstResponder()
         }
 
-        // ✅ SwiftUI에 알리지 않고 UIKit에서 크기를 조정
         DispatchQueue.main.async {
-//            let newHeight = max(uiView.contentSize.height, self.minHeight)
-//            if uiView.frame.size.height != newHeight {
-//                uiView.frame.size.height = newHeight
-//            }
             uiView.frame.size.height = uiView.contentSize.height
         }
     }
@@ -79,12 +74,7 @@ struct UIKitTextEditor: UIViewRepresentable {
         func textViewDidChange(_ textView: UITextView) {
             parent.text = textView.text
 
-            // ✅ SwiftUI에 알리지 않고 UIKit에서 크기 변경
             DispatchQueue.main.async {
-//                let newHeight = max(textView.contentSize.height, self.parent.minHeight)
-//                if textView.frame.size.height != newHeight {
-//                    textView.frame.size.height = newHeight
-//                }
                 textView.frame.size.height = textView.contentSize.height
             }
         }
