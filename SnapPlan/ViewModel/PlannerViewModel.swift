@@ -38,6 +38,19 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
+    /// selectDate의 년월일과 today의 시분를 합친 값을 반환
+    var mergedDate: Date {
+        let selectedComponents = calendar.dateComponents([.year, .month, .day], from: selectDate)
+        let todayComponents = calendar.dateComponents([.hour, .minute, .second], from: today)
+        
+        let year = selectedComponents.year
+        let month = selectedComponents.month
+        let day = selectedComponents.day
+        let hour = todayComponents.hour
+        let miniute = todayComponents.minute
+        
+        return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour, minute: miniute))!
+    }
     
     /// 해당 스케줄의 시작 offset과 duration을 반환
     func getTimeBoxOffset(from data: ScheduleData, timeZoneHeight: CGFloat, gap: CGFloat) -> (CGFloat, CGFloat) {
