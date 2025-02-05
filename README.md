@@ -9,6 +9,7 @@
 - iOS 16
 
 ## 특징
+- 노션 캘린더를 베이스로 한 UI 구현
 - Firestore를 통한 사용자 데이터 저장
 - FirebaseAuth를 통한 사용자 인증
 - Combine을 사용해 현재 시각을 0.1초 단위로 최신화
@@ -47,6 +48,16 @@
       <img src="./Preview/main_dark_expand.png" width="250px">
       <p><strong>캘린더 확장 (다크 모드)</strong></p>
     </td>
+  </tr>
+  <tr>
+  <td align="center" width="250px">
+    <img src="./Preview/schedule_set_light.png" width="250px">
+    <p><strong>스케줄 추가 (라이트 모드)</strong></p> 
+  </td>
+  <td align="center" width="250px">
+    <img src="./Preview/schedule_set_dark.png" width="250px">
+    <p><strong>스케줄 추가 (다크 모드)</strong></p> 
+  </td>
   </tr>
 </table>
 
