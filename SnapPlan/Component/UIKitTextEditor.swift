@@ -12,22 +12,25 @@ struct UIKitTextEditor: UIViewRepresentable {
     @Binding var text: String
     @Binding var isFocused: Bool
     @Binding var minHeight: CGFloat
+    private let font: Font
     private let placeholder: String
     
-    init(text: Binding<String>, isFocused: Binding<Bool>, minHeight: Binding<CGFloat>, placeholder: String) {
+    init(text: Binding<String>, isFocused: Binding<Bool>, minHeight: Binding<CGFloat>, placeholder: String, font: Font = .body) {
         self._text = text
         self._isFocused = isFocused
         self._minHeight = minHeight
+        self.font = font
         self.placeholder = placeholder
     }
     
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView()
         textView.delegate = context.coordinator
-        textView.font = UIFont.preferredFont(forTextStyle: .body)
+        textView.font = UIFont.preferredFont(forTextStyle: UIFont.from(font: font))
         textView.textContainer.lineFragmentPadding = 0
         textView.textColor = UIColor.label
         textView.autocorrectionType = .no
+        textView.isScrollEnabled = false
         updatePlaceholder(textView)
         return textView
     }
@@ -43,7 +46,7 @@ struct UIKitTextEditor: UIViewRepresentable {
         }
         
         DispatchQueue.main.async {
-            self.minHeight = max(uiView.contentSize.height, minHeight)
+            self.minHeight = uiView.contentSize.height
         }
     }
     
