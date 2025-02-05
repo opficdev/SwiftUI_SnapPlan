@@ -37,7 +37,8 @@ struct ScheduleView: View {
     @State private var descriptionFocus = false   //  설명 탭 여부
     @State private var descriptionHeight = CGFloat(17)  //  설명 높이
     @State private var tapColor = false  //  색상 탭 여부
-    @FocusState private var titleFocus: Bool
+    @State private var titleFocus = false    //  제목 탭 여부
+    @State private var titleHeight = CGFloat(22)  //  제목 높이
     
     init(schedule: Binding<ScheduleData?>) {
         self._schedule = schedule
@@ -131,9 +132,16 @@ struct ScheduleView: View {
                     }
                     ScrollView {
                         VStack(alignment: .leading) {
-                            TextField("제목", text: $title)
-                                .font(.headline)
-                                .focused($titleFocus)
+//                            TextField("제목", text: $title)
+//                                .font(.headline)
+//                                .focused($titleFocus)
+                            UIKitTextEditor(
+                                text: $title,
+                                isFocused: $titleFocus,
+                                minHeight: $titleHeight,
+                                placeholder: "제목",
+                                font: .title2
+                            )
                                 .textSelection(.enabled)
                             Divider()
                                 .padding(.vertical)
@@ -219,7 +227,7 @@ struct ScheduleView: View {
                                         .frame(width: 25)
                                         .foregroundStyle(Color.gray)
                                     Text("사진")
-                                        .foregroundStyle(Color.gray)    //  이미지가 있다면
+                                        .foregroundStyle(Color.gray)    //  이미지가 있다면 이미지 최대 5개? 정도 뷰에서 표시하고 그 이상은 NavigationStack으로 이동
                                 }
                                 HStack {
                                     Image(systemName: "map")
@@ -242,12 +250,11 @@ struct ScheduleView: View {
                                 minHeight: $descriptionHeight,
                                 placeholder: "설명"
                             )
-                            .frame(height: descriptionHeight)
                             Divider()
                                 .padding(.vertical)
                         }
                     }
-                    .scrollDisabled(!titleFocus) // 키보드가 내려가면 스크롤 비활성화
+                    .scrollDisabled(!(titleFocus || descriptionFocus)) // 키보드가 내려가면 스크롤 비활성화
                     Spacer()
                 }
                 .onAppear {
