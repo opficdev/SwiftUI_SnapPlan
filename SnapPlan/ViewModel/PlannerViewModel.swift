@@ -38,16 +38,16 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
-    /// selectDate의 년월일과 today의 시분를 합친 값을 반환
-    var mergedDate: Date {
+    /// selectDate의 년월일과 특정 Date의 시분를 합친 값을 반환
+    func getMergedDate(for date: Date) -> Date {
         let selectedComponents = calendar.dateComponents([.year, .month, .day], from: selectDate)
-        let todayComponents = calendar.dateComponents([.hour, .minute, .second], from: today)
+        let dateComppoents = calendar.dateComponents([.hour, .minute], from: date)
         
         let year = selectedComponents.year
         let month = selectedComponents.month
         let day = selectedComponents.day
-        let hour = todayComponents.hour
-        let miniute = todayComponents.minute
+        let hour = dateComppoents.hour
+        let miniute = dateComppoents.minute
         
         return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour, minute: miniute))!
     }
