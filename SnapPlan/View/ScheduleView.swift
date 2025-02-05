@@ -22,6 +22,7 @@ struct ScheduleView: View {
     @State private var endTime: Date
     @State private var location: String
     @State private var description: String
+    @State private var color: Int
     
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
@@ -34,8 +35,8 @@ struct ScheduleView: View {
     @State private var tapRepeat = false    //  반복 탭 여부
     @State private var tapLocation = false  //  위치 탭 여부
     @State private var descriptionFocus = false   //  설명 탭 여부
-    
-    @State private var descriptionHeight = CGFloat(17)
+    @State private var descriptionHeight = CGFloat(17)  //  설명 높이
+    @State private var tapColor = false  //  색상 탭 여부
     @FocusState private var titleFocus: Bool
     
     init(schedule: Binding<ScheduleData?>) {
@@ -48,6 +49,7 @@ struct ScheduleView: View {
             self._title = State(initialValue: "")
             self._location = State(initialValue: "")
             self._description = State(initialValue: "")
+            self._color = State(initialValue: 0)
         }
         else {
             self._startTime = State(initialValue: schedule.wrappedValue!.timeLine.0)
@@ -55,6 +57,7 @@ struct ScheduleView: View {
             self._title = State(initialValue: schedule.wrappedValue!.title)
             self._location = State(initialValue: schedule.wrappedValue!.location)
             self._description = State(initialValue: schedule.wrappedValue!.description)
+            self._color = State(initialValue: schedule.wrappedValue!.color)
         }
     }
     
@@ -103,6 +106,15 @@ struct ScheduleView: View {
                         }
                     }
                     else {
+                        if schedule != nil {
+                            Button(action: {
+                                
+                            }) {
+                                Image(systemName: "ellipsis")
+                                    .foregroundStyle(Color.gray)
+                                    .font(.system(size: 30))
+                            }
+                        }
                         Button(action: {
                             addSchedule = false
                             currentDetent = currentDetent.union([.fraction(0.07)])
@@ -172,7 +184,7 @@ struct ScheduleView: View {
                             Spacer()
                         }
                         HStack {
-                            Image(systemName: "sun.lefthalf.filled")
+                            Image(systemName: "sun.max")
                                 .foregroundStyle(Color.gray)
                                 .frame(width: 25)
                             Toggle("종일", isOn: $allDay)
@@ -192,14 +204,38 @@ struct ScheduleView: View {
                         Divider()
                             .padding(.vertical)
                         HStack {
-                            Image(systemName: "map")
+                            Image(systemName: "paintpalette")
+                                .frame(width: 25)
                                 .foregroundStyle(Color.gray)
-                            if location.isEmpty {
-                                Text("위치")  //  NavigationStack 구현 예정
+                            Text("색상")
+                                .onTapGesture {
+                                    tapColor.toggle()
+                                }
+                                .sheet(isPresented: $tapColor) {
+                                    ColorSelector(color: $color)
+                                }
+                        }
+                        Divider()
+                            .padding(.vertical)
+                        VStack(alignment:. leading, spacing: 20) {
+                            HStack {
+                                Image(systemName: "photo")
+                                    .frame(width: 25)
                                     .foregroundStyle(Color.gray)
+                                Text("사진")
+                                    .foregroundStyle(Color.gray)    //  이미지가 있다면
                             }
-                            else {
-                                Text(location)
+                            HStack {
+                                Image(systemName: "map")
+                                    .frame(width: 25)
+                                    .foregroundStyle(Color.gray)
+                                if location.isEmpty {
+                                    Text("위치")  //  NavigationStack 구현 예정
+                                        .foregroundStyle(Color.gray)
+                                }
+                                else {
+                                    Text(location)
+                                }
                             }
                         }
                         Divider()
