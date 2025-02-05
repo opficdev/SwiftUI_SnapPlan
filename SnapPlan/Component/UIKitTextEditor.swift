@@ -11,26 +11,26 @@ import UIKit
 struct UIKitTextEditor: UIViewRepresentable {
     @Binding var text: String
     @Binding var isFocused: Bool
-    @Binding var minHeight: CGFloat
+    private var minHeight: CGFloat
     private let font: Font
     private let placeholder: String
     
-    init(text: Binding<String>, isFocused: Binding<Bool>, minHeight: Binding<CGFloat>, placeholder: String, font: Font = .body) {
+    init(text: Binding<String>, isFocused: Binding<Bool>, placeholder: String, font: Font = .body) {
         self._text = text
         self._isFocused = isFocused
-        self._minHeight = minHeight
         self.font = font
+        self.minHeight = UIFont.from(font: font).lineHeight
         self.placeholder = placeholder
     }
     
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView()
         textView.delegate = context.coordinator
-        textView.font = UIFont.preferredFont(forTextStyle: UIFont.from(font: font))
+        textView.font = UIFont.from(font: font)
         textView.textContainer.lineFragmentPadding = 0
         textView.textColor = UIColor.label
         textView.autocorrectionType = .no
-        textView.isScrollEnabled = false
+        textView.isScrollEnabled = false  // 스크롤 비활성화하여 높이 조정 가능하게 만듦
         updatePlaceholder(textView)
         return textView
     }
@@ -44,9 +44,14 @@ struct UIKitTextEditor: UIViewRepresentable {
         } else if !isFocused && uiView.isFirstResponder {
             uiView.resignFirstResponder()
         }
-        
+
+        // ✅ SwiftUI에 알리지 않고 UIKit에서 크기를 조정
         DispatchQueue.main.async {
-            self.minHeight = uiView.contentSize.height
+//            let newHeight = max(uiView.contentSize.height, self.minHeight)
+//            if uiView.frame.size.height != newHeight {
+//                uiView.frame.size.height = newHeight
+//            }
+            uiView.frame.size.height = uiView.contentSize.height
         }
     }
     
@@ -58,8 +63,7 @@ struct UIKitTextEditor: UIViewRepresentable {
         if text.isEmpty && !isFocused {
             textView.text = placeholder
             textView.textColor = .gray
-        }
-        else if textView.textColor == .gray {
+        } else if textView.textColor == .gray {
             textView.text = nil
             textView.textColor = .label
         }
@@ -74,9 +78,14 @@ struct UIKitTextEditor: UIViewRepresentable {
         
         func textViewDidChange(_ textView: UITextView) {
             parent.text = textView.text
-            
+
+            // ✅ SwiftUI에 알리지 않고 UIKit에서 크기 변경
             DispatchQueue.main.async {
-                self.parent.minHeight = min(textView.contentSize.height, self.parent.minHeight)
+//                let newHeight = max(textView.contentSize.height, self.parent.minHeight)
+//                if textView.frame.size.height != newHeight {
+//                    textView.frame.size.height = newHeight
+//                }
+                textView.frame.size.height = textView.contentSize.height
             }
         }
         

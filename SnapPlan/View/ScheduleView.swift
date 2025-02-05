@@ -35,10 +35,8 @@ struct ScheduleView: View {
     @State private var tapRepeat = false    //  반복 탭 여부
     @State private var tapLocation = false  //  위치 탭 여부
     @State private var descriptionFocus = false   //  설명 탭 여부
-    @State private var descriptionHeight = CGFloat(17)  //  설명 높이
     @State private var tapColor = false  //  색상 탭 여부
     @State private var titleFocus = false    //  제목 탭 여부
-    @State private var titleHeight = CGFloat(22)  //  제목 높이
     
     init(schedule: Binding<ScheduleData?>) {
         self._schedule = schedule
@@ -132,13 +130,9 @@ struct ScheduleView: View {
                     }
                     ScrollView {
                         VStack(alignment: .leading) {
-//                            TextField("제목", text: $title)
-//                                .font(.headline)
-//                                .focused($titleFocus)
                             UIKitTextEditor(
                                 text: $title,
                                 isFocused: $titleFocus,
-                                minHeight: $titleHeight,
                                 placeholder: "제목",
                                 font: .title2
                             )
@@ -247,7 +241,6 @@ struct ScheduleView: View {
                             UIKitTextEditor(
                                 text: $description,
                                 isFocused: $descriptionFocus,
-                                minHeight: $descriptionHeight,
                                 placeholder: "설명"
                             )
                             Divider()
