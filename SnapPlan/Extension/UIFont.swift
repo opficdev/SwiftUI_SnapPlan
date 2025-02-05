@@ -8,32 +8,20 @@
 import SwiftUI
 
 extension UIFont {
-    static func from(font: Font) -> UIFont.TextStyle {
+    static func from(font: Font) -> UIFont {
         switch font {
-        case .largeTitle:
-            return .largeTitle
-        case .title:
-            return .title1
-        case .title2:
-            return .title2
-        case .title3:
-            return .title3
-        case .headline:
-            return .headline
-        case .subheadline:
-            return .subheadline
-        case .body:
-            return .body
-        case .callout:
-            return .callout
-        case .footnote:
-            return .footnote
-        case .caption:
-            return .caption1
-        case .caption2:
-            return .caption2
-        default:
-            return .body
+        case .largeTitle: return UIFont.preferredFont(forTextStyle: .largeTitle)
+        case .title: return UIFont.preferredFont(forTextStyle: .title1)
+        case .title2: return UIFont.preferredFont(forTextStyle: .title2)
+        case .title3: return UIFont.preferredFont(forTextStyle: .title3)
+        case .headline: return UIFont.preferredFont(forTextStyle: .headline)
+        case .body: return UIFont.preferredFont(forTextStyle: .body)
+        case .callout: return UIFont.preferredFont(forTextStyle: .callout)
+        case .subheadline: return UIFont.preferredFont(forTextStyle: .subheadline)
+        case .footnote: return UIFont.preferredFont(forTextStyle: .footnote)
+        case .caption: return UIFont.preferredFont(forTextStyle: .caption1)
+        case .caption2: return UIFont.preferredFont(forTextStyle: .caption2)
+        default: return UIFont.systemFont(ofSize: UIFont.systemFontSize)
         }
     }
 }
