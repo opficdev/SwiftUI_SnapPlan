@@ -111,6 +111,8 @@ struct ScheduleView: View {
                             }
                             Button(action: {
                                 addSchedule = false
+                                titleFocus = false
+                                descriptionFocus = false
                                 currentDetent = currentDetent.union([.fraction(0.07)])
                                 selectedDetent = .fraction(0.07)
                                 DispatchQueue.main.async {
@@ -250,9 +252,13 @@ struct ScheduleView: View {
                 }
                 .onAppear {
                     if schedule == nil {
-                        startTime = plannerVM.mergedDate
+                        startTime = plannerVM.getMergedDate(for: plannerVM.today)
                         endTime = startTime.addingTimeInterval(1800)
                     }
+                }
+                .onChange(of: plannerVM.selectDate) { _ in
+                    startTime = plannerVM.getMergedDate(for: startTime)
+                    endTime = plannerVM.getMergedDate(for: endTime)
                 }
                 .onTapGesture {
                     if titleFocus {
@@ -277,11 +283,7 @@ struct ScheduleView: View {
                         selectedTime: $endTime,
                         component: .hourAndMinute
                     )
-                    .onChange(of: endTime) { value in
-                        if endTime < startTime {
-                            startTime = endTime
-                        }
-                    }
+                    
                 }
                 .sheet(isPresented: $tapStartDate) {
                     DateTimePicker(
