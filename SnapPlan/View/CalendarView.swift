@@ -56,6 +56,9 @@ struct CalendarView: View {
                     withAnimation(.linear(duration: 0.1)) {
                         showCalendar.toggle()
                     }
+                    if !showCalendar {
+                        plannerVM.currentDate = plannerVM.selectDate
+                    }
                 }
                 Spacer()
                 
