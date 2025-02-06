@@ -14,9 +14,24 @@ import GoogleSignInSwift
 
 @MainActor
 final class FirebaseViewModel: ObservableObject {
-    @Published var signedIn = Auth.auth().currentUser != nil
-    private let db = Firestore.firestore()
+    @Published var signedIn: Bool? = nil
     private var userId: String? { Auth.auth().currentUser?.uid }
+    private let db = Firestore.firestore()
+    
+    init() {
+        GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
+            if let error = error {
+                print("이전 로그인 복원 실패: \(error.localizedDescription)")
+                return
+            }
+            
+            if let _ = user {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.signedIn = true
+                }
+            }
+        }
+    }
     
     func addScheduleData(date: String, schedule: ScheduleData, completion: @escaping (Error?) -> Void) {
         guard let userId = userId else {
@@ -93,7 +108,7 @@ final class FirebaseViewModel: ObservableObject {
         docRef.setData(["timeFmt": timeFmt], merge: true, completion: completion)
     }
     
-    func fetch12Time(completion: @escaping (Bool?, Error?) -> Void) {
+    func fetch12TimeFmt(completion: @escaping (Bool?, Error?) -> Void) {
         guard let userId = userId else {
             completion(nil, URLError(.userAuthenticationRequired))
             return
