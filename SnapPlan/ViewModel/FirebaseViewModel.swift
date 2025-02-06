@@ -14,9 +14,11 @@ import GoogleSignInSwift
 
 @MainActor
 final class FirebaseViewModel: ObservableObject {
-    @Published var signedIn: Bool? = nil
     private var userId: String? { Auth.auth().currentUser?.uid }
     private let db = Firestore.firestore()
+    @Published var signedIn: Bool? = nil
+    @Published var is12TimeFmt: Bool = true
+    @Published var schedules: [ScheduleData] = []
     
     init() {
         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
@@ -26,28 +28,82 @@ final class FirebaseViewModel: ObservableObject {
             }
             
             if let _ = user {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                Task {
+                    await self.loadTimeFormat()
+                    await self.loadScheduleData()
                     self.signedIn = true
                 }
             }
         }
     }
     
-    func addScheduleData(date: String, schedule: ScheduleData, completion: @escaping (Error?) -> Void) {
+    /// 최초 앱 실행 시 사용자의 12시간제 포맷을 불러오는 메소드
+    func loadTimeFormat() async {
+        do {
+            if let value = try await fetch12TimeFmt() {
+                await MainActor.run {
+                    self.is12TimeFmt = value
+                }
+            } else {
+                try await set12TimeFmt(timeFmt: true)
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    /// 최초 앱 실행 시 사용자의 오늘을 포함한 달의 전체 스케줄 데이터를 불러오는 메소드
+    func loadScheduleData() async {
+        do {
+            if let value = try await fetchScheduleData(date: Date()) {
+                await MainActor.run {
+                    self.schedules = value
+                }
+            } 
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func set12TimeFmt(timeFmt: Bool) async throws {
         guard let userId = userId else {
-            completion(URLError(.userAuthenticationRequired))
-            return
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let docRef = db.collection("users").document(userId)
+        
+        do {
+            try await docRef.setData(["timeFmt": timeFmt], merge: true)
+        } catch {
+            throw error
+        }
+    }
+    
+    func fetch12TimeFmt() async throws -> Bool? {
+        guard let userId = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let docRef = db.collection("users").document(userId)
+        
+        do {
+            let document = try await docRef.getDocument()
+            let timeFmt = document.data()?["timeFmt"] as? Bool
+            return timeFmt
+        } catch {
+            throw error
+        }
+    }
+    
+    func addScheduleData(date: String, schedule: ScheduleData) async throws {
+        guard let userId = userId else {
+            throw URLError(.userAuthenticationRequired)
         }
         
         let docRef = db.collection("ScheduleData").document(userId).collection("dates").document(date)
         
-        docRef.getDocument { document, error in
-            if let error = error {
-                completion(error)
-                return
-            }
-            
-//            var existingData: [[String: Any]] = document?.data()?["entries"] as? [[String: Any]] ?? []
+        do {
+            let document = try await docRef.getDocument()
             
             let newEntry: [String: Any] = [
                 "title": schedule.title,
@@ -58,30 +114,24 @@ final class FirebaseViewModel: ObservableObject {
                 "color": schedule.color
             ]
             
-//            existingData.append(newEntry)
-            
-//            docRef.setData(["entries": existingData], merge: true, completion: completion)
-            docRef.setData(["entries": newEntry], merge: true, completion: completion)
+            try await docRef.setData(["entries": newEntry], merge: true)
+        } catch {
+            throw error
         }
     }
     
-    func fetchScheduleData(date: String, completion: @escaping ([ScheduleData]?, Error?) -> Void) {
-        guard let userId = userId else {
-            completion(nil, URLError(.userAuthenticationRequired))
-            return
+    func fetchScheduleData(date: Date) async throws -> [ScheduleData]? {
+        guard let userId = userId, let date = DateFormatter.yyyyMMdd.string(for: date) else {
+            throw URLError(.userAuthenticationRequired)
         }
         
         let docRef = db.collection("ScheduleData").document(userId).collection("dates").document(date)
         
-        docRef.getDocument { document, error in
-            if let error = error {
-                completion(nil, error)
-                return
-            }
+        do {
+            let document = try await docRef.getDocument()
             
-            guard let entries = document?.data()?["entries"] as? [[String: Any]] else {
-                completion(nil, nil)
-                return
+            guard let entries = document.data()?["entries"] as? [[String: Any]] else {
+                return nil
             }
             
             let timeDataList: [ScheduleData] = entries.compactMap { entry in
@@ -94,36 +144,9 @@ final class FirebaseViewModel: ObservableObject {
                 return ScheduleData(title: title, timeLine: timeLine, cycleOption: cycleOption, location: location, description: description, color: color)
             }
             
-            completion(timeDataList.isEmpty ? nil : timeDataList, nil)
-        }
-    }
-    
-    func set12TimeFmt(timeFmt: Bool, completion: @escaping (Error?) -> Void) {
-        guard let userId = userId else {
-            completion(URLError(.userAuthenticationRequired))
-            return
-        }
-        
-        let docRef = db.collection("users").document(userId)
-        docRef.setData(["timeFmt": timeFmt], merge: true, completion: completion)
-    }
-    
-    func fetch12TimeFmt(completion: @escaping (Bool?, Error?) -> Void) {
-        guard let userId = userId else {
-            completion(nil, URLError(.userAuthenticationRequired))
-            return
-        }
-        
-        let docRef = db.collection("users").document(userId)
-        
-        docRef.getDocument { document, error in
-            if let error = error {
-                completion(nil, error)
-                return
-            }
-            
-            let timeFmt = document?.data()?["timeFmt"] as? Bool
-            completion(timeFmt, nil)
+            return timeDataList.isEmpty ? nil : timeDataList
+        } catch {
+            throw error
         }
     }
 }
