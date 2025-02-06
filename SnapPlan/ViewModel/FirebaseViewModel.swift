@@ -95,35 +95,43 @@ final class FirebaseViewModel: ObservableObject {
         }
     }
     
-    func addScheduleData(date: String, schedule: ScheduleData) async throws {
+    func addScheduleData(date: Date, schedule: ScheduleData) async throws {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
         }
+        let dateString = DateFormatter.yyyyMMdd.string(from: date)
         
-        let docRef = db.collection("ScheduleData").document(userId).collection("dates").document(date)
+        let docRef = db.collection("ScheduleData").document(userId).collection("dates").document(dateString)
         
         do {
             let document = try await docRef.getDocument()
             
+            var entries: [[String: Any]] = document.data()?["entries"] as? [[String: Any]] ?? []
+            
             let newEntry: [String: Any] = [
                 "title": schedule.title,
                 "timeLine": schedule.timeLine,
+                "isChanging": schedule.isChanging,
                 "cycleOption": schedule.cycleOption,
                 "location": schedule.location,
                 "description": schedule.description,
                 "color": schedule.color
             ]
             
-            try await docRef.setData(["entries": newEntry], merge: true)
+            entries.append(newEntry)
+            
+            try await docRef.setData(["entries": entries], merge: true)
         } catch {
             throw error
         }
     }
     
     func fetchScheduleData(date: Date) async throws -> [ScheduleData]? {
-        guard let userId = userId, let date = DateFormatter.yyyyMMdd.string(for: date) else {
+        guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
         }
+        
+        let date = DateFormatter.yyyyMMdd.string(from: date)
         
         let docRef = db.collection("ScheduleData").document(userId).collection("dates").document(date)
         
@@ -144,7 +152,7 @@ final class FirebaseViewModel: ObservableObject {
                 return ScheduleData(title: title, timeLine: timeLine, cycleOption: cycleOption, location: location, description: description, color: color)
             }
             
-            return timeDataList.isEmpty ? nil : timeDataList
+            return timeDataList
         } catch {
             throw error
         }
