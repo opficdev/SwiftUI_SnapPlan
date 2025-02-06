@@ -8,7 +8,7 @@
 import Foundation
 
 struct ScheduleData: Identifiable {
-    let id = UUID() //  UUID
+    let id: UUID //  UUID
     var title: String   // 일정 제목
     var timeLine: (Date, Date)  // 일정 시간 범위
     var isChanging = false  // 일정 시간 변경 중인지 확인
@@ -18,6 +18,7 @@ struct ScheduleData: Identifiable {
     var color: Int  // 일정 색상(뷰에서 사용할 Color 배열의 인덱스임)
     
     init(
+        id: UUID = UUID(),
         title: String,
         timeLine: (Date, Date),
         cycleOption: CycleOption = .none,
@@ -25,6 +26,7 @@ struct ScheduleData: Identifiable {
         description: String = "",
         color: Int = 0
     ) {
+        self.id = id
         self.title = title
         self.timeLine = timeLine
         self.cycleOption = cycleOption
