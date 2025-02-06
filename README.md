@@ -71,7 +71,6 @@ User (컬렉션)
 │   ├── ScheduleData (컬렉션)
 │   │   ├── 2025-01-21 (문서)
 │   │   │   ├── entries: [{
-│   │   │   │       id: UUID,  ⬅️ 일정 ID
 │   │   │   │       title: String,  ⬅️ 일정 제목
 │   │   │   │       timeLine: { start: Date, end: Date },  ⬅️ 일정 시간 범위
 │   │   │   │       isChanging: Boolean,  ⬅️ 일정 시간 변경 여부
