@@ -64,30 +64,22 @@
 
 ## Firestore 구조
 ```
-User (컬렉션)
-│  
-├── user1 (문서)  ⬅️ FirebaseAuth와 자동 연동
-│   │  
-│   ├── ScheduleData (컬렉션)
-│   │   ├── 2025-01-21 (문서)
-│   │   │   ├── entries: [{
-│   │   │   │       title: String,  ⬅️ 일정 제목
-│   │   │   │       timeLine: { start: Date, end: Date },  ⬅️ 일정 시간 범위
-│   │   │   │       isChanging: Boolean,  ⬅️ 일정 시간 변경 여부
-│   │   │   │       cycleOption: String,  ⬅️ 일정 반복 주기
-│   │   │   │       location: String,  ⬅️ 일정 장소
-│   │   │   │       description: String,  ⬅️ 일정 설명
-│   │   │   │       color: Int  ⬅️ 일정 색상 (Color 배열 인덱스)
-│   │   │   │     }]
-│   │   │       
-│   │   ├── 2025-01-22 (문서)
-│   │  
-│   ├── 12timeFmt: true / false (필드)
-│  
-├── user2 (문서)
-│   ├── ScheduleData (컬렉션)
-│   │   ├── 2025-01-21 (문서)
-│   │   ├── 2025-01-22 (문서)
-│   │  
-│   ├── 12timeFmt: true / false (필드)
+User UID (컬렉션) ⬅️ FirebaseAuth와 연동
+│
+├── info (문서)
+│   ├── displayName: String
+│   ├── email: String
+│   ├── is12TimeFmt: Bool
+│   ├── signedAt: TimeStamp
+│   └── User UID: String
+│
+└── scheduleData (문서)
+    ├── yyyy-MM-dd (서브 컬렉션) ⬅️ 일정이 시작되는 날짜
+    │   ├── UUID().uuidString (문서)
+    │   │   ├── color: Int
+    │   │   ├── cycleOption: String
+    │   │   ├── description: String
+    │   │   ├── location: String
+    │   │   ├── timeLine: [TimeStamp]
+    │   │   └── title: String
 ```
