@@ -22,7 +22,7 @@ final class FirebaseViewModel: ObservableObject {
     
     init() {
         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-            if let error = error as NSError?, error.code == -4 {
+            if let error = error as NSError?, error.code == -4 {    // -4: 로그인 세션이 만료된 경우
                 self.signedIn = false
             }
             else if let error = error {
@@ -73,7 +73,6 @@ final class FirebaseViewModel: ObservableObject {
             "email": user.email ?? "",
             "displayName": user.displayName ?? "",
             "signedAt": FieldValue.serverTimestamp(),
-            "loginTime": Date(),
             "is12TimeFmt": true
         ]
         
@@ -132,7 +131,6 @@ final class FirebaseViewModel: ObservableObject {
             let newEntry: [String: Any] = [
                 "title": schedule.title,
                 "timeLine": [schedule.timeLine.0, schedule.timeLine.1],
-                "isChanging": schedule.isChanging,
                 "cycleOption": schedule.cycleOption.rawValue,
                 "location": schedule.location,
                 "description": schedule.description,
@@ -165,12 +163,19 @@ final class FirebaseViewModel: ObservableObject {
             
             let scheduleArr: [ScheduleData] = schedules.compactMap { entry in
                 guard let title = entry["title"] as? String,
-                      let timeLine = entry["timeLine"] as? (Date, Date),
+                      let timeLine = entry["timeLine"] as? [Date],
                       let cycleOption = ScheduleData.CycleOption(rawValue: entry["cycleOption"] as? String ?? "none"),
                       let location = entry["location"] as? String,
                       let description = entry["description"] as? String,
                       let color = entry["color"] as? Int else { return nil }
-                return ScheduleData(title: title, timeLine: timeLine, cycleOption: cycleOption, location: location, description: description, color: color)
+                
+                return ScheduleData(
+                    title: title,
+                    timeLine: (timeLine[0], timeLine[1]),
+                    cycleOption: cycleOption,
+                    location: location,
+                    description: description, color: color
+                )
             }
             
             return scheduleArr
@@ -185,6 +190,7 @@ extension FirebaseViewModel {
     func signInGoogle() async {
         do {
             try await signInGoogleHelper()
+            signedIn = true
         } catch {
             print("Google SignIn Error: \(error)")
         }
@@ -216,8 +222,8 @@ extension FirebaseViewModel {
         let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
         
         let result = try await Auth.auth().signIn(with: credential)
+
         saveUserToFirestore(user: result.user)
-        signedIn = true
     }
     
     func topViewController(controller: UIViewController? = nil) -> UIViewController? {
