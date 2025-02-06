@@ -16,6 +16,7 @@ struct ScheduleView: View {
     let screenWidth = UIScreen.main.bounds.width
     @Binding var schedule: ScheduleData?
     @EnvironmentObject private var plannerVM: PlannerViewModel
+    @EnvironmentObject private var firebaseVM: FirebaseViewModel
     
     @State private var title = ""
     @State private var startDate = Date()
@@ -104,6 +105,23 @@ struct ScheduleView: View {
                                 DispatchQueue.main.async {
                                     currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
                                 }
+                                
+                                Task {
+                                    do {
+                                        let schedule = ScheduleData(
+                                            title: title,
+                                            timeLine: (startDate, endDate),
+                                            location: location,
+                                            description: description,
+                                            color: color
+                                        )
+                                        print(schedule)
+                                        try await firebaseVM.addScheduleData(schedule: schedule)
+                                    } catch {
+                                        print("스케줄 추가 실패: \(error)")
+                                    }
+                                }
+                                    
                             }) {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 5)
@@ -316,4 +334,5 @@ struct ScheduleView: View {
         schedule: .constant(nil)
     )
     .environmentObject(PlannerViewModel())
+    .environmentObject(FirebaseViewModel())
 }
