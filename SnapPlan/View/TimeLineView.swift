@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 struct TimeLineView: View {
-    @EnvironmentObject private var viewModel: PlannerViewModel
+    @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
     @State private var is12TimeFmt = true
@@ -19,6 +20,10 @@ struct TimeLineView: View {
     @State private var lastGap = UIScreen.main.bounds.width / 24
     @State private var schedules = [ScheduleData]()
     let screenWidth = UIScreen.main.bounds.width
+    
+    init() {
+
+    }
     
     var body: some View {
         ZStack {
@@ -33,18 +38,18 @@ struct TimeLineView: View {
                         }
                     
                     HStack {
-                        Text(viewModel.dateString(date: viewModel.selectDate, component: .day))
+                        Text(plannerVM.dateString(date: plannerVM.selectDate, component: .day))
                             .font(.callout)
                         ZStack {
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(
-                                    viewModel.isSameDate(
-                                        date1: viewModel.selectDate,
-                                        date2: viewModel.today,
+                                    plannerVM.isSameDate(
+                                        date1: plannerVM.selectDate,
+                                        date2: plannerVM.today,
                                         components: [.year, .month, .day]) ? Color.timeBar : Color.gray.opacity(0.5)
                                 )
                                 .frame(width: screenWidth / 14, height: screenWidth / 14)
-                            Text("\(DateFormatter.krWeekDay.string(from: viewModel.selectDate))")
+                            Text("\(DateFormatter.krWeekDay.string(from: plannerVM.selectDate))")
                                 .font(.callout)
                                 .fontWeight(.bold)
                                 .foregroundColor(Color.white)
@@ -60,13 +65,13 @@ struct TimeLineView: View {
                             HStack(spacing: 0) {
                                 ZStack(alignment: .topTrailing) {
                                     VStack(alignment: .trailing, spacing: gap) {
-                                        let hours = viewModel.getHours(is12hoursFmt: is12TimeFmt)
+                                        let hours = plannerVM.getHours(is12hoursFmt: is12TimeFmt)
                                         ForEach(Array(zip(hours.indices, hours)), id: \.1.id) { index, hour in
                                             Text("\(hour.timePeriod) \(hour.time)")
                                                 .font(.caption)
                                                 .foregroundStyle(Color.gray)
                                                 .opacity(
-                                                    viewModel.isCollapsed(
+                                                    plannerVM.isCollapsed(
                                                         timeZoneHeight: timeZoneSize.height,
                                                         gap: gap,
                                                         index: index) ? 0 : 1
@@ -85,16 +90,16 @@ struct TimeLineView: View {
                                         }
                                     }
                                     Text(
-                                        viewModel.getDateString(
-                                            for: viewModel.today,
+                                        plannerVM.getDateString(
+                                            for: plannerVM.today,
                                             components: [.hour, .minute],
                                             is12hoursFmt: is12TimeFmt
                                         )
                                     )
                                         .font(.caption)
                                         .padding(.trailing, 2)
-                                        .offset(y: viewModel.getOffsetFromMiniute(
-                                            for: viewModel.today,
+                                        .offset(y: plannerVM.getOffsetFromMiniute(
+                                            for: plannerVM.today,
                                             timeZoneHeight: timeZoneSize.height,
                                             gap: gap
                                         )
@@ -124,7 +129,7 @@ struct TimeLineView: View {
                                             
                                             //  스케줄 목록을 표시하는 ScheduleBox
                                             ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, schedule in
-                                                let (startOffset, boxHeight) = viewModel.getTimeBoxOffset(
+                                                let (startOffset, boxHeight) = plannerVM.getTimeBoxOffset(
                                                     from: schedule,
                                                     timeZoneHeight: timeZoneSize.height,
                                                     gap: gap
@@ -149,20 +154,20 @@ struct TimeLineView: View {
                                             //  현 시간 표시하는 TimeBar
                                             TimeBar(
                                                 height: timeZoneSize.height,
-                                                showVerticalLine: viewModel.isSameDate(
+                                                showVerticalLine: plannerVM.isSameDate(
                                                     date1: date,
-                                                    date2: viewModel.today,
+                                                    date2: plannerVM.today,
                                                     components: [.year, .month, .day])
                                             )
                                             .id(UUID())
                                             .padding(
-                                                .leading, viewModel.isSameDate(
+                                                .leading, plannerVM.isSameDate(
                                                     date1: date,
-                                                    date2: viewModel.today,
+                                                    date2: plannerVM.today,
                                                     components: [.year, .month, .day]) ? 2 : 0
                                             )
-                                            .offset(y: viewModel.getOffsetFromMiniute(
-                                                for: viewModel.today,
+                                            .offset(y: plannerVM.getOffsetFromMiniute(
+                                                for: plannerVM.today,
                                                 timeZoneHeight: timeZoneSize.height,
                                                 gap: gap)
                                             )
@@ -180,15 +185,15 @@ struct TimeLineView: View {
                                     )
                                 }
                                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                                .simultaneousGesture(
-                                    MagnificationGesture()
-                                        .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
-                                            gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
-                                        }
-                                        .onEnded { _ in
-                                            lastGap = max(gap, screenWidth / 24)
-                                        }
-                                )
+//                                .simultaneousGesture(
+//                                    MagnificationGesture()    //  줌 효과 -> 수정 필요
+//                                        .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
+//                                            gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
+//                                        }
+//                                        .onEnded { _ in
+//                                            lastGap = max(gap, screenWidth / 24)
+//                                        }
+//                                )
                             }
                         }
                     }
@@ -204,27 +209,27 @@ struct TimeLineView: View {
                     .offset(x: timeZoneSize.width)
             }
             .onAppear {
-                calendarData = viewModel.calendarData[1]
+                calendarData = plannerVM.calendarData[1]
                 selection = calendarData.firstIndex(where: {
-                   viewModel.isSameDate(
+                   plannerVM.isSameDate(
                     date1: $0,
-                    date2: viewModel.selectDate,
+                    date2: plannerVM.selectDate,
                     components: [.year, .month, .day]) }
                 )!
             }
             .onChange(of: selection) { value in
                 withAnimation {
-                    viewModel.wasPast = viewModel.selectDate < calendarData[value]
-                    viewModel.selectDate = calendarData[value]
+                    plannerVM.wasPast = plannerVM.selectDate < calendarData[value]
+                    plannerVM.selectDate = calendarData[value]
                 }
             }
-            .onChange(of: viewModel.selectDate) { value in
+            .onChange(of: plannerVM.selectDate) { value in
                 withAnimation {
                     if !calendarData.contains(value) {
-                        calendarData = viewModel.calendarDates(date: value)
+                        calendarData = plannerVM.calendarDates(date: value)
                     }
                     selection = calendarData.firstIndex(where: {
-                        viewModel.isSameDate(
+                        plannerVM.isSameDate(
                             date1: $0,
                             date2: value,
                             components: [.year, .month, .day]) }
@@ -232,36 +237,16 @@ struct TimeLineView: View {
                 }
             }
         }
-//        .onAppear {
-//            firebaseVM.fetch12Time { value, error in
-//                if let error = error {
-//                    print("12timeFmt 불러오기 실패")
-//                    print(error)
-//                    firebaseVM.set12TimeFmt(timeFmt: true) { error in
-//                        if let error = error {
-//                            print(error)
-//                        } else {
-//                            print("정상적으로 12시간제 저장")
-//                        }
-//                    }
-//                }
-//                else if let value = value {
-//                    DispatchQueue.main.async {
-//                        is12TimeFmt = value
-//                    }
-//                }
-//            }
-//        }
-//        .onChange(of: is12TimeFmt) { value in
-//            firebaseVM.set12TimeFmt(timeFmt: value) { error in
-//                if let error = error {
-//                    print(error)
-//                }
-//                else {
-//                    print("정상적으로 12시간제 재저장")
-//                }
-//            }
-//        }
+        .onChange(of: is12TimeFmt) { value in
+            firebaseVM.set12TimeFmt(timeFmt: value) { error in
+                if let error = error {
+                    print(error)
+                }
+                else {
+                    print("정상적으로 12시간제 재저장")
+                }
+            }
+        }
     }
 }
 

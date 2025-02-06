@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel = FirebaseViewModel()
+    @StateObject private var firebaseVM = FirebaseViewModel()
     
     var body: some View {
-        if let signedIn = viewModel.signedIn {
+        if let signedIn = firebaseVM.signedIn {
             if signedIn {
                 PlannerView()
-                    .environmentObject(viewModel)
+                    .environmentObject(firebaseVM)
             }
             else {
                 LoginView()
-                    .environmentObject(viewModel)
+                    .environmentObject(firebaseVM)
             }
         }
         else {
