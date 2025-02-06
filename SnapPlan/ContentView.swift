@@ -11,13 +11,18 @@ struct ContentView: View {
     @StateObject private var viewModel = FirebaseViewModel()
     
     var body: some View {
-        if viewModel.signedIn {
-            PlannerView()
-                .environmentObject(viewModel)
+        if let signedIn = viewModel.signedIn {
+            if signedIn {
+                PlannerView()
+                    .environmentObject(viewModel)
+            }
+            else {
+                LoginView()
+                    .environmentObject(viewModel)
+            }
         }
         else {
-            LoginView()
-                .environmentObject(viewModel)
+            //  인터넷에 연결할 수 없을 경우일 때
         }
     }
 }
