@@ -38,18 +38,18 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
-    /// selectDate의 년월일과 특정 Date의 시분를 합친 값을 반환
-    func getMergedDate(for date: Date) -> Date {
-        let selectedComponents = calendar.dateComponents([.year, .month, .day], from: selectDate)
-        let dateComppoents = calendar.dateComponents([.hour, .minute], from: date)
+    /// 특정 Date 2개의 컴포넌트들을 서로 합친 Date를 반환
+    func getMergedDate(for date1: Date, with date2: Date, forComponents: Set<Calendar.Component>, withComponents: Set<Calendar.Component>) -> Date {
+        let date1Components = calendar.dateComponents(forComponents, from: date1)
+        let date2Compoents = calendar.dateComponents(withComponents, from: date2)
         
-        let year = selectedComponents.year
-        let month = selectedComponents.month
-        let day = selectedComponents.day
-        let hour = dateComppoents.hour
-        let miniute = dateComppoents.minute
+        let year = date1Components.year ?? date2Compoents.year ?? 0
+        let month = date1Components.month ?? date2Compoents.month ?? 0
+        let day = date1Components.day ?? date2Compoents.day ?? 0
+        let hour = date1Components.hour ?? date2Compoents.hour ?? 0
+        let minute = date1Components.minute ?? date2Compoents.minute ?? 0
         
-        return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour, minute: miniute))!
+        return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour, minute: minute))!
     }
     
     /// 해당 스케줄의 시작 offset과 duration을 반환
