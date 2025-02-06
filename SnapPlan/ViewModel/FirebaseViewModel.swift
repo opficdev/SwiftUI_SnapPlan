@@ -22,11 +22,14 @@ final class FirebaseViewModel: ObservableObject {
     
     init() {
         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-            if let error = error {
-                print("이전 로그인 복원 실패: \(error.localizedDescription)")
+            if let error = error as NSError?, error.code == -4 {
+                self.signedIn = false
+            }
+            else if let error = error {
+                print("Last Login Restore Error: \(error.localizedDescription)")
                 return
             }
-            
+
             if let _ = user {
                 Task {
                     await self.loadTimeFormat()
@@ -44,11 +47,9 @@ final class FirebaseViewModel: ObservableObject {
                 await MainActor.run {
                     self.is12TimeFmt = value
                 }
-            } else {
-                try await set12TimeFmt(timeFmt: true)
             }
         } catch {
-            print(error.localizedDescription)
+            print("TimeFormat Load Error: \(error.localizedDescription)")
         }
     }
     
@@ -61,7 +62,27 @@ final class FirebaseViewModel: ObservableObject {
                 }
             } 
         } catch {
-            print(error.localizedDescription)
+            print("Schedule Load Error: \(error.localizedDescription)")
+        }
+    }
+    /// Firebase에 사용자 정보를 저장하는 메소드
+    private func saveUserToFirestore(user: User) {
+        let userRef = db.collection(user.uid).document("info")
+        let userInfo: [String: Any] = [
+            "uid": user.uid,
+            "email": user.email ?? "",
+            "displayName": user.displayName ?? "",
+            "signedAt": FieldValue.serverTimestamp(),
+            "loginTime": Date(),
+            "is12TimeFmt": true
+        ]
+        
+        userRef.setData(userInfo, merge: true) { error in
+            if let error = error {
+                print("Error saving user: \(error.localizedDescription)")
+            } else {
+                print("User saved successfully!")
+            }
         }
     }
     
@@ -70,10 +91,10 @@ final class FirebaseViewModel: ObservableObject {
             throw URLError(.userAuthenticationRequired)
         }
         
-        let docRef = db.collection("users").document(userId)
+        let docRef = db.collection(userId).document("info")
         
         do {
-            try await docRef.setData(["timeFmt": timeFmt], merge: true)
+            try await docRef.setData(["is12TimeFmt": timeFmt], merge: true)
         } catch {
             throw error
         }
@@ -84,43 +105,43 @@ final class FirebaseViewModel: ObservableObject {
             throw URLError(.userAuthenticationRequired)
         }
         
-        let docRef = db.collection("users").document(userId)
+        let docRef = db.collection(userId).document("info")
         
         do {
             let document = try await docRef.getDocument()
-            let timeFmt = document.data()?["timeFmt"] as? Bool
+            let timeFmt = document.data()?["is12TimeFmt"] as? Bool
             return timeFmt
         } catch {
             throw error
         }
     }
     
-    func addScheduleData(date: Date, schedule: ScheduleData) async throws {
+    func addScheduleData(schedule: ScheduleData) async throws {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
         }
-        let dateString = DateFormatter.yyyyMMdd.string(from: date)
+        let dateString = DateFormatter.yyyyMMdd.string(from: schedule.timeLine.0)
         
-        let docRef = db.collection("ScheduleData").document(userId).collection("dates").document(dateString)
+        let docRef = db.collection(userId).document("scheduleData").collection(dateString).document(schedule.id.uuidString)
         
         do {
             let document = try await docRef.getDocument()
             
-            var entries: [[String: Any]] = document.data()?["entries"] as? [[String: Any]] ?? []
+            var schedules: [[String: Any]] = document.data()?[dateString] as? [[String: Any]] ?? []
             
             let newEntry: [String: Any] = [
                 "title": schedule.title,
-                "timeLine": schedule.timeLine,
+                "timeLine": [schedule.timeLine.0, schedule.timeLine.1],
                 "isChanging": schedule.isChanging,
-                "cycleOption": schedule.cycleOption,
+                "cycleOption": schedule.cycleOption.rawValue,
                 "location": schedule.location,
                 "description": schedule.description,
                 "color": schedule.color
             ]
             
-            entries.append(newEntry)
+            schedules.append(newEntry)
             
-            try await docRef.setData(["entries": entries], merge: true)
+            try await docRef.setData([dateString: schedules], merge: true)
         } catch {
             throw error
         }
@@ -131,28 +152,28 @@ final class FirebaseViewModel: ObservableObject {
             throw URLError(.userAuthenticationRequired)
         }
         
-        let date = DateFormatter.yyyyMMdd.string(from: date)
-        
-        let docRef = db.collection("ScheduleData").document(userId).collection("dates").document(date)
+        let docRef = db.collection(userId).document("scheduleData")
         
         do {
             let document = try await docRef.getDocument()
             
-            guard let entries = document.data()?["entries"] as? [[String: Any]] else {
+            let dateString = DateFormatter.yyyyMMdd.string(from: date)
+            
+            guard let schedules = document.data()?[dateString] as? [[String: Any]] else {
                 return nil
             }
             
-            let timeDataList: [ScheduleData] = entries.compactMap { entry in
+            let scheduleArr: [ScheduleData] = schedules.compactMap { entry in
                 guard let title = entry["title"] as? String,
                       let timeLine = entry["timeLine"] as? (Date, Date),
-                      let cycleOption = entry["cycleOption"] as? ScheduleData.CycleOption,
+                      let cycleOption = ScheduleData.CycleOption(rawValue: entry["cycleOption"] as? String ?? "none"),
                       let location = entry["location"] as? String,
                       let description = entry["description"] as? String,
                       let color = entry["color"] as? Int else { return nil }
                 return ScheduleData(title: title, timeLine: timeLine, cycleOption: cycleOption, location: location, description: description, color: color)
             }
             
-            return timeDataList
+            return scheduleArr
         } catch {
             throw error
         }
@@ -172,6 +193,8 @@ extension FirebaseViewModel {
     func signOutGoogle() async {
         do {
             try Auth.auth().signOut()
+            GIDSignIn.sharedInstance.signOut()
+            try await GIDSignIn.sharedInstance.disconnect()
             signedIn = false
         } catch {
             print("Google SignOut Error: \(error)")
@@ -195,24 +218,6 @@ extension FirebaseViewModel {
         let result = try await Auth.auth().signIn(with: credential)
         saveUserToFirestore(user: result.user)
         signedIn = true
-    }
-    
-    private func saveUserToFirestore(user: User) {
-        let userRef = db.collection("users").document(user.uid)
-        let userData: [String: Any] = [
-            "uid": user.uid,
-            "email": user.email ?? "",
-            "displayName": user.displayName ?? "",
-            "signedAt": FieldValue.serverTimestamp()
-        ]
-        
-        userRef.setData(userData, merge: true) { error in
-            if let error = error {
-                print("Error saving user: \(error.localizedDescription)")
-            } else {
-                print("User saved successfully!")
-            }
-        }
     }
     
     func topViewController(controller: UIViewController? = nil) -> UIViewController? {
