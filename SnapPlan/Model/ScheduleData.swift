@@ -50,7 +50,14 @@ struct ScheduleData: Identifiable {
         self.cycleOption = newCycleOption
     }
     
-    enum CycleOption {
-        case none, everyDay, everyWeekDays, everyWeek, every2Week, everyMonth, everyYear, custom
+    enum CycleOption: String {
+        case none = "none"
+        case everyDay = "everyDay"
+        case everyWeekDays = "everyWeekDays"
+        case everyWeek = "everyWeek"
+        case every2Week = "every2Week"
+        case everyMonth = "everyMonth"
+        case everyYear = "everyYear"
+        case custom = "custom"
     }
 }
