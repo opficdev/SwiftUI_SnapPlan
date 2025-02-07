@@ -5,11 +5,12 @@
 //  Created by opfic on 1/1/25.
 //
 
-import Foundation
 import SwiftUI
+import SwiftUIIntrospect
 
 struct CalendarView: View {
     @EnvironmentObject private var plannerVM: PlannerViewModel
+    @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var selection = 1  //  선택된 달력의 tag
@@ -18,7 +19,7 @@ struct CalendarView: View {
     let screenWidth = UIScreen.main.bounds.width
     
     var body: some View {
-         VStack(spacing: 0) {
+        VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Image(systemName: "line.3.horizontal")
                     .resizable()
@@ -27,9 +28,7 @@ struct CalendarView: View {
                     .foregroundStyle(Color.gray)
                     .padding(EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 8)) //  월 보여주는거 때문에 16 - 8
                     .onTapGesture {
-                        Task {
-                            showSideBar = true
-                        }
+                        showSideBar = true
                     }
                 HStack(spacing: 4) {
                     Text(plannerVM.getCurrentMonthYear())
@@ -142,7 +141,24 @@ struct CalendarView: View {
                 }
             }
         }
-         .background(Color.calendar)
+        .background(Color.calendar)
+        .fullScreenCover(isPresented: $showSideBar) {
+            SettingView()
+                .environmentObject(firebaseVM)
+        }
+        .sheet(isPresented: .constant(!showSideBar)) {
+            ScheduleView(schedule: .constant(nil))
+                .environmentObject(plannerVM)
+                .presentationDragIndicator(.visible)
+                .interactiveDismissDisabled(true)   //  사용자가 임의로 sheet를 완전히 내리는 것을 방지
+                .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌
+                    if let sheet = controller as? UISheetPresentationController {
+                        if let maxDetent = sheet.detents.max(by: { $0.identifier.rawValue < $1.identifier.rawValue }) {
+                            sheet.largestUndimmedDetentIdentifier = maxDetent.identifier
+                        }
+                    }
+                }
+        }
     }
 }
 
