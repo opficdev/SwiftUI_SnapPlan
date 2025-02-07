@@ -18,7 +18,7 @@ final class FirebaseViewModel: ObservableObject {
     private let db = Firestore.firestore()
     @Published var signedIn: Bool? = nil
     @Published var is12TimeFmt: Bool = true
-    @Published var screenMode: String = "auto"
+    @Published var screenMode: UIUserInterfaceStyle = .unspecified
     @Published var schedules: [ScheduleData] = []
     
     init() {
@@ -42,7 +42,7 @@ final class FirebaseViewModel: ObservableObject {
         }
     }
     
-    /// 최초 앱 실행 시 사용자의 12시간제 포맷을 불러오는 메소드
+    /// 사용자의 12시간제 포맷을 불러오는 메소드
     func loadTimeFormat() async {
         do {
             if let value = try await fetch12TimeFmt() {
@@ -55,7 +55,24 @@ final class FirebaseViewModel: ObservableObject {
         }
     }
     
-    /// 최초 앱 실행 시 사용자의 오늘을 포함한 달의 전체 스케줄 데이터를 불러오는 메소드
+    /// 스크린 모드를 불러오는 메소드
+    func loadScreenMode() async {
+        do {
+            if let value = try await fetchScreenMode() {
+                await MainActor.run {
+                    self.screenMode = UIUserInterfaceStyle(rawValue: value)
+                    
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                        windowScene.windows.first?.overrideUserInterfaceStyle = self.screenMode
+                    }
+                }
+            }
+        } catch {
+            print("ScreenMode Load Error: \(error.localizedDescription)")
+        }
+    }
+    
+    /// 사용자의 오늘을 포함한 달의 전체 스케줄 데이터를 불러오는 메소드
     func loadScheduleData() async {
         do {
             if let value = try await fetchScheduleData(date: Date()) {
@@ -67,20 +84,7 @@ final class FirebaseViewModel: ObservableObject {
             print("Schedule Load Error: \(error.localizedDescription)")
         }
     }
-    
-    /// 최초 앱 실행 시 스크린 모드를 불러오는 메소드
-    func loadScreenMode() async {
-        do {
-            if let value = try await fetchScreenMode() {
-                await MainActor.run {
-                    self.screenMode = value
-                }
-            }
-        } catch {
-            print("ScreenMode Load Error: \(error.localizedDescription)")
-        }
-    }
-    
+
     /// Firebase에 사용자 정보를 저장하는 메소드
     private func saveUserToFirestore(user: User) {
         let userRef = db.collection(user.uid).document("info")
@@ -90,7 +94,7 @@ final class FirebaseViewModel: ObservableObject {
             "displayName": user.displayName ?? "",  //  닉네임
             "signedAt": FieldValue.serverTimestamp(),   //  가입 시간
             "is12TimeFmt": true,    //  12시간제 포맷 여부
-            "screenMode": "auto"    //  화면 모드
+            "screenMode": "unspecified"    //  화면 모드
         ]
         
         userRef.setData(userInfo, merge: true) { error in
@@ -132,7 +136,7 @@ final class FirebaseViewModel: ObservableObject {
         }
     }
     
-    func setScreenMode(mode: String) async throws {
+    func setScreenMode(mode: UIUserInterfaceStyle) async throws {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
         }
@@ -140,7 +144,7 @@ final class FirebaseViewModel: ObservableObject {
         let docRef = db.collection(userId).document("info")
         
         do {
-            try await docRef.setData(["screenMode": mode], merge: true)
+            try await docRef.setData(["screenMode": mode.rawValue], merge: true)
         } catch {
             throw error
         }
@@ -155,7 +159,7 @@ final class FirebaseViewModel: ObservableObject {
         
         do {
             let document = try await docRef.getDocument()
-            let screenMode = document.data()?["screenMode"] as? String ?? "auto"
+            let screenMode = document.data()?["screenMode"] as? String ?? "unspecified"
             return screenMode
         } catch {
             throw error
