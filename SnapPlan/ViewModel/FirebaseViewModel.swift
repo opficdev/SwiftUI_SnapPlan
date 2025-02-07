@@ -18,6 +18,7 @@ final class FirebaseViewModel: ObservableObject {
     private let db = Firestore.firestore()
     @Published var signedIn: Bool? = nil
     @Published var is12TimeFmt: Bool = true
+    @Published var screenMode: String = "auto"
     @Published var schedules: [ScheduleData] = []
     
     init() {
@@ -33,6 +34,7 @@ final class FirebaseViewModel: ObservableObject {
             if let _ = user {
                 Task {
                     await self.loadTimeFormat()
+                    await self.loadScreenMode()
                     await self.loadScheduleData()
                     self.signedIn = true
                 }
@@ -65,6 +67,20 @@ final class FirebaseViewModel: ObservableObject {
             print("Schedule Load Error: \(error.localizedDescription)")
         }
     }
+    
+    /// 최초 앱 실행 시 스크린 모드를 불러오는 메소드
+    func loadScreenMode() async {
+        do {
+            if let value = try await fetchScreenMode() {
+                await MainActor.run {
+                    self.screenMode = value
+                }
+            }
+        } catch {
+            print("ScreenMode Load Error: \(error.localizedDescription)")
+        }
+    }
+    
     /// Firebase에 사용자 정보를 저장하는 메소드
     private func saveUserToFirestore(user: User) {
         let userRef = db.collection(user.uid).document("info")
@@ -111,6 +127,36 @@ final class FirebaseViewModel: ObservableObject {
             let document = try await docRef.getDocument()
             let timeFmt = document.data()?["is12TimeFmt"] as? Bool
             return timeFmt
+        } catch {
+            throw error
+        }
+    }
+    
+    func setScreenMode(mode: String) async throws {
+        guard let userId = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let docRef = db.collection(userId).document("info")
+        
+        do {
+            try await docRef.setData(["screenMode": mode], merge: true)
+        } catch {
+            throw error
+        }
+    }
+    
+    func fetchScreenMode() async throws -> String? {
+        guard let userId = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let docRef = db.collection(userId).document("info")
+        
+        do {
+            let document = try await docRef.getDocument()
+            let screenMode = document.data()?["screenMode"] as? String ?? "auto"
+            return screenMode
         } catch {
             throw error
         }
