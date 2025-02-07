@@ -69,11 +69,12 @@ final class FirebaseViewModel: ObservableObject {
     private func saveUserToFirestore(user: User) {
         let userRef = db.collection(user.uid).document("info")
         let userInfo: [String: Any] = [
-            "uid": user.uid,
-            "email": user.email ?? "",
-            "displayName": user.displayName ?? "",
-            "signedAt": FieldValue.serverTimestamp(),
-            "is12TimeFmt": true
+            "uid": user.uid,    //  uid
+            "email": user.email ?? "",  //  이메일
+            "displayName": user.displayName ?? "",  //  닉네임
+            "signedAt": FieldValue.serverTimestamp(),   //  가입 시간
+            "is12TimeFmt": true,    //  12시간제 포맷 여부
+            "screenMode": "auto"    //  화면 모드
         ]
         
         userRef.setData(userInfo, merge: true) { error in
