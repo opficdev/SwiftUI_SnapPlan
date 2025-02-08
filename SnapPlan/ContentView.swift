@@ -11,18 +11,21 @@ struct ContentView: View {
     @StateObject private var firebaseVM = FirebaseViewModel()
     
     var body: some View {
-        if let signedIn = firebaseVM.signedIn {
-            if signedIn {
-                PlannerView()
-                    .environmentObject(firebaseVM)
+        ZStack {
+            Color.calendar.ignoresSafeArea()
+            if let signedIn = firebaseVM.signedIn {
+                if signedIn {
+                    PlannerView()
+                        .environmentObject(firebaseVM)
+                }
+                else {
+                    LoginView()
+                        .environmentObject(firebaseVM)
+                }
             }
-            else {
-                LoginView()
-                    .environmentObject(firebaseVM)
+            else {  //  로그인을 시도하는 중(최초 로그인을 한 이후인 경우)
+
             }
-        }
-        else {
-            //  인터넷에 연결할 수 없을 경우일 때
         }
     }
 }
