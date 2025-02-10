@@ -115,7 +115,6 @@ struct ScheduleView: View {
                                             description: description,
                                             color: color
                                         )
-                                        print(schedule)
                                         try await firebaseVM.addScheduleData(schedule: schedule)
                                     } catch {
                                         print("스케줄 추가 실패: \(error)")
