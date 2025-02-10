@@ -216,6 +216,9 @@ struct TimeLineView: View {
                     plannerVM.selectDate = calendarData[value]
                     plannerVM.currentDate = calendarData[value]
                 }
+                if selection == 0 || selection == calendarData.count - 1 {
+                    calendarData = plannerVM.calendarData[1]
+                }
             }
             .onChange(of: plannerVM.selectDate) { value in
                 withAnimation {
