@@ -11,11 +11,13 @@ struct TimeLineView: View {
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
+    @Binding var showSettingView: Bool
     @State private var timeZoneSize = CGSizeZero
     @State private var selection = 0
     @State private var calendarData = [Date]()
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
+    @State private var schedule: ScheduleData? = nil
     let screenWidth = UIScreen.main.bounds.width
     
     var body: some View {
@@ -103,22 +105,31 @@ struct TimeLineView: View {
                                 TabView(selection: $selection) {
                                     ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
                                         ZStack(alignment: .top) {
-                                            VStack(spacing: gap) {
+                                            VStack(spacing: 0) {
                                                 ForEach(0...24, id: \.self) { index in
-                                                    VStack {
-                                                        Spacer()
-                                                            .onTapGesture { //  [현재시간 - 30분, 현재시간]
+                                                    VStack(spacing: 0) {
+                                                        Rectangle()
+                                                            .fill(Color.clear)
+                                                            .frame(maxHeight: .infinity)
+                                                            .onTapGesture {
                                                                 
                                                             }
                                                         Divider()
-                                                        Spacer()
-                                                            .onTapGesture { //  [현재시간, 현재시간 + 30분]
+                                                        Rectangle()
+                                                            .fill(Color.clear)
+                                                            .frame(maxHeight: .infinity)
+                                                            .onTapGesture {
                                                                 
                                                             }
                                                     }
-                                                    .frame(height: timeZoneSize.height)
+                                                    .frame(height: timeZoneSize.height + gap)
+                                                    .onTapGesture { //  [현재시간 - 30분, 현재시간]
+//                                                        let before30Min = plannerVM.today.addingTimeInterval(-1800)
+//                                                        schedule = ScheduleData(timeLine: (before30Min, plannerVM.today))
+                                                    }
                                                 }
                                             }
+                                            
                                             
                                             //  스케줄 목록을 표시하는 ScheduleBox
                                             ForEach(Array(zip(firebaseVM.schedules.indices, firebaseVM.schedules)), id: \.1.id) { idx, schedule in
@@ -243,10 +254,24 @@ struct TimeLineView: View {
                 }
             }
         }
+        .sheet(isPresented: .constant(!showSettingView)) {
+            ScheduleView(schedule: $schedule)
+                .environmentObject(plannerVM)
+                .presentationDragIndicator(.visible)
+                .interactiveDismissDisabled(true)   //  사용자가 임의로 sheet를 완전히 내리는 것을 방지
+                .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌
+                    if let sheet = controller as? UISheetPresentationController {
+                        if let maxDetent = sheet.detents.max(by: { $0.identifier.rawValue < $1.identifier.rawValue }) {
+                            sheet.largestUndimmedDetentIdentifier = maxDetent.identifier
+                        }
+                    }
+                }
+        }
     }
 }
 
 #Preview {
-    TimeLineView()
+    TimeLineView(showSettingView: .constant(false))
         .environmentObject(PlannerViewModel())
+        .environmentObject(FirebaseViewModel())
 }
