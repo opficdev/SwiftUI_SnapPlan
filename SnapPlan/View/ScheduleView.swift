@@ -41,7 +41,7 @@ struct ScheduleView: View {
     
     var body: some View {
         VStack {
-            if !addSchedule {
+            if !addSchedule && schedule == nil {
                 HStack {
                     Text("선택된 이벤트 없음")
                         .font(.footnote)
@@ -73,6 +73,7 @@ struct ScheduleView: View {
                                 addSchedule = false
                                 titleFocus = false
                                 descriptionFocus = false
+                                schedule = nil
                                 currentDetent = currentDetent.union([.fraction(0.07)])
                                 selectedDetent = .fraction(0.07)
                                 DispatchQueue.main.async {
@@ -220,13 +221,13 @@ struct ScheduleView: View {
                             Divider()
                                 .padding(.vertical)
                             VStack(alignment:. leading, spacing: 20) {
-                                HStack {
-                                    Image(systemName: "photo")
-                                        .frame(width: 25)
-                                        .foregroundStyle(Color.gray)
-                                    Text("사진")
-                                        .foregroundStyle(Color.gray)    //  이미지가 있다면 이미지 최대 5개? 정도 뷰에서 표시하고 그 이상은 NavigationStack으로 이동
-                                }
+//                                HStack {
+//                                    Image(systemName: "photo")
+//                                        .frame(width: 25)
+//                                        .foregroundStyle(Color.gray)
+//                                    Text("사진")
+//                                        .foregroundStyle(Color.gray)    
+//                                }
                                 HStack {
                                     Image(systemName: "map")
                                         .frame(width: 25)
@@ -325,6 +326,18 @@ struct ScheduleView: View {
         }
         .padding()
         .presentationDetents(currentDetent, selection: $selectedDetent)
+        .onChange(of: schedule) { value in
+            if schedule == nil {
+                
+            }
+            else {
+                currentDetent = currentDetent.union([.large, .fraction(0.4)])
+                selectedDetent = .fraction(0.4)
+            }
+        }
+        .onChange(of: selectedDetent) { value in    //  TimeLineView에 하단 패딩을 추가해서 겹치는 부분이 없도록 할 것
+            
+        }
     }
 }
 
