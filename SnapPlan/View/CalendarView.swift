@@ -12,9 +12,9 @@ struct CalendarView: View {
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
+    @Binding var showSettingView: Bool
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var selection = 1  //  선택된 달력의 tag
-    @State private var showSettingView = false
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -60,7 +60,6 @@ struct CalendarView: View {
                     }
                 }
                 Spacer()
-                
                 
                 Text(plannerVM.dateString(date: plannerVM.today, component: .day))
                     .font(.subheadline)
@@ -146,23 +145,12 @@ struct CalendarView: View {
             SettingView()
                 .environmentObject(firebaseVM)
         }
-        .sheet(isPresented: .constant(!showSettingView)) {
-            ScheduleView(schedule: .constant(nil))
-                .environmentObject(plannerVM)
-                .presentationDragIndicator(.visible)
-                .interactiveDismissDisabled(true)   //  사용자가 임의로 sheet를 완전히 내리는 것을 방지
-                .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌
-                    if let sheet = controller as? UISheetPresentationController {
-                        if let maxDetent = sheet.detents.max(by: { $0.identifier.rawValue < $1.identifier.rawValue }) {
-                            sheet.largestUndimmedDetentIdentifier = maxDetent.identifier
-                        }
-                    }
-                }
-        }
     }
 }
 
 #Preview {
-    CalendarView()
+    CalendarView(
+        showSettingView: .constant(false)
+    )
         .environmentObject(PlannerViewModel())
 }
