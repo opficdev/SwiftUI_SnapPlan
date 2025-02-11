@@ -74,8 +74,8 @@ struct ThemeView: View {
                     .bold()
             }
         }
-        .toolbarBackground(Color.timeLine, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
+//        .toolbarBackground(Color.timeLine, for: .navigationBar)
+//        .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
     }
     
@@ -91,4 +91,5 @@ struct ThemeView: View {
 }
 #Preview {
     ThemeView()
+        .environmentObject(FirebaseViewModel())
 }
