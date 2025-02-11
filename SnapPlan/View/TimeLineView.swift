@@ -109,24 +109,24 @@ struct TimeLineView: View {
                                                 ForEach(0...24, id: \.self) { index in
                                                     VStack(spacing: 0) {
                                                         Rectangle()
-                                                            .fill(Color.clear)
+                                                            .fill(Color.timeLine)
                                                             .frame(maxHeight: .infinity)
                                                             .onTapGesture {
-                                                                
+                                                                let endDate = plannerVM.getDateFromIndex(index: index)
+                                                                let beginDate = endDate.addingTimeInterval(-1800)
+                                                                schedule = ScheduleData(timeLine: (beginDate, endDate))
                                                             }
                                                         Divider()
                                                         Rectangle()
-                                                            .fill(Color.clear)
+                                                            .fill(Color.timeLine)
                                                             .frame(maxHeight: .infinity)
                                                             .onTapGesture {
-                                                                
+                                                                let beginDate = plannerVM.getDateFromIndex(index: index)
+                                                                let endDate = beginDate.addingTimeInterval(1800)
+                                                                schedule = ScheduleData(timeLine: (beginDate, endDate))
                                                             }
                                                     }
                                                     .frame(height: timeZoneSize.height + gap)
-                                                    .onTapGesture { //  [현재시간 - 30분, 현재시간]
-//                                                        let before30Min = plannerVM.today.addingTimeInterval(-1800)
-//                                                        schedule = ScheduleData(timeLine: (before30Min, plannerVM.today))
-                                                    }
                                                 }
                                             }
                                             
