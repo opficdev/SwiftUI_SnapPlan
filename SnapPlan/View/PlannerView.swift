@@ -10,11 +10,10 @@ import SwiftUI
 struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
     @EnvironmentObject var firebaseVM: FirebaseViewModel
-    @State private var showSideBar = false
     
     var body: some View {
         VStack(spacing: 0) {
-            CalendarView(showSideBar: $showSideBar)
+            CalendarView()
                 .environmentObject(plannerVM)
                 .environmentObject(firebaseVM)
             TimeLineView()

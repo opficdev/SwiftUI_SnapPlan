@@ -14,7 +14,7 @@ struct CalendarView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var selection = 1  //  선택된 달력의 tag
-    @Binding var showSideBar: Bool
+    @State private var showSettingView = false
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -28,7 +28,7 @@ struct CalendarView: View {
                     .foregroundStyle(Color.gray)
                     .padding(EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 8)) //  월 보여주는거 때문에 16 - 8
                     .onTapGesture {
-                        showSideBar = true
+                        showSettingView = true
                     }
                 HStack(spacing: 4) {
                     Text(plannerVM.getCurrentMonthYear())
@@ -142,11 +142,11 @@ struct CalendarView: View {
             }
         }
         .background(Color.calendar)
-        .fullScreenCover(isPresented: $showSideBar) {
+        .fullScreenCover(isPresented: $showSettingView) {
             SettingView()
                 .environmentObject(firebaseVM)
         }
-        .sheet(isPresented: .constant(!showSideBar)) {
+        .sheet(isPresented: .constant(!showSettingView)) {
             ScheduleView(schedule: .constant(nil))
                 .environmentObject(plannerVM)
                 .presentationDragIndicator(.visible)
@@ -163,8 +163,6 @@ struct CalendarView: View {
 }
 
 #Preview {
-    CalendarView(
-        showSideBar: .constant(false)
-    )
+    CalendarView()
         .environmentObject(PlannerViewModel())
 }
