@@ -71,8 +71,12 @@ struct ThemeView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("테마")
-            }     
+                    .bold()
+            }
         }
+        .toolbarBackground(Color.timeLine, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     private func setAppTheme(_ style: UIUserInterfaceStyle) {
