@@ -11,6 +11,8 @@ struct SettingView: View {
     @EnvironmentObject var firebaseVM: FirebaseViewModel
     @Environment(\.dismiss) var dismiss
     @State private var logoutAlert = false
+    @State private var deleteAlert = false
+    @State private var days = "1"
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     
     var body: some View {
@@ -19,6 +21,27 @@ struct SettingView: View {
                 List {
                     Section(header: Text("계정")) {
                         Text(firebaseVM.email)
+                    }
+                    .listRowBackground(Color.timeLine)
+                    Section(header: Text("일정")) {
+                        Button(action: {
+                            days = "1"
+                        }) {
+                            Text("1일")
+                                .foregroundStyle(Color.primary)
+                        }
+                        Button(action: {
+                            days = "2"
+                        }) {
+                            Text("2일")
+                                .foregroundStyle(Color.primary)
+                        }
+                        Button(action: {
+                            days = "list"
+                        }) {
+                            Text("목록")
+                                .foregroundStyle(Color.primary)
+                        }
                     }
                     .listRowBackground(Color.timeLine)
                     Section(header: Text("테마")) {
@@ -36,11 +59,15 @@ struct SettingView: View {
                             Spacer()
                             Text(appVersion)
                         }
-                        Button(action: {
-//                            Link()    //  노션 링크
-                        }) {
-                            Text("개인정보 처리방침")
+                        if let ppurl = Bundle.main.object(forInfoDictionaryKey: "PRIVACY_POLICY_URL") as? String {
+                            Link(destination:
+                                    URL(string: ppurl)!,
+                                 label: {
+                                Text("개인정보 처리방침")
+                                    .foregroundColor(Color.blue)
+                            })
                         }
+                        
                         Button(role: .destructive, action: {
                             logoutAlert = true
                         }) {
@@ -48,6 +75,33 @@ struct SettingView: View {
                         }
                     }
                     .listRowBackground(Color.timeLine)
+                    HStack {
+                        Spacer()
+                        Button(role: .destructive, action: {
+                            deleteAlert = true
+                        }) {
+                            Text("탈퇴")
+                                .font(.headline) // 필요시 스타일 조정
+                        }
+                        Spacer()
+                    }
+                    .listRowBackground(Color.timeLine)
+                    .alert("정말 탈퇴하시겠습니까?", isPresented: $deleteAlert) {
+                        Button(role: .cancel, action: {
+                            deleteAlert = false
+                        }) {
+                            Text("취소")
+                        }
+                        Button(role: .destructive, action: {
+                            Task {
+                                
+                            }
+                        }) {
+                            Text("탈퇴")
+                        }
+                    } message: {
+                        Text("이 작업은 되돌릴 수 없습니다.")
+                    }
                 }
                 .scrollContentBackground(.hidden)
             }
@@ -63,7 +117,7 @@ struct SettingView: View {
                         await firebaseVM.signOutGoogle()
                     }
                 }) {
-                    Text("로그아웃")
+                    Text("확인")
                 }
             } message: {
                 Text("로그아웃하시겠습니까?")
