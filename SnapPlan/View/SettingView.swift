@@ -80,8 +80,8 @@ struct SettingView: View {
                         Button(role: .destructive, action: {
                             deleteAlert = true
                         }) {
-                            Text("탈퇴")
-                                .font(.headline) // 필요시 스타일 조정
+                            Text("회원 탈퇴")
+                                .font(.headline)
                         }
                         Spacer()
                     }
