@@ -44,7 +44,7 @@ final class FirebaseViewModel: ObservableObject {
     }
     
     /// 사용자의 12시간제 포맷을 불러오는 메소드
-    func loadTimeFormat() async {
+    private func loadTimeFormat() async {
         do {
             if let value = try await fetch12TimeFmt() {
                 await MainActor.run {
@@ -57,7 +57,7 @@ final class FirebaseViewModel: ObservableObject {
     }
     
     /// 스크린 모드를 불러오는 메소드
-    func loadScreenMode() async {
+    private func loadScreenMode() async {
         do {
             if let value = try await fetchScreenMode() {
                 await MainActor.run {
@@ -74,7 +74,7 @@ final class FirebaseViewModel: ObservableObject {
     }
     
     /// 사용자의 오늘을 포함한 달의 전체 스케줄 데이터를 불러오는 메소드
-    func loadScheduleData() async {
+    private func loadScheduleData() async {
         do {
             if let value = try await fetchScheduleData(date: Date()) {
                 await MainActor.run {
@@ -85,28 +85,10 @@ final class FirebaseViewModel: ObservableObject {
             print("Schedule Load Error: \(error.localizedDescription)")
         }
     }
+}
 
-    /// Firebase에 사용자 정보를 저장하는 메소드
-    private func saveUserToFirestore(user: User) {
-        let userRef = db.collection(user.uid).document("info")
-        let userInfo: [String: Any] = [
-            "uid": user.uid,    //  uid
-            "email": user.email ?? "",  //  이메일
-            "displayName": user.displayName ?? "",  //  닉네임
-            "signedAt": FieldValue.serverTimestamp(),   //  가입 시간
-            "is12TimeFmt": true,    //  12시간제 포맷 여부
-            "screenMode": "unspecified"    //  화면 모드
-        ]
-        
-        userRef.setData(userInfo, merge: true) { error in
-            if let error = error {
-                print("Error saving user: \(error.localizedDescription)")
-            } else {
-                print("User saved successfully!")
-            }
-        }
-    }
-    
+// MARK: - 12/24시간제 포맷 관련 기능
+extension FirebaseViewModel {
     func set12TimeFmt(timeFmt: Bool) async throws {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
@@ -136,7 +118,46 @@ final class FirebaseViewModel: ObservableObject {
             throw error
         }
     }
+}
+
+// MARK: - 사용자 관련 기능
+extension FirebaseViewModel {
+    /// Firebase에 사용자 정보를 저장하는 메소드
+    private func saveUserToFirestore(user: User) {
+        let userRef = db.collection(user.uid).document("info")
+        let userInfo: [String: Any] = [
+            "uid": user.uid,    //  uid
+            "email": user.email ?? "",  //  이메일
+            "name": user.displayName ?? "",  //  이름
+            "signedAt": FieldValue.serverTimestamp(),   //  가입 시간
+            "is12TimeFmt": true,    //  12시간제 포맷 여부
+            "screenMode": "unspecified"    //  화면 모드
+        ]
+        
+        userRef.setData(userInfo, merge: true) { error in
+            if let error = error {
+                print("Error saving user: \(error.localizedDescription)")
+            } else {
+                print("User saved successfully!")
+            }
+        }
+    }
     
+    func deleteAccount() async throws {
+        guard let user = Auth.auth().currentUser else { return }
+        let batch = db.batch()
+        let docs = try await db.collection(user.uid).getDocuments()
+        for doc in docs.documents {
+            batch.deleteDocument(doc.reference)
+        }
+        try await batch.commit()
+        await signOutGoogle()
+        try await user.delete()
+    }
+}
+
+// MARK: - 테마 관련 기능
+extension FirebaseViewModel {
     func setScreenMode(mode: UIUserInterfaceStyle) async throws {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
@@ -166,7 +187,11 @@ final class FirebaseViewModel: ObservableObject {
             throw error
         }
     }
-    
+
+}
+
+// MARK: - 스케줄 관련 기능
+extension FirebaseViewModel {
     func addScheduleData(schedule: ScheduleData) async throws {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
