@@ -19,7 +19,7 @@ struct ScheduleData: Identifiable {
     
     init(
         id: UUID = UUID(),
-        title: String,
+        title: String = "",
         timeLine: (Date, Date),
         cycleOption: CycleOption = .none,
         location: String = "",
@@ -61,5 +61,17 @@ struct ScheduleData: Identifiable {
         case everyMonth = "everyMonth"
         case everyYear = "everyYear"
         case custom = "custom"
+    }
+}
+
+extension ScheduleData: Equatable {
+    static func == (lhs: ScheduleData, rhs: ScheduleData) -> Bool {
+        return lhs.id == rhs.id &&
+               lhs.title == rhs.title &&
+               lhs.timeLine == rhs.timeLine &&
+               lhs.cycleOption == rhs.cycleOption &&
+               lhs.location == rhs.location &&
+               lhs.description == rhs.description &&
+               lhs.color == rhs.color
     }
 }
