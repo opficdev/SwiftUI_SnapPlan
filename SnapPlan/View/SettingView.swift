@@ -27,23 +27,46 @@ struct SettingView: View {
                         Button(action: {
                             days = "1"
                         }) {
-                            Text("1일")
-                                .foregroundStyle(Color.primary)
+                            HStack {
+                                Text("1일")
+                                    .foregroundStyle(Color.primary)
+                                Spacer()
+                                if days == "1" {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
                         }
                         Button(action: {
                             days = "2"
                         }) {
-                            Text("2일")
-                                .foregroundStyle(Color.primary)
+                            HStack {
+                                Text("2일")
+                                    .foregroundStyle(Color.primary)
+                                Spacer()
+                                if days == "2" {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
                         }
+                        .disabled(true)
+                        .foregroundStyle(.gray) // 비활성화된 버튼 텍스트 색을 회색으로 설정
                         Button(action: {
                             days = "list"
                         }) {
-                            Text("목록")
-                                .foregroundStyle(Color.primary)
+                            HStack {
+                                Text("목록")
+                                    .foregroundStyle(Color.primary)
+                                Spacer()
+                                if days == "list" {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
                         }
+                        .disabled(true)
+                        .foregroundStyle(.gray)
                     }
                     .listRowBackground(Color.timeLine)
+                    
                     Section(header: Text("테마")) {
                         NavigationLink(destination: ThemeView()) {
                             Text("테마")
@@ -137,8 +160,8 @@ struct SettingView: View {
                 }
             }
             .navigationTitle(Text(""))  //  < 모양 이미지 제거
-            .toolbarBackground(Color.timeLine, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+//            .toolbarBackground(Color.timeLine, for: .navigationBar)
+//            .toolbarBackground(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
         }
     }
