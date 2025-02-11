@@ -10,13 +10,14 @@ import SwiftUI
 struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
     @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @State private var showSettingView = false
     
     var body: some View {
         VStack(spacing: 0) {
-            CalendarView()
+            CalendarView(showSettingView: $showSettingView)
                 .environmentObject(plannerVM)
                 .environmentObject(firebaseVM)
-            TimeLineView()
+            TimeLineView(showSettingView: $showSettingView)
                 .environmentObject(plannerVM)
         }
     }
