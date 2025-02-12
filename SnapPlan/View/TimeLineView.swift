@@ -133,16 +133,17 @@ struct TimeLineView: View {
                                                 }
                                             }
                                             
-                                            if let schedule = schedule {    //  현재 조작중인 스케줄
-                                                if plannerVM.isSameDate(date1: schedule.timeLine.0, date2: date, components: [.year, .month, .day]) {
+                                            if schedule != nil {    //  현재 조작중인 스케줄
+                                                if plannerVM.isSameDate(date1: schedule!.timeLine.0, date2: date, components: [.year, .month, .day]) {
                                                     let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
-                                                        from: schedule,
+                                                        from: schedule!,
                                                         timeZoneHeight: timeZoneSize.height,
                                                         gap: gap
                                                     )
                                                     ScheduleBox(
                                                         height: boxHeight,
-                                                        isChanging: .constant(true)
+                                                        isChanging: .constant(true),
+                                                        schedule: $schedule
                                                     )
                                                     .offset(y: startOffset)
                                                 }
