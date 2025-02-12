@@ -45,6 +45,7 @@ struct TimeBar: View {
             }
         }
         .frame(height: height)
+        .offset(y: height / 2)
     }
 }
 
