@@ -11,7 +11,7 @@ struct ScheduleData: Identifiable {
     let id: UUID //  UUID
     var title: String   // 일정 제목
     var timeLine: (Date, Date)  // 일정 시간 범위
-    var isChanging = false  // 일정 시간 변경 중인지 확인
+    var isChanging: Bool  // 일정 시간 변경 중인지 확인
     var cycleOption: CycleOption    // 일정 반복 주기
     var location: String // 일정 장소
     var description: String  // 일정 설명
@@ -21,6 +21,7 @@ struct ScheduleData: Identifiable {
         id: UUID = UUID(),
         title: String = "",
         timeLine: (Date, Date),
+        isChanging: Bool = false,
         cycleOption: CycleOption = .none,
         location: String = "",
         description: String = "",
@@ -29,6 +30,7 @@ struct ScheduleData: Identifiable {
         self.id = id
         self.title = title
         self.timeLine = timeLine
+        self.isChanging = isChanging
         self.cycleOption = cycleOption
         self.location = location
         self.description = description
