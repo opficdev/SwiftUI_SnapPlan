@@ -17,7 +17,7 @@ struct TimeLineView: View {
     @State private var calendarData = [Date]()
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
-    @State private var schedule: ScheduleData? = nil
+    @State private var schedule: ScheduleData? = nil    //  현재 선택 또는 추가될 스케줄
     let screenWidth = UIScreen.main.bounds.width
     
     var body: some View {
@@ -91,13 +91,12 @@ struct TimeLineView: View {
                                             is12hoursFmt: firebaseVM.is12TimeFmt
                                         )
                                     )
-                                        .font(.caption)
-                                        .padding(.trailing, 2)
-                                        .offset(y: plannerVM.getOffsetFromMiniute(
-                                            for: plannerVM.today,
-                                            timeZoneHeight: timeZoneSize.height,
-                                            gap: gap
-                                        )
+                                    .font(.caption)
+                                    .padding(.trailing, 2)
+                                    .offset(y: plannerVM.getOffsetFromMiniute(
+                                        for: plannerVM.today,
+                                        timeZoneHeight: timeZoneSize.height,
+                                        gap: gap)
                                     )
                                 }
                                 
@@ -112,24 +111,42 @@ struct TimeLineView: View {
                                                             .fill(Color.timeLine)
                                                             .frame(maxHeight: .infinity)
                                                             .onTapGesture {
-                                                                let endDate = plannerVM.getDateFromIndex(index: index)
-                                                                let beginDate = endDate.addingTimeInterval(-1800)
-                                                                schedule = ScheduleData(timeLine: (beginDate, endDate))
+                                                                if schedule == nil && 0 < index {
+                                                                    let endDate = plannerVM.getDateFromIndex(index: index)
+                                                                    let beginDate = endDate.addingTimeInterval(-1800)
+                                                                    schedule = ScheduleData(timeLine: (beginDate, endDate), isChanging: true)
+                                                                }
                                                             }
                                                         Divider()
                                                         Rectangle()
                                                             .fill(Color.timeLine)
                                                             .frame(maxHeight: .infinity)
                                                             .onTapGesture {
-                                                                let beginDate = plannerVM.getDateFromIndex(index: index)
-                                                                let endDate = beginDate.addingTimeInterval(1800)
-                                                                schedule = ScheduleData(timeLine: (beginDate, endDate))
+                                                                if schedule == nil && index < 24{
+                                                                    let beginDate = plannerVM.getDateFromIndex(index: index)
+                                                                    let endDate = beginDate.addingTimeInterval(1800)
+                                                                    schedule = ScheduleData(timeLine: (beginDate, endDate), isChanging: true)
+                                                                }
                                                             }
                                                     }
                                                     .frame(height: timeZoneSize.height + gap)
                                                 }
                                             }
                                             
+                                            if let schedule = schedule {    //  현재 조작중인 스케줄
+                                                if plannerVM.isSameDate(date1: schedule.timeLine.0, date2: date, components: [.year, .month, .day]) {
+                                                    let (startOffset, boxHeight) = plannerVM.getTimeBoxOffset(
+                                                        from: schedule,
+                                                        timeZoneHeight: timeZoneSize.height,
+                                                        gap: gap
+                                                    )
+                                                    ScheduleBox(
+                                                        height: boxHeight,
+                                                        isChanging: .constant(true)
+                                                    )
+                                                    .offset(y: startOffset)
+                                                }
+                                            }
                                             
                                             //  스케줄 목록을 표시하는 ScheduleBox
                                             ForEach(Array(zip(firebaseVM.schedules.indices, firebaseVM.schedules)), id: \.1.id) { idx, schedule in
@@ -142,7 +159,7 @@ struct TimeLineView: View {
                                                     height: boxHeight,
                                                     isChanging: $firebaseVM.schedules[idx].isChanging
                                                 )
-                                                .offset(y: timeZoneSize.height + startOffset)
+                                                .offset(y: timeZoneSize.height + startOffset + boxHeight / 2)
                                                 .onTapGesture {
                                                     if firebaseVM.schedules[idx].isChanging {
                                                         firebaseVM.schedules[idx].isChanging = false
@@ -151,7 +168,12 @@ struct TimeLineView: View {
                                                         firebaseVM.schedules.indices.forEach { firebaseVM.schedules[$0].isChanging = false }
                                                         firebaseVM.schedules[idx].isChanging = true
                                                     }
-                                                    
+                                                    self.schedule = firebaseVM.schedules[idx]
+                                                }
+                                            }
+                                            .onChange(of: firebaseVM.schedules) { value in  //  Firestore 에 적용
+                                                Task {
+                                                    //                                                    try await firebaseVM.addScheduleData(schedule: <#T##ScheduleData#>)
                                                 }
                                             }
                                             
@@ -163,7 +185,6 @@ struct TimeLineView: View {
                                                     date2: plannerVM.today,
                                                     components: [.year, .month, .day])
                                             )
-                                            .id(UUID())
                                             .padding(
                                                 .leading, plannerVM.isSameDate(
                                                     date1: date,
