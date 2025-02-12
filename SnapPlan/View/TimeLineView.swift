@@ -135,7 +135,7 @@ struct TimeLineView: View {
                                             
                                             if let schedule = schedule {    //  현재 조작중인 스케줄
                                                 if plannerVM.isSameDate(date1: schedule.timeLine.0, date2: date, components: [.year, .month, .day]) {
-                                                    let (startOffset, boxHeight) = plannerVM.getTimeBoxOffset(
+                                                    let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
                                                         from: schedule,
                                                         timeZoneHeight: timeZoneSize.height,
                                                         gap: gap
@@ -150,7 +150,7 @@ struct TimeLineView: View {
                                             
                                             //  스케줄 목록을 표시하는 ScheduleBox
                                             ForEach(Array(zip(firebaseVM.schedules.indices, firebaseVM.schedules)), id: \.1.id) { idx, schedule in
-                                                let (startOffset, boxHeight) = plannerVM.getTimeBoxOffset(
+                                                let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
                                                     from: schedule,
                                                     timeZoneHeight: timeZoneSize.height,
                                                     gap: gap
@@ -173,7 +173,7 @@ struct TimeLineView: View {
                                             }
                                             .onChange(of: firebaseVM.schedules) { value in  //  Firestore 에 적용
                                                 Task {
-                                                    //                                                    try await firebaseVM.addScheduleData(schedule: <#T##ScheduleData#>)
+                                                
                                                 }
                                             }
                                             
