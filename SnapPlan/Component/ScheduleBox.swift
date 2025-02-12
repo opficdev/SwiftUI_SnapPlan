@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct ScheduleBox: View {
+    @Binding var scheulde: ScheduleData?
     @Binding var isChanging: Bool
     @State private var height: CGFloat
     @State private var isVisible = true
     
-    init(height: CGFloat, isChanging: Binding<Bool>) {
+    init(height: CGFloat, isChanging: Binding<Bool>, schedule: Binding<ScheduleData?> = .constant(nil)) {
         self._height = State(initialValue: height)
         self._isChanging = isChanging
+        self._scheulde = schedule
     }
     
     var body: some View {
@@ -72,6 +74,11 @@ struct ScheduleBox: View {
                 }
             }
             .offset(x: 2, y: 2)
+            .onTapGesture {
+                if isChanging {
+                    scheulde = nil
+                }
+            }
         }
     }
 }
@@ -79,6 +86,7 @@ struct ScheduleBox: View {
 #Preview {
     ScheduleBox(
         height: 100,
-        isChanging: .constant(false)
+        isChanging: .constant(false),
+        schedule: .constant(nil)
     )
 }
