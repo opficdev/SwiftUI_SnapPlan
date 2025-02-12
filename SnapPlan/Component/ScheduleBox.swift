@@ -21,11 +21,13 @@ struct ScheduleBox: View {
         GeometryReader { geometry in
             Group {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.macBlue.opacity(isVisible ? 0.8 : 0.5))
-                    .frame(height: height)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.macBlue, lineWidth: 2)
+                    .stroke(Color.macBlue, lineWidth: 2)
+                    .frame(width: geometry.size.width - 4, height: height - 4)
+                    .background(
+                        GeometryReader { geometry in
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.macBlue.opacity(isVisible ? 0.8 : 0.5))
+                        }
                     )
                     .onAppear {
                         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -41,33 +43,35 @@ struct ScheduleBox: View {
                             isVisible = true
                         }
                     }
+                    
                 
                 if isChanging {
                     VStack {
                         Circle()
-                            .fill(Color.timeLine)
-                            .frame(width: 16, height: 16)
-                            .overlay(
-                                Circle().stroke(Color.macBlue, lineWidth: 2) // 테두리 추가
+                            .stroke(Color.macBlue, lineWidth: 2)
+                            .frame(width: 12, height: 12)
+                            .background(
+                                Circle().fill(Color.timeLine)
+                                    .frame(width: 12, height: 12)
                             )
-                            .offset(x: geometry.size.width * 0.1, y: -8)
+                            .offset(x: geometry.size.width * 0.1, y: -6)
                     }
                     .frame(width: geometry.size.width, alignment: .leading)
                     
                     VStack {
                         Circle()
-                            .fill(Color.timeLine)
-                            .frame(width: 16, height: 16)
-                            .overlay(
-                                Circle().stroke(Color.macBlue, lineWidth: 2) // 테두리 추가
+                            .stroke(Color.macBlue, lineWidth: 2)
+                            .frame(width: 12, height: 12)
+                            .background(
+                                Circle().fill(Color.timeLine)
+                                    .frame(width: 12, height: 12)
                             )
-                            .offset(x: -geometry.size.width * 0.1, y: 8)
+                            .offset(x: -geometry.size.width * 0.1, y: 6)
                     }
                     .frame(width: geometry.size.width, alignment: .trailing)
-                    .offset(y: height - 16)
                 }
             }
-            .offset(y: -8)
+            .offset(x: 2, y: 2)
         }
     }
 }
