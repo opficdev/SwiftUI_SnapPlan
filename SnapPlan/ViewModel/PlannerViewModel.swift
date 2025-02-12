@@ -38,6 +38,15 @@ final class PlannerViewModel: ObservableObject {
             }
     }
     
+    func getDateFromIndex(index: Int) -> Date {
+        let componenets = calendar.dateComponents([.year, .month, .day], from: selectDate)
+        let year = componenets.year!
+        let month = componenets.month!
+        let day = componenets.day!
+        
+        return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: index))!
+    }
+    
     /// 특정 Date 2개의 컴포넌트들을 서로 합친 Date를 반환
     func getMergedDate(for date1: Date, with date2: Date, forComponents: Set<Calendar.Component>, withComponents: Set<Calendar.Component>) -> Date {
         let date1Components = calendar.dateComponents(forComponents, from: date1)
@@ -53,11 +62,11 @@ final class PlannerViewModel: ObservableObject {
     }
     
     /// 해당 스케줄의 시작 offset과 duration을 반환
-    func getTimeBoxOffset(from data: ScheduleData, timeZoneHeight: CGFloat, gap: CGFloat) -> (CGFloat, CGFloat) {
+    func getScheduleBoxOffset(from data: ScheduleData, timeZoneHeight: CGFloat, gap: CGFloat) -> (CGFloat, CGFloat) {
         let startOffset = getOffsetFromMiniute(for: data.timeLine.0, timeZoneHeight: timeZoneHeight, gap: gap)
         let endOffset = getOffsetFromMiniute(for: data.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap)
         
-        return (startOffset, endOffset - startOffset)
+        return (endOffset, endOffset - startOffset)
     }
     
     func isCollapsed(timeZoneHeight: CGFloat, gap: CGFloat, index: Int) -> Bool {
@@ -180,7 +189,6 @@ final class PlannerViewModel: ObservableObject {
         var dates: [[Date]] = []
 
         // 이번 달의 첫 번째 날짜와 마지막 날짜 계산
-//        guard let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date)),
         guard let range = calendar.range(of: .day, in: .month, for: date) else {
             return Array(dates.joined())
         }
