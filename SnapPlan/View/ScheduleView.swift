@@ -74,11 +74,6 @@ struct ScheduleView: View {
                                 titleFocus = false
                                 descriptionFocus = false
                                 schedule = nil
-                                currentDetent = currentDetent.union([.fraction(0.07)])
-                                selectedDetent = .fraction(0.07)
-                                DispatchQueue.main.async {
-                                    currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
-                                }
                             }) {
                                 Image(systemName: "plus.circle.fill")
                                     .symbolRenderingMode(.palette)
@@ -328,7 +323,11 @@ struct ScheduleView: View {
         .presentationDetents(currentDetent, selection: $selectedDetent)
         .onChange(of: schedule) { value in
             if schedule == nil {
-                
+                currentDetent = currentDetent.union([.fraction(0.07)])
+                selectedDetent = .fraction(0.07)
+                DispatchQueue.main.async {
+                    currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
+                }
             }
             else {
                 currentDetent = currentDetent.union([.large, .fraction(0.4)])
