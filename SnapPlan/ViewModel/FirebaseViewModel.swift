@@ -20,7 +20,7 @@ final class FirebaseViewModel: ObservableObject {
     @Published var signedIn: Bool? = nil
     @Published var is12TimeFmt: Bool = true
     @Published var screenMode: UIUserInterfaceStyle = .unspecified
-    @Published var schedules: [ScheduleData] = []
+    @Published var schedules: [String:[ScheduleData]] = [:]
     
     init() {
         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
@@ -74,13 +74,15 @@ final class FirebaseViewModel: ObservableObject {
     }
     
     /// 사용자의 오늘을 포함한 달의 전체 스케줄 데이터를 불러오는 메소드
-    private func loadScheduleData() async {
+    func loadScheduleData(date: Date = Date()) async {
         do {
-            if let value = try await fetchScheduleData(date: Date()) {
+            let dateString = DateFormatter.yyyyMMdd.string(from: date)
+            
+            if let arr = try await fetchScheduleData(dateString: dateString) {
                 await MainActor.run {
-                    self.schedules = value
+                    self.schedules[dateString] = arr
                 }
-            } 
+            }
         } catch {
             print("Schedule Load Error: \(error.localizedDescription)")
         }
@@ -235,7 +237,7 @@ extension FirebaseViewModel {
     }
     
     func modifyScheduleData(schedule: ScheduleData) async throws {
-        guard let userId = userId else {
+        guard let _ = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         do {
@@ -247,40 +249,54 @@ extension FirebaseViewModel {
     }
 
     
-    func fetchScheduleData(date: Date) async throws -> [ScheduleData]? {
+    func fetchScheduleData(dateString: String) async throws -> [ScheduleData]? {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         
-        let docRef = db.collection(userId).document("scheduleData")
+        let docRef = db.collection(userId).document("scheduleData").collection(dateString)
         
         do {
-            let document = try await docRef.getDocument()
+            let snapshot = try await docRef.getDocuments()
             
-            let dateString = DateFormatter.yyyyMMdd.string(from: date)
-            
-            guard let schedules = document.data()?[dateString] as? [[String: Any]] else {
+            if snapshot.documents.isEmpty {
                 return nil
             }
             
-            let scheduleArr: [ScheduleData] = schedules.compactMap { entry in
-                guard let title = entry["title"] as? String,
-                      let timeLine = entry["timeLine"] as? [Date],
-                      let cycleOption = ScheduleData.CycleOption(rawValue: entry["cycleOption"] as? String ?? "none"),
-                      let location = entry["location"] as? String,
-                      let description = entry["description"] as? String,
-                      let color = entry["color"] as? Int else { return nil }
-                
-                return ScheduleData(
-                    title: title,
-                    timeLine: (timeLine[0], timeLine[1]),
-                    cycleOption: cycleOption,
-                    location: location,
-                    description: description, color: color
-                )
-            }
+            let schedules: [ScheduleData] = snapshot.documents.compactMap { document in
+                let documentId = UUID(uuidString: document.documentID) ?? UUID()
+                guard let dateKey = document.data().keys.first,
+                      let array = document.data()[dateKey] as? [[String: Any]] else {
+                    return [ScheduleData]()
+                }
+
+                return array.compactMap { data in
+                    guard let title = data["title"] as? String,
+                          let timeLine = data["timeLine"] as? [Timestamp], timeLine.count == 2,
+                          let color = data["color"] as? Int,
+                          let cycleOption = ScheduleData.CycleOption(rawValue: data["cycleOption"] as? String ?? "none"),
+                          let location = data["location"] as? String,
+                          let description = data["description"] as? String else {
+                        return nil
+                    }
+
+                    let startTime = timeLine[0].dateValue()
+                    let endTime = timeLine[1].dateValue()
+
+                    return ScheduleData(
+                        id: documentId,
+                        title: title,
+                        timeLine: (startTime, endTime),
+                        isChanging: false,
+                        cycleOption: cycleOption,
+                        location: location,
+                        description: description,
+                        color: color
+                    )
+                }
+            }.flatMap { $0 }
             
-            return scheduleArr
+            return schedules.isEmpty ? nil : schedules
         } catch {
             throw error
         }
