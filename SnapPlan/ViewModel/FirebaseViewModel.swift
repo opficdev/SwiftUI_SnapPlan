@@ -36,7 +36,6 @@ final class FirebaseViewModel: ObservableObject {
                 Task {
                     await self.loadTimeFormat()
                     await self.loadScreenMode()
-                    await self.loadScheduleData()
                     self.signedIn = true
                 }
             }
