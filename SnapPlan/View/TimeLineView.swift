@@ -269,6 +269,14 @@ struct TimeLineView: View {
                     )!
                 }
             }
+            .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로
+                Task {
+                    firebaseVM.schedules.removeAll()
+                    for date in month {
+                        await firebaseVM.loadScheduleData(date: date)
+                    }
+                }
+            }
         }
         .onChange(of: firebaseVM.is12TimeFmt) { value in
             Task {
