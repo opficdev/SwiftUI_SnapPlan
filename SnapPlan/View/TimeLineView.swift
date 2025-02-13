@@ -150,33 +150,33 @@ struct TimeLineView: View {
                                                         .offset(y: startOffset)
                                                     }
                                                 }
-                                                
-                                                //  스케줄 목록을 표시하는 ScheduleBox
-                                                ForEach(Array(zip(firebaseVM.schedules.indices, firebaseVM.schedules)), id: \.1.id) { idx, schedule in
-                                                    let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
-                                                        from: schedule,
-                                                        timeZoneHeight: timeZoneSize.height,
-                                                        gap: gap
-                                                    )
-                                                    ScheduleBox(
-                                                        height: boxHeight,
-                                                        isChanging: $firebaseVM.schedules[idx].isChanging
-                                                    )
-                                                    .offset(y: timeZoneSize.height + startOffset + boxHeight / 2)
-                                                    .onTapGesture {
-                                                        if firebaseVM.schedules[idx].isChanging {
-                                                            firebaseVM.schedules[idx].isChanging = false
+                                                let dateString = DateFormatter.yyyyMMdd.string(from: date)
+//                                                //  스케줄 목록을 표시하는 ScheduleBox
+                                                if let _ = firebaseVM.schedules[dateString] {
+                                                    ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
+                                                        let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
+                                                            from: scheduleData,
+                                                            timeZoneHeight: timeZoneSize.height,
+                                                            gap: gap
+                                                        )
+                                                        ScheduleBox(
+                                                                height: boxHeight,
+                                                                isChanging: Binding(
+                                                                    get: { firebaseVM.schedules[dateString]![idx].isChanging },
+                                                                    set: { firebaseVM.schedules[dateString]?[idx].isChanging = $0 }
+                                                                )
+                                                            )
+                                                        .offset(y: timeZoneSize.height + startOffset + boxHeight / 2)
+                                                        .onTapGesture {
+                                                            if firebaseVM.schedules[dateString]![idx].isChanging {
+                                                                firebaseVM.schedules[dateString]![idx].isChanging = false
+                                                            }
+                                                            else {
+                                                                firebaseVM.schedules[dateString]!.indices.forEach { firebaseVM.schedules[dateString]![$0].isChanging = false }
+                                                                firebaseVM.schedules[dateString]![idx].isChanging = true
+                                                            }
+                                                            schedule = firebaseVM.schedules[dateString]![idx]
                                                         }
-                                                        else {
-                                                            firebaseVM.schedules.indices.forEach { firebaseVM.schedules[$0].isChanging = false }
-                                                            firebaseVM.schedules[idx].isChanging = true
-                                                        }
-                                                        self.schedule = firebaseVM.schedules[idx]
-                                                    }
-                                                }
-                                                .onChange(of: firebaseVM.schedules) { value in  //  Firestore 에 적용
-                                                    Task {
-                                                        
                                                     }
                                                 }
                                                 
@@ -213,15 +213,15 @@ struct TimeLineView: View {
                                         )
                                     }
                                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                                    //                                .simultaneousGesture(
-                                    //                                    MagnificationGesture()    //  줌 효과 -> 수정 필요
-                                    //                                        .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
-                                    //                                            gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
-                                    //                                        }
-                                    //                                        .onEnded { _ in
-                                    //                                            lastGap = max(gap, screenWidth / 24)
-                                    //                                        }
-                                    //                                )
+//                                .simultaneousGesture(
+//                                    MagnificationGesture()    //  줌 효과 -> 수정 필요
+//                                        .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
+//                                            gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
+//                                        }
+//                                        .onEnded { _ in
+//                                            lastGap = max(gap, screenWidth / 24)
+//                                        }
+//                                )
                                 }
                             }
                         }
