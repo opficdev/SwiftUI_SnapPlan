@@ -107,12 +107,7 @@ struct ScheduleView: View {
                                 addSchedule = false
                                 titleFocus = false
                                 descriptionFocus = false
-                                currentDetent = currentDetent.union([.fraction(0.07)])
-                                selectedDetent = .fraction(0.07)
-                                DispatchQueue.main.async {
-                                    currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
-                                }
-                                
+                                schedule = nil
                                 Task {
                                     do {
                                         let schedule = ScheduleData(
@@ -123,6 +118,7 @@ struct ScheduleView: View {
                                             color: color
                                         )
                                         try await firebaseVM.addScheduleData(schedule: schedule)
+                                        await firebaseVM.loadScheduleData(date: startDate)
                                     } catch {
                                         print("스케줄 추가 실패: \(error)")
                                     }
