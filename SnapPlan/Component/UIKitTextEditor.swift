@@ -38,11 +38,13 @@ struct UIKitTextEditor: UIViewRepresentable {
     func updateUIView(_ uiView: UITextView, context: Context) {
         uiView.text = text
         updatePlaceholder(uiView)
-        
-        if isFocused && !uiView.isFirstResponder {
-            uiView.becomeFirstResponder()
-        } else if !isFocused && uiView.isFirstResponder {
-            uiView.resignFirstResponder()
+
+        DispatchQueue.main.async {
+            if self.isFocused && !uiView.isFirstResponder {
+                uiView.becomeFirstResponder()
+            } else if !self.isFocused && uiView.isFirstResponder {
+                uiView.resignFirstResponder()
+            }
         }
 
         DispatchQueue.main.async {
@@ -80,7 +82,12 @@ struct UIKitTextEditor: UIViewRepresentable {
         }
         
         func textViewDidBeginEditing(_ textView: UITextView) {
-            parent.isFocused = true
+            DispatchQueue.main.async {
+                if self.parent.isFocused != true {
+                    self.parent.isFocused = true
+                }
+            }
+
             if textView.textColor == .gray {
                 textView.text = nil
                 textView.textColor = .label
@@ -88,6 +95,12 @@ struct UIKitTextEditor: UIViewRepresentable {
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
+            DispatchQueue.main.async {
+                if self.parent.isFocused != false {
+                    self.parent.isFocused = false
+                }
+            }
+
             if textView.text.isEmpty {
                 textView.text = parent.placeholder
                 textView.textColor = .gray
