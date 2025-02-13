@@ -39,6 +39,7 @@ struct ScheduleView: View {
     @State private var descriptionFocus = false   //  설명 탭 여부
     @State private var tapColor = false  //  색상 탭 여부
     @State private var titleFocus = false    //  제목 탭 여부
+    @State private var sheetMinHeight = CGFloat.zero //    sheet 최소 높이
     
     var body: some View {
         VStack {
@@ -126,7 +127,7 @@ struct ScheduleView: View {
                                         print("스케줄 추가 실패: \(error)")
                                     }
                                 }
-                                    
+                                
                             }) {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 5)
@@ -146,7 +147,7 @@ struct ScheduleView: View {
                                 placeholder: "제목",
                                 font: .title2
                             )
-                                .textSelection(.enabled)
+                            .textSelection(.enabled)
                             Divider()
                                 .padding(.vertical)
                             HStack(alignment: .top) {
@@ -231,7 +232,7 @@ struct ScheduleView: View {
 //                                        .frame(width: 25)
 //                                        .foregroundStyle(Color.gray)
 //                                    Text("사진")
-//                                        .foregroundStyle(Color.gray)    
+//                                        .foregroundStyle(Color.gray)
 //                                }
                                 HStack {
                                     Image(systemName: "map")
@@ -342,18 +343,25 @@ struct ScheduleView: View {
             else {
                 currentDetent = currentDetent.union([.large, .fraction(0.4)])
                 selectedDetent = .fraction(0.4)
-                currentDetent = currentDetent.subtracting([.fraction(0.07)])
+                DispatchQueue.main.async {
+                    currentDetent = currentDetent.subtracting([.fraction(0.07)])
+                }
             }
         }
-        .onChange(of: selectedDetent) { value in    //  TimeLineView에 하단 패딩을 추가해서 겹치는 부분이 없도록 할 것
-            let screenHeight = UIScreen.main.bounds.height
-            if value == .fraction(0.4) {
-                uiVM.bottomPadding = 0.4 * 0.97 * screenHeight
+        .background(
+            GeometryReader { proxy in
+                Color.clear.onAppear {
+                    uiVM.bottomPadding = proxy.size.height
+                }
+                Color.clear.onChange(of: proxy.size.height) { height in
+                    if selectedDetent != .large {
+                        uiVM.bottomPadding = height
+                    }
+                }
             }
-            else {
-                uiVM.bottomPadding = 0.1 * screenHeight
-            }
-        }
+                .ignoresSafeArea(.all, edges: .bottom)
+        )
+        
     }
 }
 

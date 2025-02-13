@@ -8,5 +8,5 @@
 import SwiftUI
 
 class UIViewModel: ObservableObject {
-    @Published var bottomPadding: CGFloat = UIScreen.main.bounds.height * 0.1
+    @Published var bottomPadding = CGFloat.zero
 }
