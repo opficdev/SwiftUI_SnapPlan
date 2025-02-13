@@ -73,7 +73,16 @@ struct ScheduleView: View {
                                 addSchedule = false
                                 titleFocus = false
                                 descriptionFocus = false
-                                schedule = nil
+                                if schedule == nil {
+                                    currentDetent = currentDetent.union([.fraction(0.07)])
+                                    selectedDetent = .fraction(0.07)
+                                    DispatchQueue.main.async {
+                                        currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
+                                    }
+                                }
+                                else {
+                                    schedule = nil  //  schedule이 nil이 아님에서 nil이 되었으므로 onChange(of: schedule) 실행
+                                }
                             }) {
                                 Image(systemName: "plus.circle.fill")
                                     .symbolRenderingMode(.palette)
@@ -332,6 +341,7 @@ struct ScheduleView: View {
             else {
                 currentDetent = currentDetent.union([.large, .fraction(0.4)])
                 selectedDetent = .fraction(0.4)
+                currentDetent = currentDetent.subtracting([.fraction(0.07)])
             }
         }
         .onChange(of: selectedDetent) { value in    //  TimeLineView에 하단 패딩을 추가해서 겹치는 부분이 없도록 할 것
