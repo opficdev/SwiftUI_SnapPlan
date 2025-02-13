@@ -222,6 +222,31 @@ extension FirebaseViewModel {
         }
     }
     
+    func deleteScheduleData(schedule: ScheduleData) async throws {
+        guard let userId = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        do {
+            try await db.collection(userId).document("scheduleData").collection(DateFormatter.yyyyMMdd.string(from: schedule.timeLine.0)).document(schedule.id.uuidString).delete()
+            print("Schedule Deleted Successfully!")
+        } catch {
+            print("Schedule Delete Error: \(error.localizedDescription)")
+        }
+    }
+    
+    func modifyScheduleData(schedule: ScheduleData) async throws {
+        guard let userId = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        do {
+            try await deleteScheduleData(schedule: schedule)
+            try await addScheduleData(schedule: schedule)
+        } catch {
+            print("Schedule Modify Error: \(error.localizedDescription)")
+        }
+    }
+
+    
     func fetchScheduleData(date: Date) async throws -> [ScheduleData]? {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
