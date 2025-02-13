@@ -15,8 +15,9 @@ struct ScheduleView: View {
     ]
     let screenWidth = UIScreen.main.bounds.width
     @Binding var schedule: ScheduleData?
-    @EnvironmentObject private var plannerVM: PlannerViewModel
-    @EnvironmentObject private var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var plannerVM: PlannerViewModel
+    @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var uiVM: UIViewModel
     
     @State private var title = ""
     @State private var startDate = Date()
@@ -345,7 +346,13 @@ struct ScheduleView: View {
             }
         }
         .onChange(of: selectedDetent) { value in    //  TimeLineView에 하단 패딩을 추가해서 겹치는 부분이 없도록 할 것
-            
+            let screenHeight = UIScreen.main.bounds.height
+            if value == .fraction(0.4) {
+                uiVM.bottomPadding = 0.4 * 0.97 * screenHeight
+            }
+            else {
+                uiVM.bottomPadding = 0.1 * screenHeight
+            }
         }
     }
 }
@@ -356,4 +363,5 @@ struct ScheduleView: View {
     )
     .environmentObject(PlannerViewModel())
     .environmentObject(FirebaseViewModel())
+    .environmentObject(UIViewModel())
 }

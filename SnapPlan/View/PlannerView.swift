@@ -20,6 +20,7 @@ struct PlannerView: View {
             TimeLineView(showSettingView: $showSettingView)
                 .environmentObject(plannerVM)
         }
+        .ignoresSafeArea(.all, edges: .bottom)
     }
 }
 
