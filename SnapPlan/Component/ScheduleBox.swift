@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ScheduleBox: View {
-    @Binding var scheulde: ScheduleData?
+    @Binding var schedule: ScheduleData?
     @Binding var isChanging: Bool
     @State private var height: CGFloat
     @State private var isVisible = true
@@ -16,7 +16,7 @@ struct ScheduleBox: View {
     init(height: CGFloat, isChanging: Binding<Bool>, schedule: Binding<ScheduleData?> = .constant(nil)) {
         self._height = State(initialValue: height)
         self._isChanging = isChanging
-        self._scheulde = schedule
+        self._schedule = schedule
     }
     
     var body: some View {
