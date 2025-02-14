@@ -135,6 +135,30 @@ struct TimeLineView: View {
                                                     }
                                                 }
                                                 
+                                                
+                                                let dateString = DateFormatter.yyyyMMdd.string(from: date)
+//                                                //  스케줄 목록을 표시하는 ScheduleBox
+                                                if let _ = firebaseVM.schedules[dateString] {
+                                                    ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
+                                                        if schedule?.id != scheduleData.id {
+                                                            let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
+                                                                from: scheduleData,
+                                                                timeZoneHeight: timeZoneSize.height,
+                                                                gap: gap
+                                                            )
+                                                            ScheduleBox(
+                                                                height: boxHeight,
+                                                                isChanging: .constant(false),
+                                                                schedule: .constant(scheduleData)
+                                                            )
+                                                            .offset(y: startOffset)
+                                                            .onTapGesture {
+                                                                schedule = scheduleData
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                
                                                 if schedule != nil {    //  현재 조작중인 스케줄
                                                     if plannerVM.isSameDate(date1: schedule!.timeLine.0, date2: date, components: [.year, .month, .day]) {
                                                         let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
@@ -148,35 +172,8 @@ struct TimeLineView: View {
                                                             schedule: $schedule
                                                         )
                                                         .offset(y: startOffset)
-                                                    }
-                                                }
-                                                let dateString = DateFormatter.yyyyMMdd.string(from: date)
-//                                                //  스케줄 목록을 표시하는 ScheduleBox
-                                                if let _ = firebaseVM.schedules[dateString] {
-                                                    ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
-                                                        let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
-                                                            from: scheduleData,
-                                                            timeZoneHeight: timeZoneSize.height,
-                                                            gap: gap
-                                                        )
-                                                        ScheduleBox(
-                                                                height: boxHeight,
-                                                                isChanging: Binding(
-                                                                    get: { firebaseVM.schedules[dateString]![idx].isChanging },
-                                                                    set: { firebaseVM.schedules[dateString]?[idx].isChanging = $0 }
-                                                                )
-                                                            )
-                                                        .offset(y: startOffset)
                                                         .onTapGesture {
-                                                            if firebaseVM.schedules[dateString]![idx].isChanging {
-                                                                firebaseVM.schedules[dateString]![idx].isChanging = false
-                                                            }
-                                                            else {
-                                                                firebaseVM.schedules[dateString]!.indices.forEach { firebaseVM.schedules[dateString]![$0].isChanging = false }
-                                                                firebaseVM.schedules[dateString]![idx].isChanging = true
-                                                            }
-                                                            schedule = firebaseVM.schedules[dateString]![idx]
-                                                            print("TAPPED")
+                                                            schedule = nil
                                                         }
                                                     }
                                                 }
