@@ -166,7 +166,7 @@ struct TimeLineView: View {
                                                                     set: { firebaseVM.schedules[dateString]?[idx].isChanging = $0 }
                                                                 )
                                                             )
-                                                        .offset(y: timeZoneSize.height + startOffset + boxHeight / 2)
+                                                        .offset(y: startOffset)
                                                         .onTapGesture {
                                                             if firebaseVM.schedules[dateString]![idx].isChanging {
                                                                 firebaseVM.schedules[dateString]![idx].isChanging = false
@@ -176,11 +176,12 @@ struct TimeLineView: View {
                                                                 firebaseVM.schedules[dateString]![idx].isChanging = true
                                                             }
                                                             schedule = firebaseVM.schedules[dateString]![idx]
+                                                            print("TAPPED")
                                                         }
                                                     }
                                                 }
                                                 
-                                                //  현 시간 표시하는 TimeBar
+                                                //  현 시간 표시하는 TimeBarx
                                                 TimeBar(
                                                     height: timeZoneSize.height,
                                                     showVerticalLine: plannerVM.isSameDate(
