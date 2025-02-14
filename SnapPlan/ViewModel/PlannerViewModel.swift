@@ -66,7 +66,7 @@ final class PlannerViewModel: ObservableObject {
         let startOffset = getOffsetFromMiniute(for: data.timeLine.0, timeZoneHeight: timeZoneHeight, gap: gap)
         let endOffset = getOffsetFromMiniute(for: data.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap)
         
-        return (endOffset, endOffset - startOffset)
+        return (startOffset, endOffset - startOffset)
     }
     
     func isCollapsed(timeZoneHeight: CGFloat, gap: CGFloat, index: Int) -> Bool {
