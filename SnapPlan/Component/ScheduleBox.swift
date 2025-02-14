@@ -28,7 +28,7 @@ struct ScheduleBox: View {
                     .background(
                         GeometryReader { geometry in
                             RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.macBlue.opacity(isVisible ? 0.8 : 0.5))
+                                .fill(Color.macBlue.opacity(!isVisible ? 0.5 : 0.8))
                         }
                     )
                     .onAppear {
@@ -74,11 +74,6 @@ struct ScheduleBox: View {
                 }
             }
             .offset(x: 2, y: 2)
-            .onTapGesture {
-                if isChanging {
-                    scheulde = nil
-                }
-            }
         }
     }
 }
