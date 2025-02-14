@@ -138,8 +138,6 @@ extension FirebaseViewModel {
         userRef.setData(userInfo, merge: true) { error in
             if let error = error {
                 print("Error saving user: \(error.localizedDescription)")
-            } else {
-                print("User saved successfully!")
             }
         }
     }
@@ -229,7 +227,6 @@ extension FirebaseViewModel {
         }
         do {
             try await db.collection(userId).document("scheduleData").collection(DateFormatter.yyyyMMdd.string(from: schedule.timeLine.0)).document(schedule.id.uuidString).delete()
-            print("Schedule Deleted Successfully!")
         } catch {
             print("Schedule Delete Error: \(error.localizedDescription)")
         }
