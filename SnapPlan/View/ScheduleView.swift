@@ -104,26 +104,38 @@ struct ScheduleView: View {
                                 }
                             }
                             Button(action: {
+                                if let schedule = schedule {
+                                    Task {
+                                        do {
+                                            try await firebaseVM.modifyScheduleData(schedule: schedule)
+                                            await firebaseVM.loadScheduleData(date: startDate)
+                                            self.schedule = nil
+                                        } catch {
+                                            print("스케줄 수정 실패: \(error)")
+                                        }
+                                    }
+                                }
+                                else {
+                                    Task {
+                                        do {
+                                            let schedule = ScheduleData(
+                                                title: title,
+                                                timeLine: (startDate, endDate),
+                                                location: location,
+                                                description: description,
+                                                color: color
+                                            )
+                                            try await firebaseVM.addScheduleData(schedule: schedule)
+                                            await firebaseVM.loadScheduleData(date: startDate)
+                                            self.schedule = nil
+                                        } catch {
+                                            print("스케줄 추가 실패: \(error)")
+                                        }
+                                    }
+                                }
                                 addSchedule = false
                                 titleFocus = false
                                 descriptionFocus = false
-                                schedule = nil
-                                Task {
-                                    do {
-                                        let schedule = ScheduleData(
-                                            title: title,
-                                            timeLine: (startDate, endDate),
-                                            location: location,
-                                            description: description,
-                                            color: color
-                                        )
-                                        try await firebaseVM.addScheduleData(schedule: schedule)
-                                        await firebaseVM.loadScheduleData(date: startDate)
-                                    } catch {
-                                        print("스케줄 추가 실패: \(error)")
-                                    }
-                                }
-                                
                             }) {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 5)
