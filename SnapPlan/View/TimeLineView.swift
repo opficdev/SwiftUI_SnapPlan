@@ -19,6 +19,7 @@ struct TimeLineView: View {
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
     @State private var schedule: ScheduleData? = nil    //  현재 선택 또는 추가될 스케줄
+    @State private var didScheduleAdd = false    //  FirebaseVM의 생성자에서 오늘 날짜의 스케줄을 불러왔는지 최초 확인
     let screenWidth = UIScreen.main.bounds.width
     
     var body: some View {
@@ -271,12 +272,15 @@ struct TimeLineView: View {
                     )!
                 }
             }
-            .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로
+            .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로 뷰가 로딩되면 알아서 onChange가 실행됨
                 Task {
-                    firebaseVM.schedules.removeAll()
+                    if didScheduleAdd {
+                        firebaseVM.schedules.removeAll()
+                    }
                     for date in month {
                         await firebaseVM.loadScheduleData(date: date)
                     }
+                    didScheduleAdd = true
                 }
             }
         }
