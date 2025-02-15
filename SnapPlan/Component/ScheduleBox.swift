@@ -10,23 +10,31 @@ import SwiftUI
 struct ScheduleBox: View {
     @Binding var schedule: ScheduleData?
     @Binding var isChanging: Bool
-    @State private var height: CGFloat
+    @Binding var height: CGFloat
     @State private var isVisible = true
+    @State private var lastDate = Date()
+    @State private var gap: CGFloat
+    @State private var timeZoneHeight: CGFloat
     
-    init(height: CGFloat, isChanging: Binding<Bool>, schedule: Binding<ScheduleData?> = .constant(nil)) {
-        self._height = State(initialValue: height)
+    init(gap: CGFloat, timeZoneHeight: CGFloat, height: Binding<CGFloat>,  isChanging: Binding<Bool>, schedule: Binding<ScheduleData?> = .constant(nil)) {
         self._isChanging = isChanging
         self._schedule = schedule
+        self._height = height
+        if let schedule = schedule.wrappedValue {
+            lastDate = schedule.timeLine.1
+        }
+        self._gap = State(initialValue: gap)
+        self._timeZoneHeight = State(initialValue: timeZoneHeight)
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            Group {
+        GeometryReader { proxy in
+            ZStack {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.macBlue, lineWidth: 2)
-                    .frame(width: geometry.size.width - 4, height: height - 4)
+                    .frame(width: proxy.size.width - 4, height: height - 4)
                     .background(
-                        GeometryReader { geometry in
+                        GeometryReader { proxy in
                             RoundedRectangle(cornerRadius: 16)
                                 .fill(Color.macBlue.opacity(!isVisible ? 0.5 : 0.8))
                         }
@@ -45,43 +53,72 @@ struct ScheduleBox: View {
                             isVisible = true
                         }
                     }
-                    
+                
                 
                 if isChanging {
                     VStack {
-                        Circle()
-                            .stroke(Color.macBlue, lineWidth: 2)
-                            .frame(width: 12, height: 12)
-                            .background(
-                                Circle().fill(Color.timeLine)
-                                    .frame(width: 12, height: 12)
-                            )
-                            .offset(x: geometry.size.width * 0.1, y: -6)
+                        VStack {
+                            Circle()
+                                .stroke(Color.macBlue, lineWidth: 2)
+                                .frame(width: 12, height: 12)
+                                .background(
+                                    Circle().fill(Color.timeLine)
+                                        .frame(width: 12, height: 12)
+                                )
+                                .offset(x: proxy.size.width * 0.1, y: 5)
+                        }
+                        .frame(width: proxy.size.width, alignment: .leading)
+                        Spacer()
+                        VStack {
+                            Circle()
+                                .stroke(Color.macBlue, lineWidth: 2)
+                                .frame(width: 12, height: 12)
+                                .background(
+                                    Circle().fill(Color.timeLine)
+                                        .frame(width: 12, height: 12)
+                                )
+                                .offset(x: -proxy.size.width * 0.1, y: -5)
+                        }
+                        .frame(width: proxy.size.width, alignment: .trailing)
+                        .onAppear {
+                            if let schedule = schedule {
+                                lastDate = schedule.timeLine.1
+                            }
+                        }
+                        .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
+                            DragGesture()
+                                .onChanged { offset in
+                                    schedule?.timeLine.1 = getDateFromOffset(offset: offset.translation.height, baseDate: lastDate)
+                                }
+                                .onEnded{ _ in
+                                    if let schedule = schedule {
+                                        lastDate = schedule.timeLine.1
+                                    }
+                                }
+                        )
                     }
-                    .frame(width: geometry.size.width, alignment: .leading)
-                    
-                    VStack {
-                        Circle()
-                            .stroke(Color.macBlue, lineWidth: 2)
-                            .frame(width: 12, height: 12)
-                            .background(
-                                Circle().fill(Color.timeLine)
-                                    .frame(width: 12, height: 12)
-                            )
-                            .offset(x: -geometry.size.width * 0.1, y: 6)
-                    }
-                    .frame(width: geometry.size.width, alignment: .trailing)
                 }
             }
-            .offset(x: 2, y: 2)
+            .offset(x: isChanging ? 0 : 2, y: 5 + 4)
+            //  x에 offset이 추가되야하는지는 이유를 모르겠음
+            //  5: Circle()의 offset, 4: Circle()의 크기 - 테두리 두께
+            .frame(height: height)
         }
+    }
+    
+    func getDateFromOffset(offset: CGFloat, baseDate: Date) -> Date {
+        let calendar = Calendar.current
+        let minutes = offset * 1440 / ((timeZoneHeight + gap) * 24)
+        return calendar.date(byAdding: .minute, value: Int(minutes), to: calendar.startOfDay(for: baseDate)) ?? baseDate
     }
 }
 
 #Preview {
     ScheduleBox(
-        height: 100,
-        isChanging: .constant(false),
+        gap: 10,
+        timeZoneHeight: 20,
+        height: .constant(40),
+        isChanging: .constant(true),
         schedule: .constant(nil)
     )
 }

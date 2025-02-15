@@ -147,11 +147,13 @@ struct TimeLineView: View {
                                                                 gap: gap
                                                             )
                                                             ScheduleBox(
-                                                                height: boxHeight,
+                                                                gap: gap,
+                                                                timeZoneHeight: timeZoneSize.height,
+                                                                height: .constant(boxHeight),
                                                                 isChanging: .constant(false),
                                                                 schedule: .constant(scheduleData)
                                                             )
-                                                            .offset(y: startOffset)
+                                                            .offset(y: startOffset + timeZoneSize.height / 2)
                                                             .onTapGesture {
                                                                 schedule = scheduleData
                                                             }
@@ -167,11 +169,13 @@ struct TimeLineView: View {
                                                             gap: gap
                                                         )
                                                         ScheduleBox(
-                                                            height: boxHeight,
+                                                            gap: gap,
+                                                            timeZoneHeight: timeZoneSize.height,
+                                                            height: .constant(boxHeight),
                                                             isChanging: .constant(true),
                                                             schedule: $schedule
                                                         )
-                                                        .offset(y: startOffset)
+                                                        .offset(y: startOffset + timeZoneSize.height / 2)
                                                         .onTapGesture {
                                                             schedule = nil
                                                         }
