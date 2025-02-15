@@ -65,6 +65,9 @@ struct ScheduleView: View {
                             .font(.system(size: 30))
                     }
                 }
+                .onAppear {
+                    
+                }
             }
             else {
                 VStack {
@@ -109,7 +112,6 @@ struct ScheduleView: View {
                                         do {
                                             try await firebaseVM.modifyScheduleData(schedule: schedule)
                                             await firebaseVM.loadScheduleData(date: startDate)
-                                            self.schedule = nil
                                         } catch {
                                             print("스케줄 수정 실패: \(error)")
                                         }
@@ -127,7 +129,6 @@ struct ScheduleView: View {
                                             )
                                             try await firebaseVM.addScheduleData(schedule: schedule)
                                             await firebaseVM.loadScheduleData(date: startDate)
-                                            self.schedule = nil
                                         } catch {
                                             print("스케줄 추가 실패: \(error)")
                                         }
@@ -136,6 +137,14 @@ struct ScheduleView: View {
                                 addSchedule = false
                                 titleFocus = false
                                 descriptionFocus = false
+                                schedule = nil
+                                
+                                currentDetent = currentDetent.union([.fraction(0.07)])
+                                selectedDetent = .fraction(0.07)
+                                DispatchQueue.main.async {
+                                    currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
+                                }
+                                
                             }) {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 5)
@@ -270,6 +279,12 @@ struct ScheduleView: View {
                     Spacer()
                 }
                 .onAppear {
+                    //  뷰의 저장된 데이터 초기화
+                    title = ""
+                    location = ""
+                    description = ""
+                    color = 0
+                    
                     if let schedule = schedule {
                         startDate = schedule.timeLine.0
                         endDate = schedule.timeLine.1
