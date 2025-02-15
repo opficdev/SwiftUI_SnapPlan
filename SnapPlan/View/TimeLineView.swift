@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftUIIntrospect
 
 struct TimeLineView: View {
     @StateObject var uiVM = UIViewModel()
