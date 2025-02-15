@@ -88,7 +88,9 @@ struct ScheduleBox: View {
                         .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
                             DragGesture()
                                 .onChanged { offset in
-                                    schedule?.timeLine.1 = getDateFromOffset(offset: offset.translation.height, baseDate: lastDate)
+                                    withAnimation(.easeInOut(duration: 0.05)) {
+                                        schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: offset.translation.height)
+                                    }
                                 }
                                 .onEnded{ _ in
                                     if let schedule = schedule {
@@ -103,13 +105,16 @@ struct ScheduleBox: View {
             //  x에 offset이 추가되야하는지는 이유를 모르겠음
             //  5: Circle()의 offset, 4: Circle()의 크기 - 테두리 두께
             .frame(height: height)
+            .onChange(of: height) { value in
+                print(value)
+            }
         }
     }
     
-    func getDateFromOffset(offset: CGFloat, baseDate: Date) -> Date {
+    func getDateFromOffset(date: Date, offset: CGFloat) -> Date {
         let calendar = Calendar.current
         let minutes = offset * 1440 / ((timeZoneHeight + gap) * 24)
-        return calendar.date(byAdding: .minute, value: Int(minutes), to: calendar.startOfDay(for: baseDate)) ?? baseDate
+        return calendar.date(byAdding: .minute, value: Int(minutes), to: date)!
     }
 }
 
