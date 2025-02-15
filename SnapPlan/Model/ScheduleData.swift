@@ -20,7 +20,7 @@ struct ScheduleData: Identifiable {
     init(
         id: UUID = UUID(),
         title: String = "",
-        timeLine: (Date, Date),
+        timeLine: (Date, Date), //  .0과 .1이 날짜가 다를 수 있어서 [(Date, Date), (Date, Date)...] 형태로 변경 예정
         isChanging: Bool = false,
         cycleOption: CycleOption = .none,
         location: String = "",
