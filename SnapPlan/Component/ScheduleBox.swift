@@ -77,7 +77,7 @@ struct ScheduleBox: View {
                             .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
                                 DragGesture()
                                     .onChanged { offset in
-                                        withAnimation(.easeInOut(duration: 0.1)) { //  과도한 AnimatablePair 변경 방지
+                                        withAnimation(.easeInOut(duration: 0.05)) { //  과도한 AnimatablePair 변경 방지
                                             height = offset.translation.height * 2
 //                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: offset.translation.height * 2)
                                         }
