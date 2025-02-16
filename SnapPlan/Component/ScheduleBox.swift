@@ -78,7 +78,7 @@ struct ScheduleBox: View {
                                 DragGesture()
                                     .onChanged { offset in
                                         withAnimation(.easeInOut(duration: 0.05)) { //  과도한 AnimatablePair 변경 방지
-                                            height = offset.translation.height * 2
+                                            height = max(offset.translation.height * 2, 6)
 //                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: offset.translation.height * 2)
                                         }
                                     }
