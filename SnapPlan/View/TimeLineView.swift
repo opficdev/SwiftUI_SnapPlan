@@ -151,7 +151,7 @@ struct TimeLineView: View {
                                                             ScheduleBox(
                                                                 gap: gap,
                                                                 timeZoneHeight: timeZoneSize.height,
-                                                                height: .constant(boxHeight),
+                                                                height: boxHeight,
                                                                 isChanging: .constant(false),
                                                                 schedule: .constant(scheduleData)
                                                             )
@@ -173,7 +173,7 @@ struct TimeLineView: View {
                                                         ScheduleBox(
                                                             gap: gap,
                                                             timeZoneHeight: timeZoneSize.height,
-                                                            height: .constant(boxHeight),
+                                                            height: boxHeight,
                                                             isChanging: .constant(true),
                                                             schedule: $schedule
                                                         )
