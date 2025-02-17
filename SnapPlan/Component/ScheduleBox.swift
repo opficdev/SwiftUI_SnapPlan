@@ -29,10 +29,10 @@ struct ScheduleBox: View {
     
     var body: some View {
         GeometryReader { proxy in
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 4)
                 .stroke(Color.macBlue, lineWidth: 2)
                 .background(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: 4)
                         .fill(Color.macBlue.opacity(!isVisible ? 0.5 : 0.8))
                 )
                 .frame(width: proxy.size.width - 4, height: height - 2) //  4: stroke 두께 * 2
@@ -55,7 +55,8 @@ struct ScheduleBox: View {
                         Text(title)
                             .foregroundStyle(Color.gray)
                             .font(.caption)
-                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .offset(x: 4, y: 8 - height / 2)
                     }
                     if isChanging {
                         Circle()
@@ -85,7 +86,7 @@ struct ScheduleBox: View {
                                 DragGesture()
                                     .onChanged { offset in
                                         withAnimation(.linear(duration: 0.05)) { //  과도한 AnimatablePair 변경 방지
-                                            height = max(offset.translation.height * 2, 6)
+                                            height = max(offset.translation.height * 2, 15)
 //                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: offset.translation.height * 2)
                                         }
                                     }
