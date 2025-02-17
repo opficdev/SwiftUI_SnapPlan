@@ -13,7 +13,7 @@ struct TimeLineView: View {
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
-    @Binding var showSettingView: Bool
+    @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
     @State private var selection = 0
     @State private var calendarData = [Date]()
@@ -294,7 +294,7 @@ struct TimeLineView: View {
                 }
             }
         }
-        .sheet(isPresented: .constant(!showSettingView)) {
+        .sheet(isPresented: $showScheduleView) {
             ScheduleView(schedule: $schedule)
                 .environmentObject(plannerVM)
                 .environmentObject(firebaseVM)
@@ -313,7 +313,7 @@ struct TimeLineView: View {
 }
 
 #Preview {
-    TimeLineView(showSettingView: .constant(false))
+    TimeLineView(showScheduleView: .constant(true))
         .environmentObject(PlannerViewModel())
         .environmentObject(FirebaseViewModel())
 }

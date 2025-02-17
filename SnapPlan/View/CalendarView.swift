@@ -12,6 +12,7 @@ struct CalendarView: View {
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
+    @Binding var showScheduleView: Bool
     @Binding var showSettingView: Bool
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var selection = 1  //  선택된 달력의 tag
@@ -28,7 +29,10 @@ struct CalendarView: View {
                     .foregroundStyle(Color.gray)
                     .padding(EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 8)) //  월 보여주는거 때문에 16 - 8
                     .onTapGesture {
-                        showSettingView = true
+                        showScheduleView = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            showSettingView = true
+                        }
                     }
                 HStack(spacing: 4) {
                     Text(plannerVM.getCurrentMonthYear())
@@ -144,12 +148,16 @@ struct CalendarView: View {
         .fullScreenCover(isPresented: $showSettingView) {
             SettingView()
                 .environmentObject(firebaseVM)
+                .onDisappear {
+                    showScheduleView = true
+                }
         }
     }
 }
 
 #Preview {
     CalendarView(
+        showScheduleView: .constant(true),
         showSettingView: .constant(false)
     )
         .environmentObject(PlannerViewModel())
