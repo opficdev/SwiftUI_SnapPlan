@@ -16,7 +16,7 @@ struct ScheduleCycleView: View {
     @Binding var schedule: ScheduleData?
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 30) {
+        VStack(alignment: .leading, spacing: 20) {
             if schedule?.cycleOption != Optional.none {
                 Text("반복 안함")
                     .onTapGesture {
@@ -24,6 +24,7 @@ struct ScheduleCycleView: View {
                         dismiss()
                     }
                     .padding(.leading, screenWidth / 5)
+                    .padding(.top, 20)
             }
             Divider()
             Group {
