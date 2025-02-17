@@ -36,18 +36,16 @@ struct UIKitTextEditor: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UITextView, context: Context) {
-        uiView.text = text
-        updatePlaceholder(uiView)
-
         DispatchQueue.main.async {
+            uiView.text = text
+            updatePlaceholder(uiView)
+
             if self.isFocused && !uiView.isFirstResponder {
                 uiView.becomeFirstResponder()
             } else if !self.isFocused && uiView.isFirstResponder {
                 uiView.resignFirstResponder()
             }
-        }
-
-        DispatchQueue.main.async {
+            
             uiView.frame.size.height = uiView.contentSize.height
         }
     }
