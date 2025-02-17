@@ -28,6 +28,7 @@ struct ScheduleView: View {
     
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
+    @State private var titleFocus = false    //  제목 탭 여부
     @State private var addSchedule = false  //  스케줄 버튼 탭 여부
     @State private var tapstartDate = false //  시작 시간 탭 여부
     @State private var tapendDate = false   //  종료 시간 탭 여부
@@ -38,7 +39,6 @@ struct ScheduleView: View {
     @State private var tapLocation = false  //  위치 탭 여부
     @State private var descriptionFocus = false   //  설명 탭 여부
     @State private var tapColor = false  //  색상 탭 여부
-    @State private var titleFocus = false    //  제목 탭 여부
     @State private var sheetMinHeight = CGFloat.zero //    sheet 최소 높이
     
     var body: some View {
@@ -98,12 +98,22 @@ struct ScheduleView: View {
                         }
                         else {
                             if schedule != nil {
-                                Button(action: {
-                                    
+                                Menu(content: {
+                                    Button(role: .destructive, action: {
+                                        
+                                    }) {
+                                        Label("삭제", systemImage: "trash")
+                                    }
+                                    Button(action: {
+                                        
+                                    }) {
+                                        Label("복사", systemImage: "doc.on.doc")
+                                    }
+
                                 }) {
                                     Image(systemName: "ellipsis")
                                         .foregroundStyle(Color.gray)
-                                        .font(.system(size: 30))
+                                        .font(.system(size: 25))
                                 }
                             }
                             Button(action: {
@@ -260,8 +270,9 @@ struct ScheduleView: View {
                                     Image(systemName: "map")
                                         .frame(width: 25)
                                         .foregroundStyle(Color.gray)
+                                    
                                     if location.isEmpty {
-                                        Text("위치")  //  NavigationStack 구현 예정
+                                        Text("위치")
                                             .foregroundStyle(Color.gray)
                                     }
                                     else {
