@@ -51,6 +51,12 @@ struct ScheduleBox: View {
                     }
                 }
                 .overlay {
+                    if let title = schedule?.title {
+                        Text(title)
+                            .foregroundStyle(Color.gray)
+                            .font(.caption)
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                    }
                     if isChanging {
                         Circle()
                             .stroke(Color.macBlue, lineWidth: 2)
@@ -68,6 +74,7 @@ struct ScheduleBox: View {
                                 Circle().fill(Color.timeLine)
                                     .frame(width: 12, height: 12)
                             )
+                            .padding()
                             .offset(x: proxy.size.width * 0.4, y: -2 + height / 2)
                             .onAppear {
                                 if let schedule = schedule {
@@ -77,7 +84,7 @@ struct ScheduleBox: View {
                             .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
                                 DragGesture()
                                     .onChanged { offset in
-                                        withAnimation(.easeInOut(duration: 0.05)) { //  과도한 AnimatablePair 변경 방지
+                                        withAnimation(.linear(duration: 0.05)) { //  과도한 AnimatablePair 변경 방지
                                             height = max(offset.translation.height * 2, 6)
 //                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: offset.translation.height * 2)
                                         }
