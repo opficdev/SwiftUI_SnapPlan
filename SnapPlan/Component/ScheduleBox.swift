@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct ScheduleBox: View {
+    let colorArr = [
+        Color.macBlue, Color.macPurple, Color.macPink, Color.macRed,
+        Color.macOrange, Color.macYellow, Color.macGreen
+    ]
     @Binding var schedule: ScheduleData?
     @Binding var isChanging: Bool
     @State private var height: CGFloat
@@ -15,6 +19,7 @@ struct ScheduleBox: View {
     @State private var lastDate = Date()
     @State private var gap: CGFloat
     @State private var timeZoneHeight: CGFloat
+    @State private var colorIdx: Int
     
     init(gap: CGFloat, timeZoneHeight: CGFloat, height: CGFloat,  isChanging: Binding<Bool>, schedule: Binding<ScheduleData?> = .constant(nil)) {
         self._isChanging = isChanging
@@ -25,15 +30,21 @@ struct ScheduleBox: View {
         }
         self._gap = State(initialValue: gap)
         self._timeZoneHeight = State(initialValue: timeZoneHeight)
+        if let schedule = schedule.wrappedValue {
+            colorIdx = schedule.color
+        }
+        else {
+            colorIdx = 0
+        }
     }
     
     var body: some View {
         GeometryReader { proxy in
             RoundedRectangle(cornerRadius: 4)
-                .stroke(Color.macBlue, lineWidth: 2)
+                .stroke(colorArr[colorIdx], lineWidth: 2)
                 .background(
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.macBlue.opacity(!isVisible ? 0.5 : 0.8))
+                        .fill(colorArr[colorIdx].opacity(!isVisible ? 0.5 : 0.8))
                 )
                 .frame(width: proxy.size.width - 4, height: height - 2) //  4: stroke 두께 * 2
                 .onAppear {
@@ -43,6 +54,11 @@ struct ScheduleBox: View {
                                 isVisible.toggle()
                             }
                         }
+                    }
+                }
+                .onChange(of: schedule) { schedule in
+                    if let schedule = schedule {
+                        colorIdx = schedule.color
                     }
                 }
                 .onChange(of: isChanging) { value in
@@ -60,7 +76,7 @@ struct ScheduleBox: View {
                     }
                     if isChanging {
                         Circle()
-                            .stroke(Color.macBlue, lineWidth: 2)
+                            .stroke(colorArr[colorIdx], lineWidth: 2)
                             .frame(width: 12, height: 12)
                             .background(
                                 Circle().fill(Color.timeLine)
@@ -69,7 +85,7 @@ struct ScheduleBox: View {
                             .offset(x: -proxy.size.width * 0.4, y: 2 - height / 2)
                         
                         Circle()
-                            .stroke(Color.macBlue, lineWidth: 2)
+                            .stroke(colorArr[colorIdx], lineWidth: 2)
                             .frame(width: 12, height: 12)
                             .background(
                                 Circle().fill(Color.timeLine)
@@ -85,9 +101,9 @@ struct ScheduleBox: View {
                             .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
                                 DragGesture()
                                     .onChanged { offset in
-                                        withAnimation(.linear(duration: 0.05)) { //  과도한 AnimatablePair 변경 방지
-                                            height = max(offset.translation.height * 2, 15)
-//                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: offset.translation.height * 2)
+                                        withAnimation(.easeInOut(duration: 0.05)) { //  과도한 AnimatablePair 변경 방지
+                                            height = max(CGFloat(Int(offset.translation.height)) * 2, 15)   //  소수점이 남아있으면 너무 과도한 변동값들이 나타남
+//                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: height)
                                         }
                                     }
                                     .onEnded{ _ in
