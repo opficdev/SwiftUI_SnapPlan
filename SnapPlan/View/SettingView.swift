@@ -49,7 +49,7 @@ struct SettingView: View {
                             }
                         }
                         .disabled(true)
-                        .foregroundStyle(.gray) // 비활성화된 버튼 텍스트 색을 회색으로 설정
+                        .foregroundStyle(.gray)
                         Button(action: {
                             days = "list"
                         }) {
@@ -63,6 +63,7 @@ struct SettingView: View {
                             }
                         }
                         .disabled(true)
+                        .foregroundStyle(.gray)
                     }
                     .listRowBackground(Color.timeLine)
                     
