@@ -107,9 +107,14 @@ struct ScheduleView: View {
                                 }
                             }
                             Button(action: {
-                                if let schedule = schedule {
+                                if var schedule = schedule, !schedule.title.isEmpty {    //  TimeLineView에서 schedule이 넘어왔을 때 조건을 추가해서 이게 add인지 modify인지 구분해야함
                                     Task {
                                         do {
+                                            schedule.title = title
+                                            schedule.timeLine = (startDate, endDate)
+                                            schedule.location = location
+                                            schedule.description = description
+                                            schedule.color = color
                                             try await firebaseVM.modifyScheduleData(schedule: schedule)
                                             await firebaseVM.loadScheduleData(date: startDate)
                                         } catch {
@@ -279,21 +284,16 @@ struct ScheduleView: View {
                     Spacer()
                 }
                 .onAppear {
-                    //  뷰의 저장된 데이터 초기화
-                    title = ""
-                    location = ""
-                    description = ""
-                    color = 0
-                    
                     if let schedule = schedule {
+                        title = schedule.title
                         startDate = schedule.timeLine.0
                         endDate = schedule.timeLine.1
-                        title = schedule.title
                         location = schedule.location
                         description = schedule.description
                         color = schedule.color
                     }
                     else {
+                        title = ""
                         startDate = plannerVM.getMergedDate(
                             for: plannerVM.selectDate,
                             with: plannerVM.today,
@@ -301,6 +301,9 @@ struct ScheduleView: View {
                             withComponents: [.hour, .minute]
                         )
                         endDate = startDate.addingTimeInterval(1800)
+                        location = ""
+                        description = ""
+                        color = 0
                     }
                 }
                 .onChange(of: startDate) { _ in
