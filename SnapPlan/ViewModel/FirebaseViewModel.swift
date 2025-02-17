@@ -201,10 +201,6 @@ extension FirebaseViewModel {
         let docRef = db.collection(userId).document("scheduleData").collection(dateString).document(schedule.id.uuidString)
         
         do {
-            let document = try await docRef.getDocument()
-            
-            var schedules: [[String: Any]] = document.data()?[dateString] as? [[String: Any]] ?? []
-            
             let newEntry: [String: Any] = [
                 "title": schedule.title,
                 "timeLine": [schedule.timeLine.0, schedule.timeLine.1],
@@ -214,9 +210,7 @@ extension FirebaseViewModel {
                 "color": schedule.color
             ]
             
-            schedules.append(newEntry)
-            
-            try await docRef.setData([dateString: schedules], merge: true)
+            try await docRef.setData(newEntry, merge: true)
         } catch {
             throw error
         }
@@ -262,36 +256,31 @@ extension FirebaseViewModel {
             
             let schedules: [ScheduleData] = snapshot.documents.compactMap { document in
                 let documentId = UUID(uuidString: document.documentID) ?? UUID()
-                guard let dateKey = document.data().keys.first,
-                      let array = document.data()[dateKey] as? [[String: Any]] else {
-                    return [ScheduleData]()
+                let data = document.data()
+                
+                guard let title = data["title"] as? String,
+                      let timeLine = data["timeLine"] as? [Timestamp],
+                      let color = data["color"] as? Int,
+                      let cycleOption = ScheduleData.CycleOption(rawValue: data["cycleOption"] as? String ?? "none"),
+                      let location = data["location"] as? String,
+                      let description = data["description"] as? String else {
+                    return nil
                 }
-
-                return array.compactMap { data in
-                    guard let title = data["title"] as? String,
-                          let timeLine = data["timeLine"] as? [Timestamp], timeLine.count == 2,
-                          let color = data["color"] as? Int,
-                          let cycleOption = ScheduleData.CycleOption(rawValue: data["cycleOption"] as? String ?? "none"),
-                          let location = data["location"] as? String,
-                          let description = data["description"] as? String else {
-                        return nil
-                    }
-
-                    let startTime = timeLine[0].dateValue()
-                    let endTime = timeLine[1].dateValue()
-
-                    return ScheduleData(
-                        id: documentId,
-                        title: title,
-                        timeLine: (startTime, endTime),
-                        isChanging: false,
-                        cycleOption: cycleOption,
-                        location: location,
-                        description: description,
-                        color: color
-                    )
-                }
-            }.flatMap { $0 }
+                
+                let startTime = timeLine[0].dateValue()
+                let endTime = timeLine[1].dateValue()
+                
+                return ScheduleData(
+                    id: documentId,
+                    title: title,
+                    timeLine: (startTime, endTime),
+                    isChanging: false,
+                    cycleOption: cycleOption,
+                    location: location,
+                    description: description,
+                    color: color
+                )
+            }
             
             return schedules.isEmpty ? nil : schedules
         } catch {
