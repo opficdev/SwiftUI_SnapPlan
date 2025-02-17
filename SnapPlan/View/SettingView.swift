@@ -41,7 +41,7 @@ struct SettingView: View {
                         }) {
                             HStack {
                                 Text("2일")
-                                    .foregroundStyle(Color.primary)
+                                    .foregroundStyle(.gray)
                                 Spacer()
                                 if days == "2" {
                                     Image(systemName: "checkmark")
@@ -55,7 +55,7 @@ struct SettingView: View {
                         }) {
                             HStack {
                                 Text("목록")
-                                    .foregroundStyle(Color.primary)
+                                    .foregroundStyle(.gray)
                                 Spacer()
                                 if days == "list" {
                                     Image(systemName: "checkmark")
@@ -63,7 +63,6 @@ struct SettingView: View {
                             }
                         }
                         .disabled(true)
-                        .foregroundStyle(.gray)
                     }
                     .listRowBackground(Color.timeLine)
                     
