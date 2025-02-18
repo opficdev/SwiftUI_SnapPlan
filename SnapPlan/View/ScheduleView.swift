@@ -97,18 +97,28 @@ struct ScheduleView: View {
                             }
                         }
                         else {
-                            if schedule != nil {
+                            if var schedule = schedule {
                                 Menu(content: {
                                     Button(action: {
                                         titleFocus = false
                                         descriptionFocus = false
                                         addSchedule = false
-                                        schedule = nil
+                                        self.schedule = nil
                                     }) {
                                         Label("취소", systemImage: "xmark")
                                     }
                                     Button(action: {
-                                        
+                                        let copy = ScheduleData(
+                                            title: schedule.title,
+                                            timeLine: (schedule.timeLine.0.addingTimeInterval(3600), schedule.timeLine.1.addingTimeInterval(3600)),
+                                            location: schedule.location,
+                                            description: schedule.description,
+                                            color: schedule.color
+                                        )
+                                        Task {
+                                            try await firebaseVM.addScheduleData(schedule: copy)
+                                            await firebaseVM.loadScheduleData(date: startDate)
+                                        }
                                     }) {
                                         Label("복제", systemImage: "doc.on.doc")
                                     }
