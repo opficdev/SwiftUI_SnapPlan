@@ -83,6 +83,9 @@ final class FirebaseViewModel: ObservableObject {
                     self.schedules[dateString] = arr
                 }
             }
+            else {
+                self.schedules.removeValue(forKey: dateString)
+            }
         } catch {
             print("Schedule Load Error: \(error.localizedDescription)")
         }
