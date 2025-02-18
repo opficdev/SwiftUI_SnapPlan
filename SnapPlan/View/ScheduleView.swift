@@ -132,6 +132,7 @@ struct ScheduleView: View {
                                     Image(systemName: "ellipsis")
                                         .font(.system(size: 20))
                                         .foregroundStyle(Color.gray)
+                                        .padding()
                                 }
                             }
                             Button(action: {
@@ -383,26 +384,26 @@ struct ScheduleView: View {
                     ScheduleCycleView(schedule: $schedule)
                         .environmentObject(plannerVM)
                 }
-                .alert(isPresented: $tapDeleteSchedule) {
-                    Alert(
-                        title: Text("스케줄 삭제"),
-                        message: Text("정말 삭제하시겠습니까?"),
-                        primaryButton: .destructive(Text("삭제"), action: {
-                            Task {
-                                do {
-                                    try await firebaseVM.deleteScheduleData(schedule: schedule!)
-                                    await firebaseVM.loadScheduleData(date: startDate)
-                                } catch {
-                                    print("스케줄 삭제 실패: \(error.localizedDescription)")
-                                }
-                                addSchedule = false
-                                titleFocus = false
-                                descriptionFocus = false
+                .confirmationDialog("스케줄을 삭제하시겠습니까?", isPresented: $tapDeleteSchedule, titleVisibility: .visible) {
+                    Button(role: .destructive, action: {
+                        addSchedule = false
+                        titleFocus = false
+                        descriptionFocus = false
+                        Task {
+                            do {
+                                try await firebaseVM.deleteScheduleData(schedule: schedule!)
+                                await firebaseVM.loadScheduleData(date: startDate)
                                 schedule = nil
                             }
-                        }),
-                        secondaryButton: .cancel()
-                    )
+                        }
+                    }) {
+                        Text("삭제")
+                    }
+                    Button(role: .cancel, action: {
+                        
+                    }) {
+                        Text("취소")
+                    }
                 }
             }
         }
