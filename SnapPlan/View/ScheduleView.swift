@@ -99,25 +99,30 @@ struct ScheduleView: View {
                         else {
                             if schedule != nil {
                                 Menu(content: {
+                                    Button(action: {
+                                        
+                                    }) {
+                                        Label("취소", systemImage: "xmark")
+                                    }
+                                    
+                                    Button(action: {
+                                        
+                                    }) {
+                                        Label("복제", systemImage: "doc.on.doc")
+                                    }
                                     Button(role: .destructive, action: {
                                         
                                     }) {
                                         Label("삭제", systemImage: "trash")
                                     }
-                                    Button(action: {
-                                        
-                                    }) {
-                                        Label("복사", systemImage: "doc.on.doc")
-                                    }
-
                                 }) {
                                     Image(systemName: "ellipsis")
+                                        .font(.system(size: 20))
                                         .foregroundStyle(Color.gray)
-                                        .font(.system(size: 25))
                                 }
                             }
                             Button(action: {
-                                if var schedule = schedule, !schedule.title.isEmpty {    //  TimeLineView에서 schedule이 넘어왔을 때 조건을 추가해서 이게 add인지 modify인지 구분해야함
+                                if var schedule = schedule, !schedule.title.isEmpty {
                                     Task {
                                         do {
                                             schedule.title = title
@@ -404,7 +409,15 @@ struct ScheduleView: View {
 
 #Preview {
     ScheduleView(
-        schedule: .constant(nil)
+        schedule: .constant(
+            ScheduleData(
+                title: "Test Title",
+                timeLine: (Date(), Date().addingTimeInterval(1800)),
+                location: "Test Location",
+                description: "Test Description",
+                color: 0
+            )
+        )
     )
     .environmentObject(PlannerViewModel())
     .environmentObject(FirebaseViewModel())
