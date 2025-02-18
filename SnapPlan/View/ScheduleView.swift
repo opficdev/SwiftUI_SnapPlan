@@ -100,11 +100,13 @@ struct ScheduleView: View {
                             if schedule != nil {
                                 Menu(content: {
                                     Button(action: {
-                                        
+                                        titleFocus = false
+                                        descriptionFocus = false
+                                        addSchedule = false
+                                        schedule = nil
                                     }) {
                                         Label("취소", systemImage: "xmark")
                                     }
-                                    
                                     Button(action: {
                                         
                                     }) {
