@@ -39,6 +39,7 @@ struct ScheduleView: View {
     @State private var tapLocation = false  //  위치 탭 여부
     @State private var descriptionFocus = false   //  설명 탭 여부
     @State private var tapColor = false  //  색상 탭 여부
+    @State private var tapDeleteSchedule = false   //  스케줄 삭제 탭 여부
     @State private var sheetMinHeight = CGFloat.zero //    sheet 최소 높이
     
     var body: some View {
@@ -97,7 +98,7 @@ struct ScheduleView: View {
                             }
                         }
                         else {
-                            if var schedule = schedule {
+                            if let schedule = schedule {
                                 Menu(content: {
                                     Button(action: {
                                         titleFocus = false
@@ -123,7 +124,7 @@ struct ScheduleView: View {
                                         Label("복제", systemImage: "doc.on.doc")
                                     }
                                     Button(role: .destructive, action: {
-                                        
+                                        tapDeleteSchedule = true
                                     }) {
                                         Label("삭제", systemImage: "trash")
                                     }
@@ -381,6 +382,27 @@ struct ScheduleView: View {
                 .sheet(isPresented: $tapRepeat) {
                     ScheduleCycleView(schedule: $schedule)
                         .environmentObject(plannerVM)
+                }
+                .alert(isPresented: $tapDeleteSchedule) {
+                    Alert(
+                        title: Text("스케줄 삭제"),
+                        message: Text("정말 삭제하시겠습니까?"),
+                        primaryButton: .destructive(Text("삭제"), action: {
+                            Task {
+                                do {
+                                    try await firebaseVM.deleteScheduleData(schedule: schedule!)
+                                    await firebaseVM.loadScheduleData(date: startDate)
+                                } catch {
+                                    print("스케줄 삭제 실패: \(error.localizedDescription)")
+                                }
+                                addSchedule = false
+                                titleFocus = false
+                                descriptionFocus = false
+                                schedule = nil
+                            }
+                        }),
+                        secondaryButton: .cancel()
+                    )
                 }
             }
         }
