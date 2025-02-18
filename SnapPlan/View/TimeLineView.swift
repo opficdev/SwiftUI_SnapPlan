@@ -205,6 +205,7 @@ struct TimeLineView: View {
                                                 )
                                             }
                                             .tag(idx)
+                                     
                                         }
                                         .frame(width: screenWidth - timeZoneSize.width)
                                         .background(
