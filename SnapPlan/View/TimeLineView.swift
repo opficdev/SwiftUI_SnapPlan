@@ -147,9 +147,9 @@ struct TimeLineView: View {
                                                             }
                                                         }
                                                         
+                                                        
                                                         let dateString = DateFormatter.yyyyMMdd.string(from: date)
-                                                        //                                                //  스케줄 목록을 표시하는 ScheduleBox
-                                                        if let _ = firebaseVM.schedules[dateString] {
+                                                        if let _ = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
                                                             ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
                                                                 if schedule?.id != scheduleData.id {
                                                                     let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
