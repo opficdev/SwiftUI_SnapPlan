@@ -95,20 +95,20 @@ struct ScheduleBox: View {
                             .offset(x: proxy.size.width * 0.4, y: -2 + height / 2)
                             .onAppear {
                                 if let schedule = schedule {
-                                    lastDate = schedule.timeLine.1
+                                    lastDate = schedule.timeLine.0
                                 }
                             }
                             .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
                                 DragGesture()
                                     .onChanged { offset in
-                                        withAnimation(.easeInOut(duration: 0.05)) { //  과도한 AnimatablePair 변경 방지
+                                        withAnimation(.easeInOut(duration: 0.1)) { //  과도한 AnimatablePair 변경 방지
                                             height = max(CGFloat(Int(offset.translation.height)) * 2, 15)   //  소수점이 남아있으면 너무 과도한 변동값들이 나타남
-//                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: height)
+                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: height)
                                         }
                                     }
                                     .onEnded{ _ in
                                         if let schedule = schedule {
-                                            lastDate = schedule.timeLine.1
+                                            lastDate = schedule.timeLine.0
                                         }
                                     }
                             )
