@@ -74,9 +74,6 @@ struct SettingView: View {
                     }
                     .listRowBackground(Color.timeLine)
                     Section() {
-//                        NavigationLink(destination:) {
-//                            Text("피드백 보내기")
-//                        }
                         HStack {
                             Text("버전 정보")
                             Spacer()
@@ -145,6 +142,7 @@ struct SettingView: View {
             } message: {
                 Text("로그아웃하시겠습니까?")
             }
+            .navigationTitle("")
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("설정")
@@ -159,7 +157,7 @@ struct SettingView: View {
                     }
                 }
             }
-            .navigationTitle(Text(""))  //  < 모양 이미지 제거
+            .navigationTitle("")  //  < 모양 이미지 제거
 //            .toolbarBackground(Color.timeLine, for: .navigationBar)
 //            .toolbarBackground(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
