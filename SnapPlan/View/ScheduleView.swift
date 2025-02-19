@@ -432,7 +432,9 @@ struct ScheduleView: View {
             GeometryReader { proxy in
                 Color.clear.onChange(of: proxy.size.height) { height in
                     if selectedDetent != .large {
-                        uiVM.bottomPadding = height
+                        DispatchQueue.main.async {
+                            uiVM.bottomPadding = height
+                        }
                     }
                 }
             }
