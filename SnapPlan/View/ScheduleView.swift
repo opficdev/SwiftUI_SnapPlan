@@ -66,9 +66,6 @@ struct ScheduleView: View {
                             .font(.system(size: 30))
                     }
                 }
-                .onAppear {
-                    
-                }
             }
             else {
                 VStack {
@@ -410,26 +407,29 @@ struct ScheduleView: View {
         .padding()
         .presentationDetents(currentDetent, selection: $selectedDetent)
         .onChange(of: schedule) { value in
-            if schedule == nil {
-                currentDetent = currentDetent.union([.fraction(0.07)])
-                selectedDetent = .fraction(0.07)
-                DispatchQueue.main.async {
-                    currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
-                }
-            }
-            else {
+            if let schedule = schedule {
+                title = schedule.title
+                startDate = schedule.timeLine.0
+                endDate = schedule.timeLine.1
+                location = schedule.location
+                description = schedule.description
+                color = schedule.color
                 currentDetent = currentDetent.union([.large, .fraction(0.4)])
                 selectedDetent = .fraction(0.4)
                 DispatchQueue.main.async {
                     currentDetent = currentDetent.subtracting([.fraction(0.07)])
                 }
             }
+            else {
+                currentDetent = currentDetent.union([.fraction(0.07)])
+                selectedDetent = .fraction(0.07)
+                DispatchQueue.main.async {
+                    currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
+                }
+            }
         }
         .background(
             GeometryReader { proxy in
-                Color.clear.onAppear {
-                    uiVM.bottomPadding = proxy.size.height
-                }
                 Color.clear.onChange(of: proxy.size.height) { height in
                     if selectedDetent != .large {
                         uiVM.bottomPadding = height
