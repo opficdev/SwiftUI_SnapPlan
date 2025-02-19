@@ -62,160 +62,165 @@ struct TimeLineView: View {
                         ScrollViewReader { proxy in
                             ScrollView(showsIndicators: false) {
                                 HStack(spacing: 0) {
-                                    ZStack(alignment: .topTrailing) {
-                                        VStack(alignment: .trailing, spacing: gap) {
-                                            let hours = plannerVM.getHours(is12hoursFmt: firebaseVM.is12TimeFmt)
-                                            ForEach(Array(zip(hours.indices, hours)), id: \.1.id) { index, hour in
-                                                Text("\(hour.timePeriod) \(hour.time)")
-                                                    .font(.caption)
-                                                    .foregroundStyle(Color.gray)
-                                                    .opacity(
-                                                        plannerVM.isCollapsed(
-                                                            timeZoneHeight: timeZoneSize.height,
-                                                            gap: gap,
-                                                            index: index) ? 0 : 1
-                                                    )
-                                                    .padding(.trailing, 2)
-                                                    .frame(width: screenWidth / 7, alignment: .trailing)
-                                                    .background(
-                                                        GeometryReader { geometry in
-                                                            Color.clear.onAppear {
-                                                                if timeZoneSize == CGSizeZero {
-                                                                    timeZoneSize = geometry.size
+                                    VStack {
+                                        ZStack(alignment: .topTrailing) {
+                                            VStack(alignment: .trailing, spacing: gap) {
+                                                let hours = plannerVM.getHours(is12hoursFmt: firebaseVM.is12TimeFmt)
+                                                ForEach(Array(zip(hours.indices, hours)), id: \.1.id) { index, hour in
+                                                    Text("\(hour.timePeriod) \(hour.time)")
+                                                        .font(.caption)
+                                                        .foregroundStyle(Color.gray)
+                                                        .opacity(
+                                                            plannerVM.isCollapsed(
+                                                                timeZoneHeight: timeZoneSize.height,
+                                                                gap: gap,
+                                                                index: index) ? 0 : 1
+                                                        )
+                                                        .padding(.trailing, 2)
+                                                        .frame(width: screenWidth / 7, alignment: .trailing)
+                                                        .background(
+                                                            GeometryReader { geometry in
+                                                                Color.clear.onAppear {
+                                                                    if timeZoneSize == CGSizeZero {
+                                                                        timeZoneSize = geometry.size
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                    )
+                                                        )
+                                                }
                                             }
-                                        }
-                                        Text(
-                                            plannerVM.getDateString(
-                                                for: plannerVM.today,
-                                                components: [.hour, .minute],
-                                                is12hoursFmt: firebaseVM.is12TimeFmt
+                                            Text(
+                                                plannerVM.getDateString(
+                                                    for: plannerVM.today,
+                                                    components: [.hour, .minute],
+                                                    is12hoursFmt: firebaseVM.is12TimeFmt
+                                                )
                                             )
-                                        )
-                                        .font(.caption)
-                                        .padding(.trailing, 2)
-                                        .offset(y: plannerVM.getOffsetFromMiniute(
-                                            for: plannerVM.today,
-                                            timeZoneHeight: timeZoneSize.height,
-                                            gap: gap)
-                                        )
+                                            .font(.caption)
+                                            .padding(.trailing, 2)
+                                            .offset(y: plannerVM.getOffsetFromMiniute(
+                                                for: plannerVM.today,
+                                                timeZoneHeight: timeZoneSize.height,
+                                                gap: gap)
+                                            )
+                                        }
+                                        Rectangle()
+                                            .fill(Color.clear)
+                                            .frame(width: timeZoneSize.width, height: uiVM.bottomPadding)
                                     }
                                     
                                     //  좌우로 드래그 가능한 TimeLine
                                     TabView(selection: $selection) {
                                         ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
-                                            ZStack(alignment: .top) {
-                                                VStack(spacing: 0) {
-                                                    ForEach(0...24, id: \.self) { index in
-                                                        VStack(spacing: 0) {
-                                                            Rectangle()
-                                                                .fill(Color.timeLine)
-                                                                .frame(maxHeight: .infinity)
-                                                                .onTapGesture {
-                                                                    if schedule == nil && 0 < index {
-                                                                        let endDate = plannerVM.getDateFromIndex(index: index)
-                                                                        let beginDate = endDate.addingTimeInterval(-1800)
-                                                                        schedule = ScheduleData(timeLine: (beginDate, endDate), isChanging: true)
-                                                                    }
-                                                                }
-                                                            Divider()
-                                                            Rectangle()
-                                                                .fill(Color.timeLine)
-                                                                .frame(maxHeight: .infinity)
-                                                                .onTapGesture {
-                                                                    if schedule == nil && index < 24{
-                                                                        let beginDate = plannerVM.getDateFromIndex(index: index)
-                                                                        let endDate = beginDate.addingTimeInterval(1800)
-                                                                        schedule = ScheduleData(timeLine: (beginDate, endDate), isChanging: true)
-                                                                    }
-                                                                }
-                                                        }
-                                                        .frame(height: timeZoneSize.height + gap)
-                                                    }
-                                                }
-                                                
-                                                
-                                                let dateString = DateFormatter.yyyyMMdd.string(from: date)
-//                                                //  스케줄 목록을 표시하는 ScheduleBox
-                                                if let _ = firebaseVM.schedules[dateString] {
-                                                    ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
-                                                        if schedule?.id != scheduleData.id {
-                                                            let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
-                                                                from: scheduleData,
-                                                                timeZoneHeight: timeZoneSize.height,
-                                                                gap: gap
-                                                            )
-                                                            ScheduleBox(
-                                                                gap: gap,
-                                                                timeZoneHeight: timeZoneSize.height,
-                                                                height: boxHeight,
-                                                                isChanging: .constant(false),
-                                                                schedule: .constant(scheduleData)
-                                                            )
-                                                            .offset(y: startOffset + timeZoneSize.height / 2)
-                                                            .onTapGesture {
-                                                                schedule = scheduleData
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                if schedule != nil {    //  현재 조작중인 스케줄
-                                                    if plannerVM.isSameDate(date1: schedule!.timeLine.0, date2: date, components: [.year, .month, .day]) {
-                                                        let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
-                                                            from: schedule!,
-                                                            timeZoneHeight: timeZoneSize.height,
-                                                            gap: gap
-                                                        )
-                                                        ScheduleBox(
-                                                            gap: gap,
-                                                            timeZoneHeight: timeZoneSize.height,
-                                                            height: boxHeight,
-                                                            isChanging: .constant(true),
-                                                            schedule: $schedule
-                                                        )
-                                                        .offset(y: startOffset + timeZoneSize.height / 2)
-                                                        .onTapGesture {
-                                                            schedule = nil
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                //  현 시간 표시하는 TimeBarx
-                                                TimeBar(
-                                                    height: timeZoneSize.height,
-                                                    showVerticalLine: plannerVM.isSameDate(
-                                                        date1: date,
-                                                        date2: plannerVM.today,
-                                                        components: [.year, .month, .day])
-                                                )
-                                                .padding(
-                                                    .leading, plannerVM.isSameDate(
-                                                        date1: date,
-                                                        date2: plannerVM.today,
-                                                        components: [.year, .month, .day]) ? 2 : 0
-                                                )
-                                                .offset(y: plannerVM.getOffsetFromMiniute(
-                                                    for: plannerVM.today,
-                                                    timeZoneHeight: timeZoneSize.height,
-                                                    gap: gap)
-                                                )
-                                            }
-                                            .tag(idx)
-                                     
-                                        }
-                                        .frame(width: screenWidth - timeZoneSize.width)
-                                        .background(
-                                            HStack {
+                                            HStack(spacing: 0) {
                                                 Rectangle()
                                                     .frame(width: 1)
-                                                    .foregroundStyle(Color.gray.opacity(0.5))
-                                                Spacer()
+                                                    .foregroundStyle(Color.gray.opacity(0.3))
+                                                VStack {
+                                                    ZStack(alignment: .top) {
+                                                        VStack(spacing: 0) {
+                                                            ForEach(0...24, id: \.self) { index in
+                                                                VStack(spacing: 0) {
+                                                                    Rectangle()
+                                                                        .fill(Color.timeLine)
+                                                                        .frame(maxHeight: .infinity)
+                                                                        .onTapGesture {
+                                                                            if schedule == nil && 0 < index {
+                                                                                let endDate = plannerVM.getDateFromIndex(index: index)
+                                                                                let beginDate = endDate.addingTimeInterval(-1800)
+                                                                                schedule = ScheduleData(timeLine: (beginDate, endDate), isChanging: true)
+                                                                            }
+                                                                        }
+                                                                    Divider()
+                                                                    Rectangle()
+                                                                        .fill(Color.timeLine)
+                                                                        .frame(maxHeight: .infinity)
+                                                                        .onTapGesture {
+                                                                            if schedule == nil && index < 24{
+                                                                                let beginDate = plannerVM.getDateFromIndex(index: index)
+                                                                                let endDate = beginDate.addingTimeInterval(1800)
+                                                                                schedule = ScheduleData(timeLine: (beginDate, endDate), isChanging: true)
+                                                                            }
+                                                                        }
+                                                                }
+                                                                .frame(height: timeZoneSize.height + gap)
+                                                            }
+                                                        }
+                                                        
+                                                        let dateString = DateFormatter.yyyyMMdd.string(from: date)
+                                                        //                                                //  스케줄 목록을 표시하는 ScheduleBox
+                                                        if let _ = firebaseVM.schedules[dateString] {
+                                                            ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
+                                                                if schedule?.id != scheduleData.id {
+                                                                    let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
+                                                                        from: scheduleData,
+                                                                        timeZoneHeight: timeZoneSize.height,
+                                                                        gap: gap
+                                                                    )
+                                                                    ScheduleBox(
+                                                                        gap: gap,
+                                                                        timeZoneHeight: timeZoneSize.height,
+                                                                        height: boxHeight,
+                                                                        isChanging: .constant(false),
+                                                                        schedule: .constant(scheduleData)
+                                                                    )
+                                                                    .offset(y: startOffset + timeZoneSize.height / 2)
+                                                                    .onTapGesture {
+                                                                        schedule = scheduleData
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                        if schedule != nil {    //  현재 조작중인 스케줄
+                                                            if plannerVM.isSameDate(date1: schedule!.timeLine.0, date2: date, components: [.year, .month, .day]) {
+                                                                let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
+                                                                    from: schedule!,
+                                                                    timeZoneHeight: timeZoneSize.height,
+                                                                    gap: gap
+                                                                )
+                                                                ScheduleBox(
+                                                                    gap: gap,
+                                                                    timeZoneHeight: timeZoneSize.height,
+                                                                    height: boxHeight,
+                                                                    isChanging: .constant(true),
+                                                                    schedule: $schedule
+                                                                )
+                                                                .offset(y: startOffset + timeZoneSize.height / 2)
+                                                                .onTapGesture {
+                                                                    schedule = nil
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                        //  현 시간 표시하는 TimeBarx
+                                                        TimeBar(
+                                                            height: timeZoneSize.height,
+                                                            showVerticalLine: plannerVM.isSameDate(
+                                                                date1: date,
+                                                                date2: plannerVM.today,
+                                                                components: [.year, .month, .day])
+                                                        )
+                                                        .padding(
+                                                            .leading, plannerVM.isSameDate(
+                                                                date1: date,
+                                                                date2: plannerVM.today,
+                                                                components: [.year, .month, .day]) ? 2 : 0
+                                                        )
+                                                        .offset(y: plannerVM.getOffsetFromMiniute(
+                                                            for: plannerVM.today,
+                                                            timeZoneHeight: timeZoneSize.height,
+                                                            gap: gap)
+                                                        )
+                                                    }
+                                                    Rectangle()
+                                                        .fill(Color.clear)
+                                                        .frame(width: screenWidth - timeZoneSize.width, height: uiVM.bottomPadding)
+                                                }
                                             }
-                                        )
+                                            .tag(idx)
+                                        }
+                                        .frame(width: screenWidth - timeZoneSize.width)
                                     }
                                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 //                                .simultaneousGesture(
@@ -230,11 +235,7 @@ struct TimeLineView: View {
                                 }
                             }
                         }
-                        Rectangle()
-                            .fill(Color.clear)
-                            .frame(width: screenWidth, height: uiVM.bottomPadding)
                     }
-                    
                     Rectangle()
                         .frame(width: 1)
                         .foregroundStyle(Color.gray)
