@@ -56,10 +56,8 @@ struct ScheduleBox: View {
                         }
                     }
                 }
-                .onChange(of: schedule) { schedule in
-                    if let schedule = schedule {
-                        colorIdx = schedule.color
-                    }
+                .onChange(of: schedule?.color) { color in
+                    colorIdx = color ?? 0
                 }
                 .onChange(of: isChanging) { value in
                     if !value {
