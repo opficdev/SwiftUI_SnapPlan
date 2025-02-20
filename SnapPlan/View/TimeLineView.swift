@@ -161,7 +161,7 @@ struct TimeLineView: View {
                                                                         gap: gap,
                                                                         timeZoneHeight: timeZoneSize.height,
                                                                         height: boxHeight,
-                                                                        isChanging: .constant(false),
+                                                                        isChanging: false,
                                                                         schedule: .constant(scheduleData)
                                                                     )
                                                                     .offset(y: startOffset + timeZoneSize.height / 2)
@@ -183,7 +183,7 @@ struct TimeLineView: View {
                                                                     gap: gap,
                                                                     timeZoneHeight: timeZoneSize.height,
                                                                     height: boxHeight,
-                                                                    isChanging: .constant(true),
+                                                                    isChanging: true,
                                                                     schedule: $schedule
                                                                 )
                                                                 .offset(y: startOffset + timeZoneSize.height / 2)

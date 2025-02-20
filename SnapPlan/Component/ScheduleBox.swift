@@ -13,7 +13,7 @@ struct ScheduleBox: View {
         Color.macOrange, Color.macYellow, Color.macGreen
     ]
     @Binding var schedule: ScheduleData?
-    @Binding var isChanging: Bool
+    @State private var isChanging: Bool
     @State private var height: CGFloat
     @State private var isVisible = true
     @State private var lastDate = Date()
@@ -21,8 +21,8 @@ struct ScheduleBox: View {
     @State private var timeZoneHeight: CGFloat
     @State private var colorIdx: Int
     
-    init(gap: CGFloat, timeZoneHeight: CGFloat, height: CGFloat,  isChanging: Binding<Bool>, schedule: Binding<ScheduleData?> = .constant(nil)) {
-        self._isChanging = isChanging
+    init(gap: CGFloat, timeZoneHeight: CGFloat, height: CGFloat,  isChanging: Bool, schedule: Binding<ScheduleData?>) {
+        self._isChanging = State(initialValue: isChanging)
         self._schedule = schedule
         self._height = State(initialValue: height)
         if let schedule = schedule.wrappedValue {
@@ -80,7 +80,7 @@ struct ScheduleBox: View {
                                 Circle().fill(Color.timeLine)
                                     .frame(width: 12, height: 12)
                             )
-                            .offset(x: -proxy.size.width * 0.4, y: 2 - height / 2)
+                            .offset(x: -proxy.size.width * 0.4, y: 2 - height)
                         
                         Circle()
                             .stroke(colorArr[colorIdx], lineWidth: 2)
@@ -90,7 +90,7 @@ struct ScheduleBox: View {
                                     .frame(width: 12, height: 12)
                             )
                             .padding()
-                            .offset(x: proxy.size.width * 0.4, y: -2 + height / 2)
+                            .offset(x: proxy.size.width * 0.4, y: -2 + height)
                             .onAppear {
                                 if let schedule = schedule {
                                     lastDate = schedule.timeLine.0
@@ -100,13 +100,16 @@ struct ScheduleBox: View {
                                 DragGesture()
                                     .onChanged { offset in
                                         withAnimation(.easeInOut(duration: 0.1)) { //  과도한 AnimatablePair 변경 방지
-                                            height = max(CGFloat(Int(offset.translation.height)) * 2, 15)   //  소수점이 남아있으면 너무 과도한 변동값들이 나타남
-                                            schedule?.timeLine.1 = getDateFromOffset(date: lastDate, offset: height)
+                                            height = max(CGFloat(Int(offset.translation.height)), 15)   //  소수점이 남아있으면 너무 과도한 변동값들이 나타남
+//                                            let newDate = getDateFromOffset(date: lastDate, offset: height)
+//                                            if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
+//                                                schedule?.timeLine.1 = newDate
+//                                            }
                                         }
                                     }
                                     .onEnded{ _ in
                                         if let schedule = schedule {
-                                            lastDate = schedule.timeLine.0
+//                                            lastDate = schedule.timeLine.0
                                         }
                                     }
                             )
@@ -130,7 +133,7 @@ struct ScheduleBox: View {
         gap: 10,
         timeZoneHeight: 20,
         height: 100,
-        isChanging: .constant(true),
+        isChanging: true,
         schedule: .constant(nil)
     )
 }
