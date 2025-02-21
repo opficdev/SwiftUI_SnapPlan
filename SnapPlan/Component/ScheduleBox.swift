@@ -44,7 +44,7 @@ struct ScheduleBox: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(colorArr[colorIdx].opacity(!isVisible ? 0.5 : 0.8))
                 )
-                .frame(width: proxy.size.width - 4, height: height - 2) //  4: stroke 두께 * 2
+                .frame(width: proxy.size.width - 4, height: max(height - 2, 4)) //  4: stroke 두께 * 2
                 .onAppear {
                     Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                         if isChanging {
