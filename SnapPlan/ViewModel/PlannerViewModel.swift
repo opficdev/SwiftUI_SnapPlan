@@ -61,14 +61,6 @@ final class PlannerViewModel: ObservableObject {
         return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour, minute: minute))!
     }
     
-    /// 해당 스케줄의 시작 offset과 duration을 반환
-    func getScheduleBoxOffset(from data: ScheduleData, timeZoneHeight: CGFloat, gap: CGFloat) -> (CGFloat, CGFloat) {
-        let startOffset = getOffsetFromMiniute(for: data.timeLine.0, timeZoneHeight: timeZoneHeight, gap: gap)
-        let endOffset = getOffsetFromMiniute(for: data.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap)
-        
-        return (startOffset, endOffset - startOffset)
-    }
-    
     func isCollapsed(timeZoneHeight: CGFloat, gap: CGFloat, index: Int) -> Bool {
         let height = CGFloat(index) * (timeZoneHeight + gap)
         let offset = getOffsetFromMiniute(for: today, timeZoneHeight: timeZoneHeight, gap: gap)
