@@ -14,25 +14,32 @@ struct ScheduleBox: View {
     ]
     @Binding var schedule: ScheduleData?
     @State private var isChanging: Bool
-    @State private var height: CGFloat
-    @State private var lastHeight: CGFloat
+    @State private var startOffset = CGFloat.zero
+    @State private var height = CGFloat.zero
+    @State private var lastHeight = CGFloat.zero
     @State private var isVisible = true
     @State private var gap: CGFloat
     @State private var timeZoneHeight: CGFloat
     @State private var colorIdx: Int
     
-    init(gap: CGFloat, timeZoneHeight: CGFloat, height: CGFloat, isChanging: Bool, schedule: Binding<ScheduleData?>) {
+    init(gap: CGFloat, timeZoneHeight: CGFloat, isChanging: Bool, schedule: Binding<ScheduleData?>) {
         self._isChanging = State(initialValue: isChanging)
         self._schedule = schedule
-        self._height = State(initialValue: height)
-        self._lastHeight = State(initialValue: height)
         self._gap = State(initialValue: gap)
         self._timeZoneHeight = State(initialValue: timeZoneHeight)
         if let schedule = schedule.wrappedValue {
-            colorIdx = schedule.color
+            self.colorIdx = schedule.color
+            let (startOffset, boxHeight) = getScheduleBoxOffset(
+                from: schedule,
+                timeZoneHeight: timeZoneHeight,
+                gap: gap
+            )
+            self._startOffset = State(initialValue: startOffset)
+            self._height = State(initialValue: boxHeight)
+            self._lastHeight = State(initialValue: boxHeight)
         }
         else {
-            colorIdx = 0
+            self.colorIdx = 0
         }
     }
     
@@ -127,7 +134,6 @@ struct ScheduleBox: View {
     ScheduleBox(
         gap: 10,
         timeZoneHeight: 20,
-        height: 100,
         isChanging: true,
         schedule: .constant(nil)
     )
