@@ -112,7 +112,7 @@ struct ScheduleBox: View {
                 }
                 //  x: Circle() stroke가 2라서
                 //  y: 5: Circle()의 offset, 4: Circle()의 크기 - 테두리 두께
-                .offset(x: 2, y: 5 + 4)
+                .offset(x: 2, y: startOffset + timeZoneHeight / 2 + 5 + 4)
         }
     }
     
