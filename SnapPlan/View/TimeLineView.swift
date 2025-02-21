@@ -152,19 +152,12 @@ struct TimeLineView: View {
                                                         if let _ = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
                                                             ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
                                                                 if schedule?.id != scheduleData.id {
-                                                                    let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
-                                                                        from: scheduleData,
-                                                                        timeZoneHeight: timeZoneSize.height,
-                                                                        gap: gap
-                                                                    )
                                                                     ScheduleBox(
                                                                         gap: gap,
                                                                         timeZoneHeight: timeZoneSize.height,
-                                                                        height: boxHeight,
                                                                         isChanging: false,
                                                                         schedule: .constant(scheduleData)
                                                                     )
-                                                                    .offset(y: startOffset + timeZoneSize.height / 2)
                                                                     .onTapGesture {
                                                                         schedule = scheduleData
                                                                     }
@@ -174,19 +167,12 @@ struct TimeLineView: View {
                                                         
                                                         if schedule != nil {    //  현재 조작중인 스케줄
                                                             if plannerVM.isSameDate(date1: schedule!.timeLine.0, date2: date, components: [.year, .month, .day]) {
-                                                                let (startOffset, boxHeight) = plannerVM.getScheduleBoxOffset(
-                                                                    from: schedule!,
-                                                                    timeZoneHeight: timeZoneSize.height,
-                                                                    gap: gap
-                                                                )
                                                                 ScheduleBox(
                                                                     gap: gap,
                                                                     timeZoneHeight: timeZoneSize.height,
-                                                                    height: boxHeight,
                                                                     isChanging: true,
                                                                     schedule: $schedule
                                                                 )
-                                                                .offset(y: startOffset + timeZoneSize.height / 2)
                                                                 .onTapGesture {
                                                                     schedule = nil
                                                                 }
