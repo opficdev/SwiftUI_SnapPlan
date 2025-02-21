@@ -96,8 +96,10 @@ struct ScheduleBox: View {
                                             if let schedule = schedule {
                                                 height = max(lastHeight + offset.translation.height * 2, 4)
                                                 let newDate = getDateFromOffset(date: schedule.timeLine.0, offset: height)
-                                                if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
-                                                    self.schedule?.timeLine.1 = newDate
+                                                DispatchQueue.main.async {
+                                                    if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
+                                                        self.schedule?.timeLine.1 = newDate
+                                                    }
                                                 }
                                             }
                                         }
