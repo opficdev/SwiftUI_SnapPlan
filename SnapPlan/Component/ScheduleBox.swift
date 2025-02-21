@@ -15,20 +15,17 @@ struct ScheduleBox: View {
     @Binding var schedule: ScheduleData?
     @State private var isChanging: Bool
     @State private var height: CGFloat
+    @State private var lastHeight: CGFloat
     @State private var isVisible = true
-    @State private var lastDate = Date()
-    @State private var lastHeight = CGFloat.zero
     @State private var gap: CGFloat
     @State private var timeZoneHeight: CGFloat
     @State private var colorIdx: Int
     
-    init(gap: CGFloat, timeZoneHeight: CGFloat, height: CGFloat,  isChanging: Bool, schedule: Binding<ScheduleData?>) {
+    init(gap: CGFloat, timeZoneHeight: CGFloat, height: CGFloat, isChanging: Bool, schedule: Binding<ScheduleData?>) {
         self._isChanging = State(initialValue: isChanging)
         self._schedule = schedule
         self._height = State(initialValue: height)
-        if let schedule = schedule.wrappedValue {
-            lastDate = schedule.timeLine.1
-        }
+        self._lastHeight = State(initialValue: height)
         self._gap = State(initialValue: gap)
         self._timeZoneHeight = State(initialValue: timeZoneHeight)
         if let schedule = schedule.wrappedValue {
@@ -92,28 +89,21 @@ struct ScheduleBox: View {
                             )
                             .padding()
                             .offset(x: proxy.size.width * 0.4, y: -2 + height / 2)
-                            .onAppear {
-                                if let schedule = schedule {
-                                    lastDate = schedule.timeLine.0
-                                }
-                            }
                             .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
                                 DragGesture()
                                     .onChanged { offset in
                                         withAnimation(.linear(duration: 0.1)) { //  과도한 AnimatablePair 변경 방지
-                                            height = max(lastHeight + CGFloat(Int(offset.translation.height)) * 2, 4)  //  소수점이 남아있으면 너무 과도한 변동값들이 나타남
-//                                            let newDate = getDateFromOffset(date: lastDate, offset: height)
-//                                            if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
-//                                                schedule?.timeLine.1 = newDate
-//                                            }
+                                            if let schedule = schedule {
+                                                height = max(lastHeight + offset.translation.height * 2, 4)
+                                                let newDate = getDateFromOffset(date: schedule.timeLine.0, offset: height)
+                                                if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
+                                                    self.schedule?.timeLine.1 = newDate
+                                                }
+                                            }
                                         }
                                     }
                                     .onEnded{ offset in
-                                        lastHeight += CGFloat(Int(offset.translation.height)) * 2
-//                                        lastHeight = max(lastHeight, 4)
-                                        if let schedule = schedule {
-//                                            lastDate = schedule.timeLine.0
-                                        }
+                                        lastHeight = height
                                     }
                             )
                     }
