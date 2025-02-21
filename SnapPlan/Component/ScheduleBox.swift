@@ -130,13 +130,13 @@ struct ScheduleBox: View {
     }
     
     func getScheduleBoxOffset(from data: ScheduleData, timeZoneHeight: CGFloat, gap: CGFloat) -> (CGFloat, CGFloat) {
-        let startOffset = getOffsetFromMiniute(for: data.timeLine.0, timeZoneHeight: timeZoneHeight, gap: gap)
-        let endOffset = getOffsetFromMiniute(for: data.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap)
+        let startOffset = getOffsetFromDate(for: data.timeLine.0, timeZoneHeight: timeZoneHeight, gap: gap)
+        let endOffset = getOffsetFromDate(for: data.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap)
         
         return (startOffset, endOffset - startOffset)
     }
     
-    func getOffsetFromMiniute(for date: Date, timeZoneHeight: CGFloat, gap: CGFloat) -> CGFloat {
+    func getOffsetFromDate(for date: Date, timeZoneHeight: CGFloat, gap: CGFloat) -> CGFloat {
         let startOfDay = Calendar.current.startOfDay(for: date)
         return CGFloat(Calendar.current.dateComponents([.minute], from: startOfDay, to: date).minute ?? 0) * (timeZoneHeight + gap) * 24 / 1440
     }

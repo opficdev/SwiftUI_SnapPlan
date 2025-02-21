@@ -63,7 +63,7 @@ final class PlannerViewModel: ObservableObject {
     
     func isCollapsed(timeZoneHeight: CGFloat, gap: CGFloat, index: Int) -> Bool {
         let height = CGFloat(index) * (timeZoneHeight + gap)
-        let offset = getOffsetFromMiniute(for: today, timeZoneHeight: timeZoneHeight, gap: gap)
+        let offset = getOffsetFromDate(for: today, timeZoneHeight: timeZoneHeight, gap: gap)
         
         return height - timeZoneHeight <= offset && offset <= height + timeZoneHeight
     }
@@ -100,7 +100,7 @@ final class PlannerViewModel: ObservableObject {
         return dateString.trimmingCharacters(in: .whitespaces)
     }
     
-    func getOffsetFromMiniute(for date: Date, timeZoneHeight: CGFloat, gap: CGFloat) -> CGFloat {
+    func getOffsetFromDate(for date: Date, timeZoneHeight: CGFloat, gap: CGFloat) -> CGFloat {
         let startOfDay = calendar.startOfDay(for: date)
         return CGFloat(calendar.dateComponents([.minute], from: startOfDay, to: date).minute ?? 0) * (timeZoneHeight + gap) * 24 / 1440
     }

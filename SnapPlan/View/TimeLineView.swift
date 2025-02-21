@@ -98,7 +98,7 @@ struct TimeLineView: View {
                                             )
                                             .font(.caption)
                                             .padding(.trailing, 2)
-                                            .offset(y: plannerVM.getOffsetFromMiniute(
+                                            .offset(y: plannerVM.getOffsetFromDate(
                                                 for: plannerVM.today,
                                                 timeZoneHeight: timeZoneSize.height,
                                                 gap: gap)
@@ -193,7 +193,7 @@ struct TimeLineView: View {
                                                                 date2: plannerVM.today,
                                                                 components: [.year, .month, .day]) ? 2 : 0
                                                         )
-                                                        .offset(y: plannerVM.getOffsetFromMiniute(
+                                                        .offset(y: plannerVM.getOffsetFromDate(
                                                             for: plannerVM.today,
                                                             timeZoneHeight: timeZoneSize.height,
                                                             gap: gap)
