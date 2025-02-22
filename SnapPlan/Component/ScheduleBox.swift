@@ -15,12 +15,13 @@ struct ScheduleBox: View {
     @Binding var schedule: ScheduleData?
     @State private var isChanging: Bool
     @State private var startOffset = CGFloat.zero
-    @State private var height = CGFloat.zero
+    @State private var boxHeight = CGFloat.zero
     @State private var lastHeight = CGFloat.zero
     @State private var isVisible = true
     @State private var gap: CGFloat
     @State private var timeZoneHeight: CGFloat
     @State private var colorIdx: Int
+    @State private var didDateChangedByDrag = false //  드래그로 일정 시간 변경 시 true
     
     init(gap: CGFloat, timeZoneHeight: CGFloat, isChanging: Bool, schedule: Binding<ScheduleData?>) {
         self._isChanging = State(initialValue: isChanging)
@@ -35,7 +36,7 @@ struct ScheduleBox: View {
                 gap: gap
             )
             self._startOffset = State(initialValue: startOffset)
-            self._height = State(initialValue: boxHeight)
+            self._boxHeight = State(initialValue: boxHeight)
             self._lastHeight = State(initialValue: boxHeight)
         }
         else {
@@ -51,7 +52,7 @@ struct ScheduleBox: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(colorArr[colorIdx].opacity(!isVisible ? 0.5 : 0.8))
                 )
-                .frame(width: proxy.size.width - 4, height: max(height - 2, 4)) //  4: stroke 두께 * 2
+                .frame(width: proxy.size.width - 4, height: max(boxHeight - 2, 4)) //  4: stroke 두께 * 2
                 .onAppear {
                     Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                         if isChanging {
@@ -64,6 +65,17 @@ struct ScheduleBox: View {
                 .onChange(of: schedule?.color) { color in
                     colorIdx = color ?? 0
                 }
+                .onChange(of: schedule?.timeLine.0) { date in
+                    
+                }
+                .onChange(of: schedule?.timeLine.1) { date in
+                    if let date = date {
+                        if !didDateChangedByDrag {  //  드래그 시 알아서 시간이 변경되므로 조건 추가
+                            boxHeight = getOffsetFromDate(for: date, timeZoneHeight: timeZoneHeight, gap: gap) - startOffset
+                            lastHeight = boxHeight
+                        }
+                    }
+                }
                 .onChange(of: isChanging) { value in
                     if !value {
                         isVisible = true
@@ -75,7 +87,7 @@ struct ScheduleBox: View {
                             .foregroundStyle(Color.gray)
                             .font(.caption)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .offset(x: 4, y: 8 - height / 2)
+                            .offset(x: 4, y: 8 - boxHeight / 2)
                     }
                     if isChanging {
                         Circle()
@@ -85,7 +97,7 @@ struct ScheduleBox: View {
                                 Circle().fill(Color.timeLine)
                                     .frame(width: 12, height: 12)
                             )
-                            .offset(x: -proxy.size.width * 0.4, y: 2 - height / 2)
+                            .offset(x: -proxy.size.width * 0.4, y: 2 - boxHeight / 2)
                         
                         Circle()
                             .stroke(colorArr[colorIdx], lineWidth: 2)
@@ -95,14 +107,15 @@ struct ScheduleBox: View {
                                     .frame(width: 12, height: 12)
                             )
                             .padding()
-                            .offset(x: proxy.size.width * 0.4, y: -2 + height / 2)
+                            .offset(x: proxy.size.width * 0.4, y: -2 + boxHeight / 2)
                             .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
                                 DragGesture()
                                     .onChanged { offset in
+                                        didDateChangedByDrag = true
                                         withAnimation(.linear(duration: 0.1)) { //  과도한 AnimatablePair 변경 방지
                                             if let schedule = schedule {
-                                                height = max(lastHeight + offset.translation.height * 2, 4)
-                                                let newDate = getDateFromOffset(date: schedule.timeLine.0, offset: height)
+                                                boxHeight = max(lastHeight + offset.translation.height * 2, 4)
+                                                let newDate = getDateFromOffset(date: schedule.timeLine.0, offset: boxHeight)
                                                 DispatchQueue.main.async {
                                                     if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
                                                         self.schedule?.timeLine.1 = newDate
@@ -112,7 +125,8 @@ struct ScheduleBox: View {
                                         }
                                     }
                                     .onEnded{ offset in
-                                        lastHeight = height
+                                        lastHeight = boxHeight
+                                        didDateChangedByDrag = false
                                     }
                             )
                     }
