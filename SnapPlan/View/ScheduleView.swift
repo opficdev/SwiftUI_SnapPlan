@@ -333,13 +333,17 @@ struct ScheduleView: View {
                         color = 0
                     }
                 }
-                .onChange(of: startDate) { _ in
+                .onChange(of: startDate) { date in
+                    schedule?.timeLine.0 = date
                     endDate = plannerVM.getMergedDate(
                         for: startDate,
                         with: endDate,
                         forComponents: [.year, .month, .day],
                         withComponents: [.hour, .minute]
                     )
+                }
+                .onChange(of: endDate) { date in
+                    schedule?.timeLine.1 = date
                 }
                 .onTapGesture {
                     if titleFocus {
