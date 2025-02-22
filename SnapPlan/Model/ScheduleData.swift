@@ -37,23 +37,6 @@ struct ScheduleData: Identifiable {
         self.color = color
     }
     
-    mutating func setTitle(newTitle: String) {
-        self.title = newTitle
-    }
-    
-    mutating func setTimeLine(newTimeLine: (Date?, Date?)) {
-        if let startTime = newTimeLine.0 {
-            self.timeLine.0 = startTime
-        }
-        if let endTime = newTimeLine.1 {
-            self.timeLine.1 = endTime
-        }
-    }
-    
-    mutating func setCycleOption(newCycleOption: CycleOption) {
-        self.cycleOption = newCycleOption
-    }
-    
     enum CycleOption: String {
         case none = "none"
         case everyDay = "everyDay"
