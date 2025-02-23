@@ -101,6 +101,7 @@ struct ScheduleView: View {
                                 Menu(content: {
                                     Button(action: {
                                         titleFocus = false
+                                        locationFocus = false
                                         descriptionFocus = false
                                         addSchedule = false
                                         self.schedule = nil
@@ -169,6 +170,7 @@ struct ScheduleView: View {
                                 }
                                 addSchedule = false
                                 titleFocus = false
+                                locationFocus = false
                                 descriptionFocus = false
                                 schedule = nil
                                 
@@ -338,6 +340,7 @@ struct ScheduleView: View {
                         titleFocus = false
                         currentDetent = [.large, .fraction(0.4)]
                     }
+                    locationFocus = false
                     descriptionFocus = false
                 }
                 .sheet(isPresented: $tapstartDate) {
@@ -377,6 +380,7 @@ struct ScheduleView: View {
                     Button(role: .destructive, action: {
                         addSchedule = false
                         titleFocus = false
+                        locationFocus = false
                         descriptionFocus = false
                         Task {
                             do {
