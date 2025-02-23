@@ -92,7 +92,7 @@ struct ScheduleBox: View {
                     }
                 }
                 .overlay {
-                    if let title = schedule?.title {
+                    if let title = schedule?.title, boxHeight > UIFont.preferredFont(forTextStyle: .caption1).pointSize + 4 {
                         Text(title)
                             .foregroundStyle(Color.gray)
                             .font(.caption)
