@@ -202,21 +202,23 @@ struct ScheduleView: View {
                                 VStack(alignment: .leading, spacing: 10) {
                                     HStack(spacing: 0) {
                                         Text(plannerVM.getDateString(for: startDate, components: [.hour, .minute]))
-                                            .foregroundStyle(tapstartDate ? Color.blue : Color.primary)
+                                            .foregroundStyle(tapstartDate ? Color.blue : (allDay ? Color.gray : Color.primary))
                                             .onTapGesture {
                                                 tapstartDate.toggle()
                                                 tapendDate = false
                                             }
                                             .frame(width: screenWidth / 4, alignment: .leading)
+                                            .disabled(allDay)
                                         Image(systemName: "arrow.right")
                                             .foregroundStyle(Color.gray)
                                             .frame(width: screenWidth / 10, alignment: .leading)
                                         Text(plannerVM.getDateString(for: endDate, components: [.hour, .minute]))
-                                            .foregroundStyle(tapendDate ? Color.blue : Color.primary)
+                                            .foregroundStyle(tapEndDate ? Color.blue : (allDay ? Color.gray : Color.primary))
                                             .onTapGesture {
                                                 tapendDate.toggle()
                                                 tapstartDate = false
                                             }
+                                            .disabled(allDay)
                                     }
                                     HStack(spacing: 0) {
                                         Text(
