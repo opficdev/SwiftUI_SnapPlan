@@ -66,7 +66,13 @@ struct ScheduleBox: View {
                     colorIdx = color ?? 0
                 }
                 .onChange(of: schedule?.timeLine.0) { date in
-                    
+                    if let date = date {
+                        if !didDateChangedByDrag {
+                            startOffset = getOffsetFromDate(for: date, timeZoneHeight: timeZoneHeight, gap: gap)
+                            boxHeight = getOffsetFromDate(for: schedule!.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap) - startOffset
+                            lastHeight = boxHeight
+                        }
+                    }
                 }
                 .onChange(of: schedule?.timeLine.1) { date in
                     if let date = date {
