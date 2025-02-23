@@ -28,7 +28,6 @@ struct ScheduleView: View {
     
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
-    @State private var titleFocus = false    //  제목 탭 여부
     @State private var addSchedule = false  //  스케줄 버튼 탭 여부
     @State private var tapstartDate = false //  시작 시간 탭 여부
     @State private var tapendDate = false   //  종료 시간 탭 여부
@@ -37,10 +36,13 @@ struct ScheduleView: View {
     @State private var allDay = false       //  종일 여부
     @State private var tapRepeat = false    //  반복 탭 여부
     @State private var tapLocation = false  //  위치 탭 여부
-    @State private var descriptionFocus = false   //  설명 탭 여부
     @State private var tapColor = false  //  색상 탭 여부
     @State private var tapDeleteSchedule = false   //  스케줄 삭제 탭 여부
     @State private var sheetMinHeight = CGFloat.zero //    sheet 최소 높이
+    
+    @State private var titleFocus = false    //  제목 포커싱 여부
+    @State private var locationFocus = false    //  위치 포커싱 여부
+    @State private var descriptionFocus = false   //  설명 포커싱 여부
     
     var body: some View {
         VStack {
@@ -189,12 +191,7 @@ struct ScheduleView: View {
                     }
                     ScrollView {
                         VStack(alignment: .leading) {
-                            UIKitTextEditor(
-                                text: $title,
-                                isFocused: $titleFocus,
-                                placeholder: "제목",
-                                font: .title2
-                            )
+                            UIKitTextEditor(text: $title, isFocused: $titleFocus, placeholder: "제목", font: .title2)
                             .textSelection(.enabled)
                             Divider()
                                 .padding(.vertical)
@@ -286,23 +283,12 @@ struct ScheduleView: View {
                                     Image(systemName: "map")
                                         .frame(width: 25)
                                         .foregroundStyle(Color.gray)
-                                    
-                                    if location.isEmpty {
-                                        Text("위치")
-                                            .foregroundStyle(Color.gray)
-                                    }
-                                    else {
-                                        Text(location)
-                                    }
+                                    UIKitTextEditor(text: $location, isFocused: $locationFocus, placeholder: "위치")
                                 }
                             }
                             Divider()
                                 .padding(.vertical)
-                            UIKitTextEditor(
-                                text: $description,
-                                isFocused: $descriptionFocus,
-                                placeholder: "설명"
-                            )
+                            UIKitTextEditor(text: $description, isFocused: $descriptionFocus, placeholder: "설명")
                             Divider()
                                 .padding(.vertical)
                         }
