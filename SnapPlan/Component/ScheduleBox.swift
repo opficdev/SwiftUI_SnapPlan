@@ -103,6 +103,7 @@ struct ScheduleBox: View {
                                 Circle().fill(Color.timeLine)
                                     .frame(width: 12, height: 12)
                             )
+                            .padding()
                             .offset(x: -proxy.size.width * 0.4, y: 2 - boxHeight / 2)
                         
                         Circle()
