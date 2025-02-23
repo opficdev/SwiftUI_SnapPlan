@@ -125,13 +125,13 @@ struct ScheduleBox: View {
                                                 let newDate = getDateFromOffset(date: schedule.timeLine.0, offset: boxHeight)
                                                 DispatchQueue.main.async {
                                                     if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
-                                                        self.schedule?.timeLine.1 = newDate
+                                                        self.schedule!.timeLine.1 = newDate
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                    .onEnded{ offset in
+                                    .onEnded{ _ in
                                         lastHeight = boxHeight
                                         didDateChangedByDrag = false
                                     }
