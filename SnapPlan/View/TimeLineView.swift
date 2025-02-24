@@ -243,12 +243,7 @@ struct TimeLineView: View {
                                 ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
                                     //  종일 일정을 출력
                                     if scheduleData.allDay {
-                                        ScheduleBox(
-                                            gap: gap,
-                                            timeZoneHeight: timeZoneSize.height,
-                                            isChanging: false,
-                                            schedule: .constant(scheduleData)
-                                        )
+                                        AllDayScheduleBox(height: timeZoneSize.height, schedule: $schedule)
                                         .onTapGesture {
                                             schedule = scheduleData
                                         }
