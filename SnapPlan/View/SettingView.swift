@@ -51,13 +51,13 @@ struct SettingView: View {
                         .disabled(true)
                         .foregroundStyle(.gray)
                         Button(action: {
-                            days = "list"
+                            days = "3"
                         }) {
                             HStack {
-                                Text("목록")
+                                Text("3일")
                                     .foregroundStyle(.gray)
                                 Spacer()
-                                if days == "list" {
+                                if days == "3" {
                                     Image(systemName: "checkmark")
                                 }
                             }
@@ -158,8 +158,6 @@ struct SettingView: View {
                 }
             }
             .navigationTitle("")  //  < 모양 이미지 제거
-//            .toolbarBackground(Color.timeLine, for: .navigationBar)
-//            .toolbarBackground(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
         }
     }
