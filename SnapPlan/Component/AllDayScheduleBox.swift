@@ -36,7 +36,7 @@ struct AllDayScheduleBox: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(colorArr[colorIdx])
                         .brightness(colorScheme == .light ? 0.4 : 0)
-//                        .opacity(!isVisible ? 0.5 : 0.8)
+                        .opacity(schedule == nil ? 0.5 : 0.8)
                 )
                 .frame(width: proxy.size.width - 4, height: max(boxHeight - 2, 4))
         }
