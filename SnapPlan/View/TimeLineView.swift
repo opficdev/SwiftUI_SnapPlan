@@ -155,9 +155,9 @@ struct TimeLineView: View {
                                                         
                                                         
                                                         let dateString = DateFormatter.yyyyMMdd.string(from: date)
-                                                        if let _ = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
-                                                            ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
-                                                                //  종일 일정이거나, 현재 조작중인 스케줄이 아닌 것들만 출력
+                                                        if let arr = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
+                                                            ForEach(Array(zip(arr.indices, arr)), id: \.1.id) { idx, scheduleData in
+                                                                //  종일 일정과 현재 조작중인 스케줄이 아닌 것들만 출력
                                                                 if schedule?.id != scheduleData.id && !scheduleData.allDay {
                                                                     ScheduleBox(
                                                                         gap: gap,
