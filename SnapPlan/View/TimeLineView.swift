@@ -172,7 +172,7 @@ struct TimeLineView: View {
                                                             }
                                                         }
                                                         
-                                                        if schedule != nil {    //  현재 조작중인 스케줄
+                                                        if schedule != nil && !schedule!.allDay {    //  현재 조작중인 스케줄
                                                             if plannerVM.isSameDate(date1: schedule!.timeLine.0, date2: date, components: [.year, .month, .day]) {
                                                                 ScheduleBox(
                                                                     gap: gap,
