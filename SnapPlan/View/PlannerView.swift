@@ -20,6 +20,7 @@ struct PlannerView: View {
                 .environmentObject(firebaseVM)
             TimeLineView(showScheduleView: $showScheduleView)
                 .environmentObject(plannerVM)
+                .environmentObject(firebaseVM)
         }
         .ignoresSafeArea(.all, edges: .bottom)
     }
