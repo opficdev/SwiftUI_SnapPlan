@@ -22,6 +22,8 @@ struct ScheduleView: View {
     @State private var title = ""
     @State private var startDate = Date()
     @State private var endDate = Date()
+    @State private var allDay = false
+    @State private var cycleOption = ScheduleData.CycleOption.none
     @State private var location = ""
     @State private var description = ""
     @State private var color = 0
@@ -33,7 +35,6 @@ struct ScheduleView: View {
     @State private var tapendDate = false   //  종료 시간 탭 여부
     @State private var tapStartDate = false //  시작 날짜 탭 여부
     @State private var tapEndDate = false   //  종료 날짜 탭
-    @State private var allDay = false       //  종일 여부
     @State private var tapRepeat = false    //  반복 탭 여부
     @State private var tapLocation = false  //  위치 탭 여부
     @State private var tapColor = false  //  색상 탭 여부
@@ -141,6 +142,8 @@ struct ScheduleView: View {
                                         do {
                                             schedule.title = title
                                             schedule.timeLine = (startDate, endDate)
+                                            schedule.allDay = allDay
+                                            schedule.cycleOption = cycleOption
                                             schedule.location = location
                                             schedule.description = description
                                             schedule.color = color
@@ -173,7 +176,6 @@ struct ScheduleView: View {
                                 locationFocus = false
                                 descriptionFocus = false
                                 schedule = nil
-                                
                                 currentDetent = currentDetent.union([.fraction(0.07)])
                                 selectedDetent = .fraction(0.07)
                                 DispatchQueue.main.async {
@@ -305,6 +307,7 @@ struct ScheduleView: View {
                         title = schedule.title
                         startDate = schedule.timeLine.0
                         endDate = schedule.timeLine.1
+                        allDay = schedule.allDay
                         location = schedule.location
                         description = schedule.description
                         color = schedule.color
@@ -318,6 +321,7 @@ struct ScheduleView: View {
                             withComponents: [.hour, .minute]
                         )
                         endDate = startDate.addingTimeInterval(1800)
+                        allDay = false
                         location = ""
                         description = ""
                         color = 0
@@ -403,10 +407,11 @@ struct ScheduleView: View {
         .padding()
         .presentationDetents(currentDetent, selection: $selectedDetent)
         .onChange(of: schedule) { value in
-            if let schedule = schedule {
+            if let schedule = value {
                 title = schedule.title
                 startDate = schedule.timeLine.0
                 endDate = schedule.timeLine.1
+                allDay = schedule.allDay
                 location = schedule.location
                 description = schedule.description
                 color = schedule.color
@@ -429,7 +434,7 @@ struct ScheduleView: View {
                 Color.clear.onChange(of: proxy.size.height) { height in
                     if selectedDetent != .large {
                         DispatchQueue.main.async {
-                            uiVM.bottomPadding = height
+                            uiVM.sheetPadding = height
                         }
                     }
                 }
