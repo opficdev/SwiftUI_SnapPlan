@@ -57,12 +57,15 @@ struct TimeLineView: View {
                 }
                 .background(Color.calendar)
                 
-                ZStack(alignment: .leading) {
+                ZStack(alignment: .topLeading) {
                     VStack {
                         ScrollViewReader { proxy in
                             ScrollView(showsIndicators: false) {
                                 HStack(spacing: 0) {
                                     VStack {
+                                        Rectangle()
+                                            .fill(Color.clear)
+                                            .frame(width: timeZoneSize.width, height: uiVM.allDayPadding)
                                         ZStack(alignment: .topTrailing) {
                                             VStack(alignment: .trailing, spacing: gap) {
                                                 let hours = plannerVM.getHours(is12hoursFmt: firebaseVM.is12TimeFmt)
@@ -106,7 +109,7 @@ struct TimeLineView: View {
                                         }
                                         Rectangle()
                                             .fill(Color.clear)
-                                            .frame(width: timeZoneSize.width, height: uiVM.bottomPadding)
+                                            .frame(width: timeZoneSize.width, height: uiVM.sheetPadding)
                                     }
                                     
                                     //  좌우로 드래그 가능한 TimeLine
@@ -117,6 +120,9 @@ struct TimeLineView: View {
                                                     .frame(width: 1)
                                                     .foregroundStyle(Color.gray.opacity(0.3))
                                                 VStack {
+                                                    Rectangle()
+                                                        .fill(Color.clear)
+                                                        .frame(width: timeZoneSize.width, height: uiVM.allDayPadding)
                                                     ZStack(alignment: .top) {
                                                         VStack(spacing: 0) {
                                                             ForEach(0...24, id: \.self) { index in
@@ -151,7 +157,8 @@ struct TimeLineView: View {
                                                         let dateString = DateFormatter.yyyyMMdd.string(from: date)
                                                         if let _ = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
                                                             ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
-                                                                if schedule?.id != scheduleData.id {
+                                                                //  종일 일정이거나, 현재 조작중인 스케줄이 아닌 것들만 출력
+                                                                if schedule?.id != scheduleData.id && !scheduleData.allDay {
                                                                     ScheduleBox(
                                                                         gap: gap,
                                                                         timeZoneHeight: timeZoneSize.height,
@@ -179,7 +186,7 @@ struct TimeLineView: View {
                                                             }
                                                         }
                                                         
-                                                        //  현 시간 표시하는 TimeBarx
+                                                        //  현 시간 표시하는 TimeBar
                                                         TimeBar(
                                                             height: timeZoneSize.height,
                                                             showVerticalLine: plannerVM.isSameDate(
@@ -201,7 +208,7 @@ struct TimeLineView: View {
                                                     }
                                                     Rectangle()
                                                         .fill(Color.clear)
-                                                        .frame(width: screenWidth - timeZoneSize.width, height: uiVM.bottomPadding)
+                                                        .frame(width: screenWidth - timeZoneSize.width, height: uiVM.sheetPadding)
                                                 }
                                             }
                                             .tag(idx)
@@ -222,6 +229,57 @@ struct TimeLineView: View {
                             }
                         }
                     }
+                    
+                    HStack(alignment:. top, spacing: 2) {
+                        Text("종일")
+                            .font(.caption)
+                            .foregroundStyle(Color.gray)
+                            .padding(.trailing, 2)
+                            .frame(width: timeZoneSize.width, height: uiVM.allDayPadding, alignment: .trailing)
+                        
+                        VStack(spacing: 0) {
+                            let dateString = DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)
+                            if let _ = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
+                                ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
+                                    //  종일 일정을 출력
+                                    if scheduleData.allDay {
+                                        ScheduleBox(
+                                            gap: gap,
+                                            timeZoneHeight: timeZoneSize.height,
+                                            isChanging: false,
+                                            schedule: .constant(scheduleData)
+                                        )
+                                        .onTapGesture {
+                                            schedule = scheduleData
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .onTapGesture {
+                            if schedule == nil {
+                                
+                            }
+                        }
+                    }
+                    .background(Color.timeLine)
+                    .border(Color.gray)
+                    .onAppear {
+                        DispatchQueue.main.async {
+                            let arr = firebaseVM.schedules[DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)] ?? []
+                            let count = arr.filter { $0.allDay }.count
+                            uiVM.allDayPadding = timeZoneSize.height * CGFloat((max(count, 2) * 2 - 1))
+                        }
+                    }
+                    .onChange(of: firebaseVM.schedules) { schedules in
+                        DispatchQueue.main.async {
+                            let arr = schedules[DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)] ?? []
+                            let count = arr.filter { $0.allDay }.count
+                            uiVM.allDayPadding = timeZoneSize.height * CGFloat((max(count, 2) * 2 - 1))
+                        }
+                    }
+                    
                     Rectangle()
                         .frame(width: 1)
                         .foregroundStyle(Color.gray)
@@ -229,48 +287,53 @@ struct TimeLineView: View {
                 }
                
             }
-            .onAppear {
-                calendarData = plannerVM.calendarData[1]
-                selection = calendarData.firstIndex(where: {
-                   plannerVM.isSameDate(
+        }
+        .onAppear {
+            calendarData = plannerVM.calendarData[1]
+            selection = calendarData.firstIndex(where: {
+                plannerVM.isSameDate(
                     date1: $0,
                     date2: plannerVM.selectDate,
                     components: [.year, .month, .day]) }
+            )!
+        }
+        .onChange(of: selection) { value in
+            withAnimation {
+                plannerVM.wasPast = plannerVM.selectDate < calendarData[value]
+                plannerVM.selectDate = calendarData[value]
+                plannerVM.currentDate = calendarData[value]
+            }
+            if selection == 0 || selection == calendarData.count - 1 {
+                calendarData = plannerVM.calendarData[1]
+            }
+        }
+        .onChange(of: plannerVM.selectDate) { date in
+            withAnimation {
+                if !calendarData.contains(date) {
+                    calendarData = plannerVM.calendarDates(date: date)
+                }
+                selection = calendarData.firstIndex(where: {
+                    plannerVM.isSameDate(
+                        date1: $0,
+                        date2: date,
+                        components: [.year, .month, .day]) }
                 )!
             }
-            .onChange(of: selection) { value in
-                withAnimation {
-                    plannerVM.wasPast = plannerVM.selectDate < calendarData[value]
-                    plannerVM.selectDate = calendarData[value]
-                    plannerVM.currentDate = calendarData[value]
-                }
-                if selection == 0 || selection == calendarData.count - 1 {
-                    calendarData = plannerVM.calendarData[1]
-                }
+            DispatchQueue.main.async {
+                let arr = firebaseVM.schedules[DateFormatter.yyyyMMdd.string(from: date)] ?? []
+                let count = arr.filter { $0.allDay }.count
+                uiVM.allDayPadding = timeZoneSize.height * CGFloat(max(count, 1) * 2)
             }
-            .onChange(of: plannerVM.selectDate) { value in
-                withAnimation {
-                    if !calendarData.contains(value) {
-                        calendarData = plannerVM.calendarDates(date: value)
-                    }
-                    selection = calendarData.firstIndex(where: {
-                        plannerVM.isSameDate(
-                            date1: $0,
-                            date2: value,
-                            components: [.year, .month, .day]) }
-                    )!
+        }
+        .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로 뷰가 로딩되면 알아서 onChange가 실행됨
+            Task {
+                if didScheduleAdd {
+                    firebaseVM.schedules.removeAll()
                 }
-            }
-            .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로 뷰가 로딩되면 알아서 onChange가 실행됨
-                Task {
-                    if didScheduleAdd {
-                        firebaseVM.schedules.removeAll()
-                    }
-                    for date in month {
-                        await firebaseVM.loadScheduleData(date: date)
-                    }
-                    didScheduleAdd = true
+                for date in month {
+                    await firebaseVM.loadScheduleData(date: date)
                 }
+                didScheduleAdd = true
             }
         }
         .onChange(of: firebaseVM.is12TimeFmt) { value in

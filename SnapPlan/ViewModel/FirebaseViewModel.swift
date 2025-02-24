@@ -207,6 +207,7 @@ extension FirebaseViewModel {
             let newEntry: [String: Any] = [
                 "title": schedule.title,
                 "timeLine": [schedule.timeLine.0, schedule.timeLine.1],
+                "allDay": schedule.allDay,
                 "cycleOption": schedule.cycleOption.rawValue,
                 "location": schedule.location,
                 "description": schedule.description,
@@ -264,6 +265,7 @@ extension FirebaseViewModel {
                 guard let title = data["title"] as? String,
                       let timeLine = data["timeLine"] as? [Timestamp],
                       let color = data["color"] as? Int,
+                      let allDay = data["allDay"] as? Bool,
                       let cycleOption = ScheduleData.CycleOption(rawValue: data["cycleOption"] as? String ?? "none"),
                       let location = data["location"] as? String,
                       let description = data["description"] as? String else {
@@ -278,6 +280,7 @@ extension FirebaseViewModel {
                     title: title,
                     timeLine: (startTime, endTime),
                     isChanging: false,
+                    allDay: allDay,
                     cycleOption: cycleOption,
                     location: location,
                     description: description,
