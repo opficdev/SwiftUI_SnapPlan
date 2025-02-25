@@ -233,8 +233,8 @@ struct TimeLineView: View {
                         
                         VStack(spacing: 3) {
                             let dateString = DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)
-                            if let _ = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
-                                ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
+                            if let arr = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
+                                ForEach(Array(zip(arr.indices, arr)), id: \.1.id) { idx, scheduleData in
                                     //  종일 일정을 출력
                                     if scheduleData.allDay {
                                         AllDayScheduleBox(height: timeZoneSize.height, schedule: $schedule)
