@@ -14,11 +14,11 @@ struct AllDayScheduleBox: View {
     ]
     @Environment(\.colorScheme) var colorScheme
     @Binding var schedule: ScheduleData?
-    @State private var boxHeight: CGFloat
+    @Binding var boxHeight: CGFloat
     @State private var colorIdx: Int
     
-    init(height: CGFloat, schedule: Binding<ScheduleData?>) {
-        self._boxHeight = State(initialValue: height)
+    init(height: Binding<CGFloat>, schedule: Binding<ScheduleData?>) {
+        self._boxHeight = height
         self._schedule = schedule
         if let schedule = schedule.wrappedValue {
             colorIdx = schedule.color
@@ -43,7 +43,7 @@ struct AllDayScheduleBox: View {
 
 #Preview {
     AllDayScheduleBox(
-        height: 20,
-        schedule: .constant(nil) 
+        height: .constant(20),
+        schedule: .constant(nil)
     )
 }
