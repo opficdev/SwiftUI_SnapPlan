@@ -28,18 +28,16 @@ struct AllDayScheduleBox: View {
         }
     }
     var body: some View {
-        GeometryReader { proxy in
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(colorArr[colorIdx], lineWidth: 2)
-                .brightness(colorScheme == .light ? 0.4 : 0)
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(colorArr[colorIdx])
-                        .brightness(colorScheme == .light ? 0.4 : 0)
-                        .opacity(schedule == nil ? 0.5 : 0.8)
-                )
-                .frame(width: proxy.size.width - 4, height: max(boxHeight - 2, 4))
-        }
+        RoundedRectangle(cornerRadius: 4)
+            .stroke(colorArr[colorIdx], lineWidth: 2)
+            .brightness(colorScheme == .light ? 0.4 : 0)
+            .background(
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(colorArr[colorIdx])
+                    .brightness(colorScheme == .light ? 0.4 : 0)
+                    .opacity(schedule == nil ? 0.5 : 0.8)
+            )
+            .frame(width: UIScreen.main.bounds.width * 6 / 7 - 4 ,height: max(boxHeight, 4))
     }
 }
 
