@@ -27,6 +27,7 @@ struct AllDayScheduleBox: View {
             colorIdx = 0
         }
     }
+    
     var body: some View {
         RoundedRectangle(cornerRadius: 4)
             .stroke(colorArr[colorIdx], lineWidth: 2)
@@ -35,7 +36,7 @@ struct AllDayScheduleBox: View {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(colorArr[colorIdx])
                     .brightness(colorScheme == .light ? 0.4 : 0)
-                    .opacity(schedule == nil ? 0.5 : 0.8)
+                    .opacity(0.8)
             )
             .frame(width: UIScreen.main.bounds.width * 6 / 7 - 4 ,height: max(boxHeight, 4))
     }
