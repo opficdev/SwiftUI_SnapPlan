@@ -231,7 +231,7 @@ struct TimeLineView: View {
                             .padding(.trailing, 2)
                             .frame(width: timeZoneSize.width, height: uiVM.allDayPadding, alignment: .trailing)
                         
-                        VStack(spacing: 0) {
+                        VStack(spacing: 3) {
                             let dateString = DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)
                             if let _ = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
                                 ForEach(Array(zip(firebaseVM.schedules[dateString]!.indices, firebaseVM.schedules[dateString]!)), id: \.1.id) { idx, scheduleData in
