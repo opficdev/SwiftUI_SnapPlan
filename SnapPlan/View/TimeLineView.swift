@@ -237,7 +237,7 @@ struct TimeLineView: View {
                                 ForEach(Array(zip(arr.indices, arr)), id: \.1.id) { idx, scheduleData in
                                     //  종일 일정을 출력
                                     if scheduleData.allDay {
-                                        AllDayScheduleBox(height: timeZoneSize.height, schedule: $schedule)
+                                        AllDayScheduleBox(height: $timeZoneSize.height, schedule: .constant(scheduleData))
                                         .onTapGesture {
                                             schedule = scheduleData
                                         }
