@@ -258,14 +258,24 @@ struct TimeLineView: View {
                         DispatchQueue.main.async {
                             let arr = firebaseVM.schedules[DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)] ?? []
                             let count = arr.filter { $0.allDay }.count
-                            uiVM.allDayPadding = timeZoneSize.height * CGFloat((max(count, 2) * 2 - 1))
+                            if count < 2 {
+                                uiVM.allDayPadding = timeZoneSize.height * 2
+                            }
+                            else {
+                                uiVM.allDayPadding = (timeZoneSize.height + 3) * CGFloat(count) + 2
+                            }
                         }
                     }
                     .onChange(of: firebaseVM.schedules) { schedules in
                         DispatchQueue.main.async {
                             let arr = schedules[DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)] ?? []
                             let count = arr.filter { $0.allDay }.count
-                            uiVM.allDayPadding = timeZoneSize.height * CGFloat((max(count, 2) * 2 - 1))
+                            if count < 2 {
+                                uiVM.allDayPadding = timeZoneSize.height * 2
+                            }
+                            else {
+                                uiVM.allDayPadding = (timeZoneSize.height + 3) * CGFloat(count) + 2
+                            }
                         }
                     }
                     
@@ -311,7 +321,12 @@ struct TimeLineView: View {
             DispatchQueue.main.async {
                 let arr = firebaseVM.schedules[DateFormatter.yyyyMMdd.string(from: date)] ?? []
                 let count = arr.filter { $0.allDay }.count
-                uiVM.allDayPadding = timeZoneSize.height * CGFloat(max(count, 1) * 2)
+                if count < 2 {
+                    uiVM.allDayPadding = timeZoneSize.height * 2
+                }
+                else {
+                    uiVM.allDayPadding = (timeZoneSize.height + 3) * CGFloat(count) + 2
+                }
             }
         }
         .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로 뷰가 로딩되면 알아서 onChange가 실행됨
