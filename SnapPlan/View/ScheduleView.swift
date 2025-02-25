@@ -160,6 +160,8 @@ struct ScheduleView: View {
                                             let schedule = ScheduleData(
                                                 title: title,
                                                 timeLine: (startDate, endDate),
+                                                allDay: allDay,
+                                                cycleOption: cycleOption,
                                                 location: location,
                                                 description: description,
                                                 color: color
