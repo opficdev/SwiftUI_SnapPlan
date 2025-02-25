@@ -58,14 +58,14 @@ struct TimeLineView: View {
                 .background(Color.calendar)
                 
                 ZStack(alignment: .topLeading) {
-                    VStack {
+                    VStack(spacing: 0) {
+                        Rectangle()
+                            .fill(Color.clear)
+                            .frame(height: uiVM.allDayPadding)
                         ScrollViewReader { proxy in
                             ScrollView(showsIndicators: false) {
                                 HStack(spacing: 0) {
                                     VStack {
-                                        Rectangle()
-                                            .fill(Color.clear)
-                                            .frame(width: timeZoneSize.width, height: uiVM.allDayPadding)
                                         ZStack(alignment: .topTrailing) {
                                             VStack(alignment: .trailing, spacing: gap) {
                                                 let hours = plannerVM.getHours(is12hoursFmt: firebaseVM.is12TimeFmt)
@@ -107,9 +107,6 @@ struct TimeLineView: View {
                                                 gap: gap)
                                             )
                                         }
-                                        Rectangle()
-                                            .fill(Color.clear)
-                                            .frame(width: timeZoneSize.width, height: uiVM.sheetPadding)
                                     }
                                     
                                     //  좌우로 드래그 가능한 TimeLine
@@ -120,9 +117,6 @@ struct TimeLineView: View {
                                                     .frame(width: 1)
                                                     .foregroundStyle(Color.gray.opacity(0.3))
                                                 VStack {
-                                                    Rectangle()
-                                                        .fill(Color.clear)
-                                                        .frame(width: timeZoneSize.width, height: uiVM.allDayPadding)
                                                     ZStack(alignment: .top) {
                                                         VStack(spacing: 0) {
                                                             ForEach(0...24, id: \.self) { index in
@@ -206,9 +200,6 @@ struct TimeLineView: View {
                                                             gap: gap)
                                                         )
                                                     }
-                                                    Rectangle()
-                                                        .fill(Color.clear)
-                                                        .frame(width: screenWidth - timeZoneSize.width, height: uiVM.sheetPadding)
                                                 }
                                             }
                                             .tag(idx)
@@ -228,6 +219,9 @@ struct TimeLineView: View {
                                 }
                             }
                         }
+                        Rectangle()
+                            .fill(Color.clear)
+                            .frame(height: uiVM.sheetPadding)
                     }
                     
                     HStack(alignment:. top, spacing: 2) {
