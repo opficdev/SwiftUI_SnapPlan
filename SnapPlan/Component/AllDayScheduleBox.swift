@@ -24,16 +24,22 @@ struct AllDayScheduleBox: View {
     }
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 4)
-            .stroke(colorArr[colorIdx], lineWidth: 2)
-            .brightness(colorScheme == .light ? 0.4 : 0)
-            .background(
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(colorArr[colorIdx])
-                    .brightness(colorScheme == .light ? 0.4 : 0)
-                    .opacity(0.8)
-            )
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(colorArr[colorIdx], lineWidth: 2)
+                .brightness(colorScheme == .light ? 0.4 : 0)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(colorArr[colorIdx])
+                        .brightness(colorScheme == .light ? 0.4 : 0)
+                        .opacity(0.8)
+                )
+            Text(schedule.title)
+                .font(.caption)
+                .foregroundStyle(Color.gray)
+        }
             .frame(width: UIScreen.main.bounds.width * 6 / 7 - 4 ,height: max(boxHeight, 4))
+            .offset(y: 2)
     }
 }
 
