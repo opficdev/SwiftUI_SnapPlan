@@ -246,11 +246,6 @@ struct TimeLineView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .onTapGesture {
-                            if schedule == nil {
-                                
-                            }
-                        }
                     }
                     .background(Color.timeLine)
                     .border(Color.gray)
