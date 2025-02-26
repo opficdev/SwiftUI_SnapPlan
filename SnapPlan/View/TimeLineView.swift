@@ -236,7 +236,7 @@ struct TimeLineView: View {
                             if let arr = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
                                 ForEach(Array(zip(arr.indices, arr)), id: \.1.id) { idx, scheduleData in
                                     //  종일 일정을 출력
-                                    if scheduleData.allDay {
+                                    if schedule?.id != scheduleData.id && scheduleData.allDay {
                                         AllDayScheduleBox(height: $timeZoneSize.height, schedule: .constant(scheduleData))
                                         .onTapGesture {
                                             schedule = scheduleData
@@ -244,8 +244,20 @@ struct TimeLineView: View {
                                     }
                                 }
                             }
+                            if let schedule = schedule, schedule.allDay {    //  현재 조작중인 종일 스케줄
+                                AllDayScheduleBox(height: $timeZoneSize.height, schedule: .constant(self.schedule!))
+                                    .onTapGesture {
+                                        self.schedule = nil
+                                    }
+                            }
                         }
-                        .frame(maxWidth: .infinity)
+                        .frame(width: screenWidth * 6 / 7, height: uiVM.allDayPadding, alignment: .top)
+                        .background(Color.timeLine) //  터치 이벤트
+                        .onTapGesture {
+                            let beginDate = Calendar.current.startOfDay(for: plannerVM.selectDate).addingTimeInterval(60 * 60 * 12)
+                            let endDate = beginDate.addingTimeInterval(1800)
+                            schedule = ScheduleData(timeLine: (beginDate, endDate), allDay: true)
+                        }
                     }
                     .background(Color.timeLine)
                     .border(Color.gray)
