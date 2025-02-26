@@ -379,7 +379,7 @@ struct ScheduleView: View {
                     )
                 }
                 .sheet(isPresented: $tapRepeat) {
-                    ScheduleCycleView(schedule: $schedule)
+                    CycleOptionView(schedule: $schedule)
                         .environmentObject(plannerVM)
                 }
                 .confirmationDialog("스케줄을 삭제하시겠습니까?", isPresented: $tapDeleteSchedule, titleVisibility: .visible) {

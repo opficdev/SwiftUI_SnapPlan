@@ -1,5 +1,5 @@
 //
-//  RepeatSetting.swift
+//  CycleOptionView.swift
 //  SnapPlan
 //
 //  Created by opfic on 2/3/25.
@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct ScheduleCycleView: View {
+struct CycleOptionView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var plannerVM: PlannerViewModel
     let screenWidth = UIScreen.main.bounds.width
@@ -108,6 +108,6 @@ struct ScheduleCycleView: View {
 }
 
 #Preview {
-    ScheduleCycleView(schedule: .constant(nil))
+    CycleOptionView(schedule: .constant(nil))
         .environmentObject(PlannerViewModel())
 }
