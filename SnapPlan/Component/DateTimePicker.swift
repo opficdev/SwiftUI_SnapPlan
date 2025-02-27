@@ -15,6 +15,7 @@ struct DateTimePicker<S: DatePickerStyle>: View {
     let style: S
     
     init(selectedTime: Binding<Date>, component: DatePickerComponents, style: S = .wheel) {
+        UIDatePicker.appearance().minuteInterval = 5
         self._selectedTime = selectedTime
         self.component = component
         self.style = style
