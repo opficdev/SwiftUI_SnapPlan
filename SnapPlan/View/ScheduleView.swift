@@ -227,9 +227,7 @@ struct ScheduleView: View {
                                             .disabled(allDay)
                                     }
                                     HStack(spacing: 0) {
-                                        Text(
-                                            plannerVM.getDateString(for: startDate, components: [.month, .day])
-                                        )
+                                        Text(plannerVM.getDateString(for: startDate, components: [.month, .day]))
                                         .foregroundStyle(tapStartDate ? Color.blue : Color.primary)
                                         .onTapGesture {
                                             tapStartDate.toggle()
@@ -301,7 +299,8 @@ struct ScheduleView: View {
                                     Image(systemName: "map")
                                         .frame(width: 25)
                                         .foregroundStyle(Color.gray)
-                                    UIKitTextEditor(text: $location, isFocused: $locationFocus, placeholder: "위치")
+                                    Text(location.isEmpty ? "위치" : location)
+                                        .foregroundStyle(location.isEmpty ? Color.gray : Color.primary)
                                 }
                             }
                             Divider()
