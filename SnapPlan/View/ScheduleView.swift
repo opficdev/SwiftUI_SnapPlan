@@ -283,13 +283,20 @@ struct ScheduleView: View {
                             Divider()
                                 .padding(.vertical)
                             VStack(alignment:. leading, spacing: 20) {
-//                                HStack {
-//                                    Image(systemName: "photo")
-//                                        .frame(width: 25)
-//                                        .foregroundStyle(Color.gray)
-//                                    Text("사진")
-//                                        .foregroundStyle(Color.gray)
-//                                }
+                                HStack {
+                                    Image(systemName: "memories.badge.plus")
+                                        .frame(width: 25)
+                                        .foregroundStyle(Color.gray)
+                                    Text("음성 메모")
+                                        .foregroundStyle(Color.gray)
+                                }
+                                HStack {
+                                    Image(systemName: "photo")
+                                        .frame(width: 25)
+                                        .foregroundStyle(Color.gray)
+                                    Text("사진")
+                                        .foregroundStyle(Color.gray)
+                                }
                                 HStack {
                                     Image(systemName: "map")
                                         .frame(width: 25)
