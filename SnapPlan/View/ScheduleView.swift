@@ -237,7 +237,7 @@ struct ScheduleView: View {
                                             tapEndDate = false
                                         }
                                         .frame(width: screenWidth / 4 + screenWidth / 10, alignment: .leading)
-                                        if !plannerVM.isSameDate(date1: startDate, date2: endDate, components: [.year, .month, .day]) {
+                                        if !plannerVM.isSameDate(date1: startDate, date2: endDate, components: [.year, .month, .day]) || allDay {
                                             Text(
                                                 plannerVM.getDateString(for: endDate, components: [.month, .day])
                                             )
