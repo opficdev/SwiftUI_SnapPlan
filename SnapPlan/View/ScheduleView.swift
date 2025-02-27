@@ -304,7 +304,7 @@ struct ScheduleView: View {
                                 .padding(.vertical)
                         }
                     }
-                    .scrollDisabled(!(titleFocus || descriptionFocus)) // 키보드가 내려가면 스크롤 비활성화
+                    .scrollDisabled(!(titleFocus || locationFocus || descriptionFocus)) // 키보드가 내려가면 스크롤 비활성화
                     Spacer()
                 }
                 .onAppear {
