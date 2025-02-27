@@ -195,6 +195,7 @@ struct ScheduleView: View {
                             }
                         }
                     }
+                    .frame(height: 30)
                     ScrollView {
                         VStack(alignment: .leading) {
                             UIKitTextEditor(text: $title, isFocused: $titleFocus, placeholder: "제목", font: .title2)
