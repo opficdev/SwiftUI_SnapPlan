@@ -183,7 +183,6 @@ struct ScheduleView: View {
                                 DispatchQueue.main.async {
                                     currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
                                 }
-                                
                             }) {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 5)
@@ -209,10 +208,10 @@ struct ScheduleView: View {
                                 VStack(alignment: .leading, spacing: 10) {
                                     HStack(spacing: 0) {
                                         Text(plannerVM.getDateString(for: startDate, components: [.hour, .minute]))
-                                            .foregroundStyle(tapstartDate ? Color.blue : (allDay ? Color.gray : Color.primary))
+                                            .foregroundStyle(tapStartTime ? Color.blue : (allDay ? Color.gray : Color.primary))
                                             .onTapGesture {
-                                                tapstartDate.toggle()
-                                                tapendDate = false
+                                                tapStartTime.toggle()
+                                                tapEndTime = false
                                             }
                                             .frame(width: screenWidth / 4, alignment: .leading)
                                             .disabled(allDay)
@@ -220,10 +219,10 @@ struct ScheduleView: View {
                                             .foregroundStyle(Color.gray)
                                             .frame(width: screenWidth / 10, alignment: .leading)
                                         Text(plannerVM.getDateString(for: endDate, components: [.hour, .minute]))
-                                            .foregroundStyle(tapEndDate ? Color.blue : (allDay ? Color.gray : Color.primary))
+                                            .foregroundStyle(tapEndTime ? Color.blue : (allDay ? Color.gray : Color.primary))
                                             .onTapGesture {
-                                                tapendDate.toggle()
-                                                tapstartDate = false
+                                                tapEndTime.toggle()
+                                                tapStartTime = false
                                             }
                                             .disabled(allDay)
                                     }
@@ -238,9 +237,12 @@ struct ScheduleView: View {
                                         }
                                         .frame(width: screenWidth / 4 + screenWidth / 10, alignment: .leading)
                                         if !plannerVM.isSameDate(date1: startDate, date2: endDate, components: [.year, .month, .day]) || allDay {
-                                            Text(
-                                                plannerVM.getDateString(for: endDate, components: [.month, .day])
-                                            )
+                                            Text(plannerVM.getDateString(for: endDate, components: [.month, .day]))
+                                                .foregroundStyle(tapEndDate ? Color.blue : Color.primary)
+                                                .onTapGesture {
+                                                    tapEndDate.toggle()
+                                                    tapStartDate = false
+                                                }
                                         }
                                     }
                                 }
@@ -350,7 +352,7 @@ struct ScheduleView: View {
                     locationFocus = false
                     descriptionFocus = false
                 }
-                .sheet(isPresented: $tapstartDate) {
+                .sheet(isPresented: $tapStartTime) {
                     DateTimePicker(
                         selectedTime: $startDate,
                         component: .hourAndMinute
@@ -361,7 +363,7 @@ struct ScheduleView: View {
                         }
                     }
                 }
-                .sheet(isPresented: $tapendDate) {
+                .sheet(isPresented: $tapEndTime) {
                     DateTimePicker(
                         selectedTime: $endDate,
                         component: .hourAndMinute
@@ -375,6 +377,13 @@ struct ScheduleView: View {
                 .sheet(isPresented: $tapStartDate) {
                     DateTimePicker(
                         selectedTime: $startDate,
+                        component: .date,
+                        style: .graphical
+                    )
+                }
+                .sheet(isPresented: $tapEndDate) {
+                    DateTimePicker(
+                        selectedTime: $endDate,
                         component: .date,
                         style: .graphical
                     )
