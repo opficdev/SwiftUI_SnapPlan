@@ -420,13 +420,8 @@ struct ScheduleView: View {
         .presentationDetents(currentDetent, selection: $selectedDetent)
         .onChange(of: schedule) { value in
             if let schedule = value {
-                title = schedule.title
                 startDate = schedule.timeLine.0
                 endDate = schedule.timeLine.1
-                allDay = schedule.allDay
-                location = schedule.location
-                description = schedule.description
-                color = schedule.color
                 currentDetent = currentDetent.union([.large, .fraction(0.4)])
                 selectedDetent = .fraction(0.4)
                 DispatchQueue.main.async {
