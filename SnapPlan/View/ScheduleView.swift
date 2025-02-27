@@ -31,10 +31,10 @@ struct ScheduleView: View {
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
     @State private var addSchedule = false  //  스케줄 버튼 탭 여부
-    @State private var tapstartDate = false //  시작 시간 탭 여부
-    @State private var tapendDate = false   //  종료 시간 탭 여부
+    @State private var tapStartTime = false //  시작 시간 탭 여부
     @State private var tapStartDate = false //  시작 날짜 탭 여부
-    @State private var tapEndDate = false   //  종료 날짜 탭
+    @State private var tapEndTime = false   //  종료 시간 탭 여부
+    @State private var tapEndDate = false   //  종료 시간 탭 여부
     @State private var tapRepeat = false    //  반복 탭 여부
     @State private var tapLocation = false  //  위치 탭 여부
     @State private var tapColor = false  //  색상 탭 여부
