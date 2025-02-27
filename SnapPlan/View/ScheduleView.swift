@@ -357,22 +357,12 @@ struct ScheduleView: View {
                         selectedTime: $startDate,
                         component: .hourAndMinute
                     )
-                    .onChange(of: startDate) { date in
-                        if date > endDate {
-                            endDate = date.addingTimeInterval(1800)
-                        }
-                    }
                 }
                 .sheet(isPresented: $tapEndTime) {
                     DateTimePicker(
                         selectedTime: $endDate,
                         component: .hourAndMinute
                     )
-                    .onChange(of: endDate) { date in
-                        if date < startDate {
-                            endDate = startDate
-                        }
-                    }
                 }
                 .sheet(isPresented: $tapStartDate) {
                     DateTimePicker(
@@ -433,6 +423,26 @@ struct ScheduleView: View {
                 selectedDetent = .fraction(0.07)
                 DispatchQueue.main.async {
                     currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
+                }
+            }
+        }
+        .onChange(of: startDate) { date in
+            if endDate < date {
+                if allDay {
+                    endDate = plannerVM.getMergedDate(for: date, with: endDate, forComponents: [.year, .month, .day], withComponents: [.hour, .minute])
+                }
+                else {
+                    endDate = date.addingTimeInterval(1800)
+                }
+            }
+        }
+        .onChange(of: endDate) { date in
+            if date < startDate {
+                if allDay {
+                    startDate = plannerVM.getMergedDate(for: date, with: startDate, forComponents: [.year, .month, .day], withComponents: [.hour, .minute])
+                }
+                else {
+                    startDate = date.addingTimeInterval(-1800)
                 }
             }
         }
