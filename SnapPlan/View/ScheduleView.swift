@@ -314,9 +314,6 @@ struct ScheduleView: View {
                             withComponents: [.hour, .minute]
                         )
                     }
-                    .onChange(of: endDate) { date in
-                        schedule?.timeLine.1 = date
-                    }
                     .onTapGesture {
                         if titleFocus {
                             titleFocus = false
@@ -382,9 +379,7 @@ struct ScheduleView: View {
             .padding()
             .presentationDetents(currentDetent, selection: $selectedDetent)
             .onChange(of: schedule) { value in
-                if let schedule = value {
-                    startDate = schedule.timeLine.0
-                    endDate = schedule.timeLine.1
+                if let _ = value {
                     currentDetent = currentDetent.union([.large, .fraction(0.4)])
                     selectedDetent = .fraction(0.4)
                     DispatchQueue.main.async {
