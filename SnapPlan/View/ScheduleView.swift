@@ -19,6 +19,7 @@ struct ScheduleView: View {
     @EnvironmentObject var firebaseVM: FirebaseViewModel
     @EnvironmentObject var uiVM: UIViewModel
     @StateObject var scheduleVM = ScheduleViewModel()
+    @StateObject var searchVM = SearchLocationViewModel()
     
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
@@ -434,6 +435,7 @@ struct ScheduleView: View {
         if scheduleVM.location.isEmpty {
             SearchLocationView()
                 .environmentObject(scheduleVM)
+                .environmentObject(searchVM)
         }
         else {
             MapView()
