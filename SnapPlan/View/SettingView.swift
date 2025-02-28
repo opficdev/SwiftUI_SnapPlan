@@ -142,7 +142,6 @@ struct SettingView: View {
             } message: {
                 Text("로그아웃하시겠습니까?")
             }
-            .navigationTitle("")
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("설정")
@@ -157,7 +156,7 @@ struct SettingView: View {
                     }
                 }
             }
-            .navigationTitle("")  //  < 모양 이미지 제거
+            .navigationTitle("설정")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
