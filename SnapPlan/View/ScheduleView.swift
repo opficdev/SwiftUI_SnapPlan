@@ -149,7 +149,7 @@ struct ScheduleView: View {
                                                 try await firebaseVM.modifyScheduleData(schedule: newSchedule)
                                                 await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                             } catch {
-                                                print("스케줄 수정 실패: \(error)")
+                                                print("스케줄 수정 실패: \(error.localizedDescription)")
                                             }
                                         }
                                     }
@@ -160,7 +160,7 @@ struct ScheduleView: View {
                                                 try await firebaseVM.addScheduleData(schedule: schedule)
                                                 await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                             } catch {
-                                                print("스케줄 추가 실패: \(error)")
+                                                print("스케줄 추가 실패: \(error.localizedDescription)")
                                             }
                                         }
                                     }
