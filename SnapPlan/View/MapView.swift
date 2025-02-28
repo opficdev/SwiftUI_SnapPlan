@@ -34,11 +34,10 @@ struct MapView: View {
         .ignoresSafeArea(.all, edges: [.bottom, .horizontal])
         .toolbar{
             ToolbarItem(placement: .principal) {
-                Text("위치")
+                Text(scheduleVM.location)
                     .bold()
             }
         }
-        .navigationTitle("")
     }
 }
 // MARK: @retroactive - extension으로 똑같은 프로토콜을 conform하면 컴파일 에러가 발생하는데,

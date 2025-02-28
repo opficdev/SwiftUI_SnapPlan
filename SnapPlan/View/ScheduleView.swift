@@ -296,12 +296,15 @@ struct ScheduleView: View {
                                                 .foregroundStyle(scheduleVM.location.isEmpty ? Color.gray : Color.primary)
                                                 .underline(!scheduleVM.location.isEmpty)
                                         }
+                                        .navigationTitle("")
                                         Spacer()
                                         if !scheduleVM.location.isEmpty {
                                             NavigationLink(destination: SearchLocationView().environmentObject(scheduleVM).environmentObject(searchVM)) {
                                                 Image(systemName: "pencil")
                                                     .foregroundStyle(Color.gray)
+                                                    .bold()
                                             }
+                                            .navigationTitle("")
                                         }
                                     }
                                 }
