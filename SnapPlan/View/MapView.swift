@@ -10,18 +10,23 @@ import MapKit
 
 struct MapView: View {
     @StateObject var mapVM = MapViewModel()
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0),
-        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-    )
-    @Binding var location: String
+    @EnvironmentObject var scheduleVM: ScheduleViewModel
+    private var region: Binding<MKCoordinateRegion> {
+        Binding {
+            mapVM.region
+        } set: { region in
+            DispatchQueue.main.async {
+                mapVM.region = region
+            }
+        }
+    }
     
     var body: some View {
         Map(coordinateRegion: region, showsUserLocation: true)
             .onChange(of: mapVM.userLocation) { location in
                 DispatchQueue.main.async {
                     if let location = location {
-                        region.center = location
+                        mapVM.region.center = location
                     }
                 }
             }
@@ -43,5 +48,6 @@ extension CLLocationCoordinate2D: @retroactive Equatable {
 }
 
 #Preview {
-    MapView(location: .constant(""))
+    MapView()
+        .environmentObject(ScheduleViewModel())
 }
