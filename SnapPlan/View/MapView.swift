@@ -17,27 +17,22 @@ struct MapView: View {
     @Binding var location: String
     
     var body: some View {
-        VStack {
-            TextField("위치", text: $location)
-                .onTapGesture {
-                    
-                }
-            Map(coordinateRegion: $region, showsUserLocation: true)
-                .onChange(of: mapVM.userLocation) { location in
+        Map(coordinateRegion: region, showsUserLocation: true)
+            .onChange(of: mapVM.userLocation) { location in
+                DispatchQueue.main.async {
                     if let location = location {
                         region.center = location
                     }
                 }
-                .edgesIgnoringSafeArea(.all)
-        }
-        .padding([.horizontal, .top])
-        .navigationTitle("")
+            }
+        .ignoresSafeArea(.all, edges: [.bottom, .horizontal])
         .toolbar{
             ToolbarItem(placement: .principal) {
                 Text("위치")
                     .bold()
             }
         }
+        .navigationTitle("")
     }
 }
 
