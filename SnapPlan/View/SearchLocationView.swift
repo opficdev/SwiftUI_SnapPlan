@@ -19,7 +19,7 @@ struct SearchLocationView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.gray)
-                TextField("위치", text: $searchVM.query)
+                TextField("검색", text: $searchVM.query)
                     .focused($focused)
                     .onAppear {
                         focused = true
@@ -43,12 +43,24 @@ struct SearchLocationView: View {
             .padding(.horizontal)
             
             List(searchVM.suggestions, id: \.self) { suggestion in
-                Text(suggestion.title)
-                    .onTapGesture {
-                        scheduleVM.location = suggestion.title
-                        searchVM.query = suggestion.title
-                        dismiss()
-                    }
+                VStack(alignment: .leading) {
+                    Text(suggestion.title)
+                    Text(suggestion.subtitle)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .onTapGesture {
+                    scheduleVM.location = suggestion.title
+                    searchVM.query = suggestion.title
+                    dismiss()
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("위치")
+                    .font(.headline)
+                    .bold()
             }
         }
         .ignoresSafeArea(.container, edges: [.horizontal, .bottom])
