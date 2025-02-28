@@ -61,6 +61,20 @@ struct ScheduleView: View {
                                 .font(.system(size: 30))
                         }
                     }
+                    .onDisappear {
+                        if let schedule = schedule {
+                            scheduleVM.setSchedule(schedule: schedule)
+                        }
+                        else {
+                            let startDate = plannerVM.getMergedDate(
+                                for: plannerVM.selectDate,
+                                with: plannerVM.today,
+                                forComponents: [.year, .month, .day],
+                                withComponents: [.hour, .minute]
+                            )
+                            scheduleVM.setSchedule(startDate: startDate)
+                        }
+                    }
                 }
                 else {
                     VStack {
@@ -292,36 +306,10 @@ struct ScheduleView: View {
                         .scrollDisabled(!(titleFocus || descriptionFocus)) // 키보드가 내려가면 스크롤 비활성화
                         Spacer()
                     }
-                    .onAppear {
-                        if let schedule = schedule {
-                            title = schedule.title
-                            startDate = schedule.timeLine.0
-                            endDate = schedule.timeLine.1
-                            allDay = schedule.allDay
-                            location = schedule.location
-                            description = schedule.description
-                            color = schedule.color
-                        }
-                        else {
-                            title = ""
-                            startDate = plannerVM.getMergedDate(
-                                for: plannerVM.selectDate,
-                                with: plannerVM.today,
-                                forComponents: [.year, .month, .day],
-                                withComponents: [.hour, .minute]
-                            )
-                            endDate = startDate.addingTimeInterval(1800)
-                            allDay = false
-                            location = ""
-                            description = ""
-                            color = 0
-                        }
-                    }
-                    .onChange(of: startDate) { date in
-                        schedule?.timeLine.0 = date
-                        endDate = plannerVM.getMergedDate(
-                            for: startDate,
-                            with: endDate,
+                    .onChange(of: scheduleVM.startDate) { date in
+                        scheduleVM.endDate = plannerVM.getMergedDate(
+                            for: scheduleVM.startDate,
+                            with: scheduleVM.endDate,
                             forComponents: [.year, .month, .day],
                             withComponents: [.hour, .minute]
                         )
