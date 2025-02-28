@@ -5,14 +5,49 @@
 //  Created by opfic on 2/22/25.
 //
 
-import SwiftUI
+import Foundation
 
-struct ScheduleViewModel: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+class ScheduleViewModel: ObservableObject {
+    @Published var title = ""
+    @Published var startDate = Date()
+    @Published var endDate = Date()
+    @Published var allDay = false
+    @Published var cycleOption = ScheduleData.CycleOption.none
+    @Published var location = ""
+    @Published var description = ""
+    @Published var color = 0
+    
+    func getSchedule() -> ScheduleData {
+        return ScheduleData(
+            title: title,
+            timeLine: (startDate, endDate),
+            allDay: allDay,
+            cycleOption: cycleOption,
+            location: location,
+            description: description,
+            color: color
+        )
     }
-}
-
-#Preview {
-    ScheduleViewModel()
+    
+    func setSchedule(schedule: ScheduleData) {
+        title = schedule.title
+        startDate = schedule.timeLine.0
+        endDate = schedule.timeLine.1
+        allDay = schedule.allDay
+        cycleOption = schedule.cycleOption
+        location = schedule.location
+        description = schedule.description
+        color = schedule.color
+    }
+    
+    func setSchedule(startDate: Date) {
+        title = ""
+        self.startDate = startDate
+        self.endDate = startDate.addingTimeInterval(1800)
+        allDay = false
+        cycleOption = .none
+        location = ""
+        description = ""
+        color = 0
+    }
 }
