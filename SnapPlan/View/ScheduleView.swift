@@ -428,6 +428,18 @@ struct ScheduleView: View {
             )
         }
     }
+    
+    @ViewBuilder
+    private var LocationView: some View {
+        if scheduleVM.location.isEmpty {
+            SearchLocationView()
+                .environmentObject(scheduleVM)
+        }
+        else {
+            MapView()
+                .environmentObject(scheduleVM)
+        }
+    }
 }
 
 #Preview {
