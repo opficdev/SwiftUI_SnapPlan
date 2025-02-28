@@ -18,15 +18,7 @@ struct ScheduleView: View {
     @EnvironmentObject var plannerVM: PlannerViewModel
     @EnvironmentObject var firebaseVM: FirebaseViewModel
     @EnvironmentObject var uiVM: UIViewModel
-    
-    @State private var title = ""
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-    @State private var allDay = false
-    @State private var cycleOption = ScheduleData.CycleOption.none
-    @State private var location = ""
-    @State private var description = ""
-    @State private var color = 0
+    @StateObject var scheduleVM = ScheduleViewModel()
     
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
@@ -74,7 +66,7 @@ struct ScheduleView: View {
                     VStack {
                         HStack {
                             Spacer()
-                            if title.isEmpty {
+                            if scheduleVM.title.isEmpty {
                                 Button(action: {
                                     addSchedule = false
                                     titleFocus = false
@@ -118,7 +110,7 @@ struct ScheduleView: View {
                                             )
                                             Task {
                                                 try await firebaseVM.addScheduleData(schedule: copy)
-                                                await firebaseVM.loadScheduleData(date: startDate)
+                                                await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                             }
                                         }) {
                                             Label("복제", systemImage: "doc.on.doc")
@@ -136,18 +128,12 @@ struct ScheduleView: View {
                                     }
                                 }
                                 Button(action: {
-                                    if var schedule = schedule, !schedule.title.isEmpty {
+                                    if let schedule = schedule, !schedule.title.isEmpty {
                                         Task {
                                             do {
-                                                schedule.title = title
-                                                schedule.timeLine = (startDate, endDate)
-                                                schedule.allDay = allDay
-                                                schedule.cycleOption = cycleOption
-                                                schedule.location = location
-                                                schedule.description = description
-                                                schedule.color = color
-                                                try await firebaseVM.modifyScheduleData(schedule: schedule)
-                                                await firebaseVM.loadScheduleData(date: startDate)
+                                                let newSchedule = scheduleVM.getSchedule()
+                                                try await firebaseVM.modifyScheduleData(schedule: newSchedule)
+                                                await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                             } catch {
                                                 print("스케줄 수정 실패: \(error)")
                                             }
@@ -156,17 +142,9 @@ struct ScheduleView: View {
                                     else {
                                         Task {
                                             do {
-                                                let schedule = ScheduleData(
-                                                    title: title,
-                                                    timeLine: (startDate, endDate),
-                                                    allDay: allDay,
-                                                    cycleOption: cycleOption,
-                                                    location: location,
-                                                    description: description,
-                                                    color: color
-                                                )
+                                                let schedule = scheduleVM.getSchedule()
                                                 try await firebaseVM.addScheduleData(schedule: schedule)
-                                                await firebaseVM.loadScheduleData(date: startDate)
+                                                await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                             } catch {
                                                 print("스케줄 추가 실패: \(error)")
                                             }
@@ -195,7 +173,7 @@ struct ScheduleView: View {
                         .frame(height: 30)
                         ScrollView {
                             VStack(alignment: .leading) {
-                                UIKitTextEditor(text: $title, isFocused: $titleFocus, placeholder: "제목", font: .title2)
+                                UIKitTextEditor(text: $scheduleVM.title, isFocused: $titleFocus, placeholder: "제목", font: .title2)
                                     .textSelection(.enabled)
                                 Divider()
                                     .padding(.vertical)
@@ -205,35 +183,35 @@ struct ScheduleView: View {
                                         .frame(width: 25)
                                     VStack(alignment: .leading, spacing: 10) {
                                         HStack(spacing: 0) {
-                                            Text(plannerVM.getDateString(for: startDate, components: [.hour, .minute]))
-                                                .foregroundStyle(tapStartTime ? Color.blue : (allDay ? Color.gray : Color.primary))
+                                            Text(plannerVM.getDateString(for: scheduleVM.startDate, components: [.hour, .minute]))
+                                                .foregroundStyle(tapStartTime ? Color.blue : (scheduleVM.allDay ? Color.gray : Color.primary))
                                                 .onTapGesture {
                                                     tapStartTime.toggle()
                                                     tapEndTime = false
                                                 }
                                                 .frame(width: screenWidth / 4, alignment: .leading)
-                                                .disabled(allDay)
+                                                .disabled(scheduleVM.allDay)
                                             Image(systemName: "arrow.right")
                                                 .foregroundStyle(Color.gray)
                                                 .frame(width: screenWidth / 10, alignment: .leading)
-                                            Text(plannerVM.getDateString(for: endDate, components: [.hour, .minute]))
-                                                .foregroundStyle(tapEndTime ? Color.blue : (allDay ? Color.gray : Color.primary))
+                                            Text(plannerVM.getDateString(for: scheduleVM.endDate, components: [.hour, .minute]))
+                                                .foregroundStyle(tapEndTime ? Color.blue : (scheduleVM.allDay ? Color.gray : Color.primary))
                                                 .onTapGesture {
                                                     tapEndTime.toggle()
                                                     tapStartTime = false
                                                 }
-                                                .disabled(allDay)
+                                                .disabled(scheduleVM.allDay)
                                         }
                                         HStack(spacing: 0) {
-                                            Text(plannerVM.getDateString(for: startDate, components: [.month, .day]))
+                                            Text(plannerVM.getDateString(for: scheduleVM.startDate, components: [.month, .day]))
                                                 .foregroundStyle(tapStartDate ? Color.blue : Color.primary)
                                                 .onTapGesture {
                                                     tapStartDate.toggle()
                                                     tapEndDate = false
                                                 }
                                                 .frame(width: screenWidth / 4 + screenWidth / 10, alignment: .leading)
-                                            if !plannerVM.isSameDate(date1: startDate, date2: endDate, components: [.year, .month, .day]) || allDay {
-                                                Text(plannerVM.getDateString(for: endDate, components: [.month, .day]))
+                                            if !plannerVM.isSameDate(date1: scheduleVM.startDate, date2: scheduleVM.endDate, components: [.year, .month, .day]) || scheduleVM.allDay {
+                                                Text(plannerVM.getDateString(for: scheduleVM.endDate, components: [.month, .day]))
                                                     .foregroundStyle(tapEndDate ? Color.blue : Color.primary)
                                                     .onTapGesture {
                                                         tapEndDate.toggle()
@@ -248,7 +226,7 @@ struct ScheduleView: View {
                                     Image(systemName: "sun.max")
                                         .foregroundStyle(Color.gray)
                                         .frame(width: 25)
-                                    Toggle("종일", isOn: $allDay)
+                                    Toggle("종일", isOn: $scheduleVM.allDay)
                                         .toggleStyle(SwitchToggleStyle(tint: Color.blue))
                                         .frame(width: screenWidth / 4)
                                 }
@@ -273,7 +251,7 @@ struct ScheduleView: View {
                                             tapColor.toggle()
                                         }
                                         .sheet(isPresented: $tapColor) {
-                                            ColorSelector(color: $color)
+                                            ColorSelector(color: $scheduleVM.color)
                                         }
                                 }
                                 Divider()
@@ -297,15 +275,16 @@ struct ScheduleView: View {
                                         Image(systemName: "map")
                                             .frame(width: 25)
                                             .foregroundStyle(Color.gray)
-                                        NavigationLink(destination: MapView(location: $location)) {
-                                            Text(location.isEmpty ? "위치" : location)
-                                                .foregroundStyle(location.isEmpty ? Color.gray : Color.primary)
+                                        NavigationLink(destination: LocationView) {
+                                            Text(scheduleVM.location.isEmpty ? "위치" : scheduleVM.location)
+                                                .foregroundStyle(scheduleVM.location.isEmpty ? Color.gray : Color.primary)
+                                                .underline(!scheduleVM.location.isEmpty)
                                         }
                                     }
                                 }
                                 Divider()
                                     .padding(.vertical)
-                                UIKitTextEditor(text: $description, isFocused: $descriptionFocus, placeholder: "설명")
+                                UIKitTextEditor(text: $scheduleVM.description, isFocused: $descriptionFocus, placeholder: "설명")
                                 Divider()
                                     .padding(.vertical)
                             }
@@ -359,26 +338,26 @@ struct ScheduleView: View {
                     }
                     .sheet(isPresented: $tapStartTime) {
                         DateTimePicker(
-                            selectedTime: $startDate,
+                            selectedTime: $scheduleVM.startDate,
                             component: .hourAndMinute
                         )
                     }
                     .sheet(isPresented: $tapEndTime) {
                         DateTimePicker(
-                            selectedTime: $endDate,
+                            selectedTime: $scheduleVM.endDate,
                             component: .hourAndMinute
                         )
                     }
                     .sheet(isPresented: $tapStartDate) {
                         DateTimePicker(
-                            selectedTime: $startDate,
+                            selectedTime: $scheduleVM.startDate,
                             component: .date,
                             style: .graphical
                         )
                     }
                     .sheet(isPresented: $tapEndDate) {
                         DateTimePicker(
-                            selectedTime: $endDate,
+                            selectedTime: $scheduleVM.endDate,
                             component: .date,
                             style: .graphical
                         )
@@ -398,8 +377,7 @@ struct ScheduleView: View {
                                         schedule = nil
                                     }
                                     try await firebaseVM.deleteScheduleData(schedule: schedule!)
-                                    await firebaseVM.loadScheduleData(date: startDate)
-                                    schedule = nil
+                                    await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                 }
                             }
                         }) {
@@ -433,23 +411,23 @@ struct ScheduleView: View {
                     }
                 }
             }
-            .onChange(of: startDate) { date in
-                if endDate < date {
-                    if allDay {
-                        endDate = plannerVM.getMergedDate(for: date, with: endDate, forComponents: [.year, .month, .day], withComponents: [.hour, .minute])
+            .onChange(of: scheduleVM.startDate) { date in
+                if scheduleVM.endDate < date {
+                    if scheduleVM.allDay {
+                        scheduleVM.endDate = plannerVM.getMergedDate(for: date, with: scheduleVM.endDate, forComponents: [.year, .month, .day], withComponents: [.hour, .minute])
                     }
                     else {
-                        endDate = date.addingTimeInterval(1800)
+                        scheduleVM.endDate = date.addingTimeInterval(1800)
                     }
                 }
             }
-            .onChange(of: endDate) { date in
-                if date < startDate {
-                    if allDay {
-                        startDate = plannerVM.getMergedDate(for: date, with: startDate, forComponents: [.year, .month, .day], withComponents: [.hour, .minute])
+            .onChange(of: scheduleVM.endDate) { date in
+                if date < scheduleVM.startDate {
+                    if scheduleVM.allDay {
+                        scheduleVM.startDate = plannerVM.getMergedDate(for: date, with: scheduleVM.startDate, forComponents: [.year, .month, .day], withComponents: [.hour, .minute])
                     }
                     else {
-                        startDate = date.addingTimeInterval(-1800)
+                        scheduleVM.startDate = date.addingTimeInterval(-1800)
                     }
                 }
             }
