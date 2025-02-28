@@ -21,6 +21,7 @@ struct MapView: View {
         }
     }
     
+    //  검색된 위치를 지도에 띄우도록 해야함
     var body: some View {
         Map(coordinateRegion: region, showsUserLocation: true)
             .onChange(of: mapVM.userLocation) { location in

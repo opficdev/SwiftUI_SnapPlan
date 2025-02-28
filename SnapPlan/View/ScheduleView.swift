@@ -290,6 +290,7 @@ struct ScheduleView: View {
                                         Image(systemName: "map")
                                             .frame(width: 25)
                                             .foregroundStyle(Color.gray)
+                                        // NavigationLink 내 뷰일 경우 selectedDetent를 .large로 고정해야함
                                         NavigationLink(destination: LocationView) {
                                             Text(scheduleVM.location.isEmpty ? "위치" : scheduleVM.location)
                                                 .foregroundStyle(scheduleVM.location.isEmpty ? Color.gray : Color.primary)
