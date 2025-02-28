@@ -394,6 +394,9 @@ struct ScheduleView: View {
                             descriptionFocus = false
                             Task {
                                 do {
+                                    defer { //  firebase에서 오류가 나도 실행
+                                        schedule = nil
+                                    }
                                     try await firebaseVM.deleteScheduleData(schedule: schedule!)
                                     await firebaseVM.loadScheduleData(date: startDate)
                                     schedule = nil
