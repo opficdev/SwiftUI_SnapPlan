@@ -290,7 +290,6 @@ struct ScheduleView: View {
                                         Image(systemName: "map")
                                             .frame(width: 25)
                                             .foregroundStyle(Color.gray)
-                                        // NavigationLink 내 뷰일 경우 selectedDetent를 .large로 고정해야함
                                         NavigationLink(destination: LocationView) {
                                             Text(scheduleVM.location.isEmpty ? "위치" : scheduleVM.location)
                                                 .foregroundStyle(scheduleVM.location.isEmpty ? Color.gray : Color.primary)
@@ -443,14 +442,25 @@ struct ScheduleView: View {
     
     @ViewBuilder
     private var LocationView: some View {
-        if scheduleVM.location.isEmpty {
-            SearchLocationView()
-                .environmentObject(scheduleVM)
-                .environmentObject(searchVM)
+        Group {
+            if scheduleVM.location.isEmpty {
+                SearchLocationView()
+                    .environmentObject(scheduleVM)
+                    .environmentObject(searchVM)
+            } else {
+                MapView()
+                    .environmentObject(scheduleVM)
+            }
         }
-        else {
-            MapView()
-                .environmentObject(scheduleVM)
+        .onAppear {
+            currentDetent = currentDetent.union([.large])
+            selectedDetent = .large
+            DispatchQueue.main.async {
+                currentDetent = currentDetent.subtracting([.fraction(0.4)])
+            }
+        }
+        .onDisappear {
+            currentDetent = currentDetent.union([.fraction(0.4)])
         }
     }
 }
