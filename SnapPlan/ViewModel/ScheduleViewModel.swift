@@ -14,6 +14,7 @@ class ScheduleViewModel: ObservableObject {
     @Published var allDay = false
     @Published var cycleOption = ScheduleData.CycleOption.none
     @Published var location = ""
+    @Published var address = ""
     @Published var description = ""
     @Published var color = 0
     

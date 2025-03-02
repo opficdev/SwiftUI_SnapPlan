@@ -15,6 +15,7 @@ struct ScheduleData: Identifiable {
     var allDay: Bool // 종일 일정 여부
     var cycleOption: CycleOption    // 일정 반복 주기
     var location: String // 일정 장소
+    var address: String  // 장소에 대한 주소
     var description: String  // 일정 설명
     var color: Int  // 일정 색상(뷰에서 사용할 Color 배열의 인덱스임)
     
@@ -26,6 +27,7 @@ struct ScheduleData: Identifiable {
         allDay: Bool = false,
         cycleOption: CycleOption = .none,
         location: String = "",
+        address: String = "",
         description: String = "",
         color: Int = 0
     ) {
@@ -36,6 +38,7 @@ struct ScheduleData: Identifiable {
         self.allDay = allDay
         self.cycleOption = cycleOption
         self.location = location
+        self.address = address
         self.description = description
         self.color = color
     }
