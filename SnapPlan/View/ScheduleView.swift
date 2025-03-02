@@ -291,10 +291,20 @@ struct ScheduleView: View {
                                             .frame(width: 25)
                                             .foregroundStyle(Color.gray)
                                         NavigationLink(destination: LocationView) {
-                                            Text(scheduleVM.location.isEmpty ? "위치" : scheduleVM.location)
-                                                .foregroundStyle(scheduleVM.location.isEmpty ? Color.gray : Color.primary)
-                                                .underline(!scheduleVM.location.isEmpty)
+                                            VStack(alignment: .leading) {
+                                                Text(scheduleVM.location.isEmpty ? "위치" : scheduleVM.location)
+                                                    .foregroundStyle(scheduleVM.location.isEmpty ? Color.gray : Color.primary)
+                                                    .underline(!scheduleVM.address.isEmpty)
+                                                    .lineLimit(1)
+                                                if !scheduleVM.address.isEmpty {
+                                                    Text(scheduleVM.address)
+                                                        .font(.caption)
+                                                        .foregroundStyle(Color.gray)
+                                                        .lineLimit(1)
+                                                }
+                                            }
                                         }
+                                        .disabled(!scheduleVM.location.isEmpty && scheduleVM.address.isEmpty)
                                         .navigationTitle("")
                                         Spacer()
                                         if !scheduleVM.location.isEmpty {
@@ -443,7 +453,7 @@ struct ScheduleView: View {
     @ViewBuilder
     private var LocationView: some View {
         Group {
-            if scheduleVM.location.isEmpty {
+            if scheduleVM.address.isEmpty {
                 SearchLocationView()
                     .environmentObject(scheduleVM)
                     .environmentObject(searchVM)
