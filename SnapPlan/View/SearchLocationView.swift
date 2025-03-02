@@ -51,6 +51,7 @@ struct SearchLocationView: View {
                 }
                 .onTapGesture {
                     scheduleVM.location = suggestion.title
+                    scheduleVM.address = suggestion.subtitle
                     searchVM.query = suggestion.title
                     dismiss()
                 }
