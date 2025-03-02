@@ -14,6 +14,8 @@ struct SearchLocationView: View {
     @Environment(\.colorScheme) var colorScheme
     @FocusState private var focused: Bool
     
+    @State private var address = ""
+    
     var body: some View {
         VStack {
             HStack {
@@ -50,8 +52,7 @@ struct SearchLocationView: View {
                         .foregroundColor(.gray)
                 }
                 .onTapGesture {
-                    scheduleVM.location = suggestion.title
-                    scheduleVM.address = suggestion.subtitle
+                    address = suggestion.subtitle
                     searchVM.query = suggestion.title
                     dismiss()
                 }
@@ -67,9 +68,8 @@ struct SearchLocationView: View {
         .ignoresSafeArea(.container, edges: [.horizontal, .bottom])
         .frame(maxHeight: .infinity, alignment: .top)
         .onDisappear {
-            if searchVM.suggestions.isEmpty {
-                scheduleVM.location = searchVM.query
-            }
+            scheduleVM.location = searchVM.query
+            scheduleVM.address = address
             DispatchQueue.main.async {
                 focused = false
             }
