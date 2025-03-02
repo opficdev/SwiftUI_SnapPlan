@@ -23,14 +23,28 @@ struct MapView: View {
     
     //  검색된 위치를 지도에 띄우도록 해야함
     var body: some View {
-        Map(coordinateRegion: region, showsUserLocation: true)
-            .onChange(of: mapVM.userLocation) { location in
-                DispatchQueue.main.async {
-                    if let location = location {
-                        mapVM.region.center = location
-                    }
+        Map(coordinateRegion: region, showsUserLocation: true, annotationItems: mapVM.annotations) { point in
+            MapAnnotation(coordinate: point.annotation.coordinate) {
+                VStack {
+                    Image(systemName: "mappin.circle.fill")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                        .foregroundStyle(Color.white, Color.red)
+                    Text(scheduleVM.location)
+                        .font(.caption)
                 }
             }
+        }
+        .onAppear {
+            mapVM.showLocation(location: scheduleVM.location, address: scheduleVM.address)
+        }
+        .onChange(of: mapVM.userLocation) { location in
+            DispatchQueue.main.async {
+                if let location = location, scheduleVM.address.isEmpty {
+                    mapVM.region.center = location
+                }
+            }
+        }
         .ignoresSafeArea(.all, edges: [.bottom, .horizontal])
         .toolbar{
             ToolbarItem(placement: .principal) {
