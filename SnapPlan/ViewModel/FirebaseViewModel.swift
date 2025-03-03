@@ -210,6 +210,7 @@ extension FirebaseViewModel {
                 "allDay": schedule.allDay,
                 "cycleOption": schedule.cycleOption.rawValue,
                 "location": schedule.location,
+                "address": schedule.address,
                 "description": schedule.description,
                 "color": schedule.color
             ]
@@ -268,6 +269,7 @@ extension FirebaseViewModel {
                       let allDay = data["allDay"] as? Bool,
                       let cycleOption = ScheduleData.CycleOption(rawValue: data["cycleOption"] as? String ?? "none"),
                       let location = data["location"] as? String,
+                      let address = data["address"] as? String,
                       let description = data["description"] as? String else {
                     return nil
                 }
