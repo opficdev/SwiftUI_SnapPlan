@@ -76,9 +76,7 @@ final class FirebaseViewModel: ObservableObject {
     /// 사용자의 오늘을 포함한 달의 전체 스케줄 데이터를 불러오는 메소드
     func loadScheduleData(date: Date = Date()) async {
         do {
-            let dateString = DateFormatter.yyyyMMdd.string(from: date)
-            
-            if let arr = try await fetchScheduleData(dateString: dateString) {
+            if let arr = try await fetchScheduleData(date: date) {
                 await MainActor.run {
                     self.schedules = arr
                 }
@@ -199,9 +197,8 @@ extension FirebaseViewModel {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
         }
-        let dateString = DateFormatter.yyyyMMdd.string(from: schedule.timeLine.0)
-        
-        let docRef = db.collection(userId).document("scheduleData").collection(dateString).document(schedule.id.uuidString)
+
+        let docRef = db.collection(userId).document("schedules").collection("data").document(schedule.id.uuidString)
         
         do {
             let newEntry: [String: Any] = [
@@ -227,7 +224,7 @@ extension FirebaseViewModel {
             throw URLError(.userAuthenticationRequired)
         }
         do {
-            try await db.collection(userId).document("scheduleData").collection(DateFormatter.yyyyMMdd.string(from: schedule.timeLine.0)).document(schedule.id.uuidString).delete()
+            try await db.collection(userId).document("schedules").collection("data").document(schedule.id.uuidString).delete()
         } catch {
             print("Schedule Delete Error: \(error.localizedDescription)")
         }
