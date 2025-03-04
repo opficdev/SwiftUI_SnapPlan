@@ -51,9 +51,11 @@ struct SearchLocationView: View {
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
                 .onTapGesture {
-                    address = suggestion.subtitle
                     searchVM.query = suggestion.title
+                    address = suggestion.subtitle
                     dismiss()
                 }
             }
