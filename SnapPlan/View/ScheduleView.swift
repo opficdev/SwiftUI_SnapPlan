@@ -146,7 +146,7 @@ struct ScheduleView: View {
                                     if let schedule = schedule, !schedule.title.isEmpty {
                                         Task {
                                             do {
-                                                let newSchedule = scheduleVM.getSchedule()
+                                                let newSchedule = scheduleVM.getSchedule(id: schedule.id)
                                                 try await firebaseVM.modifyScheduleData(schedule: newSchedule)
                                                 await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                             } catch {
@@ -157,7 +157,7 @@ struct ScheduleView: View {
                                     else {
                                         Task {
                                             do {
-                                                let schedule = scheduleVM.getSchedule()
+                                                let schedule = scheduleVM.getSchedule(id: nil)
                                                 try await firebaseVM.addScheduleData(schedule: schedule)
                                                 await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                             } catch {

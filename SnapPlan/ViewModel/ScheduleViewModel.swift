@@ -18,8 +18,9 @@ class ScheduleViewModel: ObservableObject {
     @Published var description = ""
     @Published var color = 0
     
-    func getSchedule() -> ScheduleData {
+    func getSchedule(id: UUID?) -> ScheduleData {
         return ScheduleData(
+            id: id == nil ? UUID() : id!,
             title: title,
             timeLine: (startDate, endDate),
             allDay: allDay,
