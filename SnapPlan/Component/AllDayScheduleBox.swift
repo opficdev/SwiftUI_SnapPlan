@@ -46,6 +46,6 @@ struct AllDayScheduleBox: View {
 #Preview {
     AllDayScheduleBox(
         height: .constant(20),
-        schedule: .constant(ScheduleData(timeLine: (Date(), Date())))
+        schedule: .constant(ScheduleData(startDate: Date(), endDate: Date()))
     )
 }

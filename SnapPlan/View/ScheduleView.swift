@@ -118,7 +118,8 @@ struct ScheduleView: View {
                                         Button(action: {
                                             let copy = ScheduleData(
                                                 title: schedule.title,
-                                                timeLine: (schedule.timeLine.0.addingTimeInterval(3600), schedule.timeLine.1.addingTimeInterval(3600)),
+                                                startDate: schedule.startDate.addingTimeInterval(3600),
+                                                endDate: schedule.endDate.addingTimeInterval(3600),
                                                 location: schedule.location,
                                                 description: schedule.description,
                                                 color: schedule.color
@@ -480,7 +481,8 @@ struct ScheduleView: View {
         schedule: .constant(
             ScheduleData(
                 title: "Test Title",
-                timeLine: (Date(), Date().addingTimeInterval(1800)),
+                startDate: Date(),
+                endDate: Date(),
                 location: "Test Location",
                 description: "Test Description",
                 color: 0

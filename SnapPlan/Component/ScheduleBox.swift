@@ -69,16 +69,16 @@ struct ScheduleBox: View {
                 .onChange(of: schedule?.color) { color in
                     colorIdx = color ?? 0
                 }
-                .onChange(of: schedule?.timeLine.0) { date in
+                .onChange(of: schedule?.startDate) { date in
                     if let date = date {
                         if !didDateChangedByDrag {
                             startOffset = getOffsetFromDate(for: date, timeZoneHeight: timeZoneHeight, gap: gap)
-                            boxHeight = getOffsetFromDate(for: schedule!.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap) - startOffset
+                            boxHeight = getOffsetFromDate(for: schedule!.endDate, timeZoneHeight: timeZoneHeight, gap: gap) - startOffset
                             lastHeight = boxHeight
                         }
                     }
                 }
-                .onChange(of: schedule?.timeLine.1) { date in
+                .onChange(of: schedule?.endDate) { date in
                     if let date = date {
                         if !didDateChangedByDrag {  //  드래그 시 알아서 시간이 변경되므로 조건 추가
                             boxHeight = getOffsetFromDate(for: date, timeZoneHeight: timeZoneHeight, gap: gap) - startOffset
@@ -117,11 +117,11 @@ struct ScheduleBox: View {
                                         withAnimation(.linear(duration: 0.1)) {
                                             if let schedule = schedule {
                                                 boxHeight = max(lastHeight - offset.translation.height * 2, 4)
-                                                let newDate = getDateFromOffset(date: schedule.timeLine.1, offset: -boxHeight)
+                                                let newDate = getDateFromOffset(date: schedule.endDate, offset: -boxHeight)
                                                 startOffset = getOffsetFromDate(for: newDate, timeZoneHeight: timeZoneHeight, gap: gap)
                                                 DispatchQueue.main.async {
                                                     if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
-                                                        self.schedule!.timeLine.0 = newDate
+                                                        self.schedule!.startDate = newDate
                                                     }
                                                 }
                                             }
@@ -150,10 +150,10 @@ struct ScheduleBox: View {
                                         withAnimation(.linear(duration: 0.1)) { //  과도한 AnimatablePair 변경 방지
                                             if let schedule = schedule {
                                                 boxHeight = max(lastHeight + offset.translation.height * 2, 4)
-                                                let newDate = getDateFromOffset(date: schedule.timeLine.0, offset: boxHeight)
+                                                let newDate = getDateFromOffset(date: schedule.startDate, offset: boxHeight)
                                                 DispatchQueue.main.async {
                                                     if Calendar.current.component(.minute, from: newDate) % 5 == 0 {
-                                                        self.schedule!.timeLine.1 = newDate
+                                                        self.schedule!.endDate = newDate
                                                     }
                                                 }
                                             }
@@ -179,8 +179,8 @@ struct ScheduleBox: View {
     }
     
     func getScheduleBoxOffset(from data: ScheduleData, timeZoneHeight: CGFloat, gap: CGFloat) -> (CGFloat, CGFloat) {
-        let startOffset = getOffsetFromDate(for: data.timeLine.0, timeZoneHeight: timeZoneHeight, gap: gap)
-        let endOffset = getOffsetFromDate(for: data.timeLine.1, timeZoneHeight: timeZoneHeight, gap: gap)
+        let startOffset = getOffsetFromDate(for: data.startDate, timeZoneHeight: timeZoneHeight, gap: gap)
+        let endOffset = getOffsetFromDate(for: data.endDate, timeZoneHeight: timeZoneHeight, gap: gap)
         
         return (startOffset, endOffset - startOffset)
     }

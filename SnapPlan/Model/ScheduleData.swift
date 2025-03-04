@@ -10,7 +10,8 @@ import Foundation
 struct ScheduleData: Identifiable {
     let id: UUID //  UUID
     var title: String   // 일정 제목
-    var timeLine: (Date, Date)  // 일정 시간 범위
+    var startDate: Date // 일정 시작 날짜
+    var endDate: Date   // 일정 종료 날짜
     var isChanging: Bool  // 일정 시간 변경 중인지 확인
     var allDay: Bool // 종일 일정 여부
     var cycleOption: CycleOption    // 일정 반복 주기
@@ -22,7 +23,8 @@ struct ScheduleData: Identifiable {
     init(
         id: UUID = UUID(),
         title: String = "",
-        timeLine: (Date, Date), //  .0과 .1이 날짜가 다를 수 있어서 [(Date, Date), (Date, Date)...] 형태로 변경 예정
+        startDate: Date,
+        endDate: Date,
         isChanging: Bool = false,
         allDay: Bool = false,
         cycleOption: CycleOption = .none,
@@ -33,7 +35,8 @@ struct ScheduleData: Identifiable {
     ) {
         self.id = id
         self.title = title
-        self.timeLine = timeLine
+        self.startDate = startDate
+        self.endDate = endDate
         self.isChanging = isChanging
         self.allDay = allDay
         self.cycleOption = cycleOption

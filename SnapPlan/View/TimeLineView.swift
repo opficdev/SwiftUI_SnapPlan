@@ -127,8 +127,8 @@ struct TimeLineView: View {
                                                                         .onTapGesture {
                                                                             if schedule == nil && 0 < index {
                                                                                 let endDate = plannerVM.getDateFromIndex(index: index)
-                                                                                let beginDate = endDate.addingTimeInterval(-1800)
-                                                                                schedule = ScheduleData(timeLine: (beginDate, endDate), isChanging: true)
+                                                                                let startDate = endDate.addingTimeInterval(-1800)
+                                                                                schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
                                                                             }
                                                                         }
                                                                     Divider()
@@ -137,9 +137,9 @@ struct TimeLineView: View {
                                                                         .frame(maxHeight: .infinity)
                                                                         .onTapGesture {
                                                                             if schedule == nil && index < 24{
-                                                                                let beginDate = plannerVM.getDateFromIndex(index: index)
-                                                                                let endDate = beginDate.addingTimeInterval(1800)
-                                                                                schedule = ScheduleData(timeLine: (beginDate, endDate), isChanging: true)
+                                                                                let startDate = plannerVM.getDateFromIndex(index: index)
+                                                                                let endDate = startDate.addingTimeInterval(1800)
+                                                                                schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
                                                                             }
                                                                         }
                                                                 }
@@ -167,7 +167,7 @@ struct TimeLineView: View {
                                                         }
                                                         
                                                         if schedule != nil && !schedule!.allDay {    //  현재 조작중인 스케줄
-                                                            if plannerVM.isSameDate(date1: schedule!.timeLine.0, date2: date, components: [.year, .month, .day]) {
+                                                            if plannerVM.isSameDate(date1: schedule!.startDate, date2: date, components: [.year, .month, .day]) {
                                                                 ScheduleBox(
                                                                     gap: gap,
                                                                     timeZoneHeight: timeZoneSize.height,
@@ -254,9 +254,9 @@ struct TimeLineView: View {
                         .frame(width: screenWidth * 6 / 7, height: uiVM.allDayPadding, alignment: .top)
                         .background(Color.timeLine) //  터치 이벤트
                         .onTapGesture {
-                            let beginDate = Calendar.current.startOfDay(for: plannerVM.selectDate).addingTimeInterval(60 * 60 * 12)
-                            let endDate = beginDate.addingTimeInterval(1800)
-                            schedule = ScheduleData(timeLine: (beginDate, endDate), allDay: true)
+                            let startDate = Calendar.current.startOfDay(for: plannerVM.selectDate).addingTimeInterval(60 * 60 * 12)
+                            let endDate = startDate.addingTimeInterval(1800)
+                            schedule = ScheduleData(startDate: startDate, endDate: endDate, allDay: true)
                         }
                     }
                     .background(Color.timeLine)
