@@ -73,13 +73,16 @@ User UID (컬렉션) ⬅️ FirebaseAuth와 연동
 │   ├── signedAt: TimeStamp
 │   └── User UID: String
 │
-└── scheduleData (문서)
-    ├── yyyy-MM-dd (서브 컬렉션) ⬅️ 일정이 시작되는 날짜
-    │   ├── UUID().uuidString (문서)
-    │   │   ├── color: Int
-    │   │   ├── cycleOption: String
-    │   │   ├── description: String
-    │   │   ├── location: String
-    │   │   ├── timeLine: [TimeStamp]
-    │   │   └── title: String
+└── schedules (문서)
+    └── data (서브 컬렉션)
+        ├── UUID().uuidString (문서)
+        │   ├── address: String
+        │   ├── allDay: Bool
+        │   ├── color: Int
+        │   ├── cycleOption: String
+        │   ├── description: String
+        │   ├── endDate: TimeStamp
+        │   ├── location: String
+        │   ├── startDate: TimeStamp
+        │   └── title: String
 ```
