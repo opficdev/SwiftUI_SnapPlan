@@ -246,13 +246,19 @@ extension FirebaseViewModel {
     }
 
     
-    func fetchScheduleData(dateString: String) async throws -> [ScheduleData]? {
+    func fetchScheduleData(date: Date) async throws -> [ScheduleData]? {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         
-        let docRef = db.collection(userId).document("scheduleData").collection(dateString)
+        let startOfDay = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: date)!
+        let endOfDay = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
         
+        
+        let docRef = db.collection(userId).document("schedules").collection("data")
+            .whereField("startDate", isLessThanOrEqualTo: endOfDay)
+            .whereField("endDate", isGreaterThanOrEqualTo: startOfDay)
+     
         do {
             let snapshot = try await docRef.getDocuments()
             
