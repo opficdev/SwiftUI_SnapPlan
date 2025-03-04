@@ -285,6 +285,7 @@ extension FirebaseViewModel {
                     allDay: allDay,
                     cycleOption: cycleOption,
                     location: location,
+                    address: address,
                     description: description,
                     color: color
                 )
