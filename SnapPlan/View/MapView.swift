@@ -21,19 +21,9 @@ struct MapView: View {
         }
     }
     
-    //  검색된 위치를 지도에 띄우도록 해야함
     var body: some View {
         Map(coordinateRegion: region, showsUserLocation: true, annotationItems: mapVM.annotations) { point in
-            MapAnnotation(coordinate: point.annotation.coordinate) {
-                VStack {
-                    Image(systemName: "mappin.circle.fill")
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                        .foregroundStyle(Color.white, Color.red)
-                    Text(scheduleVM.location)
-                        .font(.caption)
-                }
-            }
+            MapMarker(coordinate: point.annotation.coordinate, tint: Color.blue)
         }
         .onAppear {
             mapVM.showLocation(location: scheduleVM.location, address: scheduleVM.address)
