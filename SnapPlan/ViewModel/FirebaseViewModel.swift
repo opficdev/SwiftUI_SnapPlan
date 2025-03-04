@@ -20,7 +20,7 @@ final class FirebaseViewModel: ObservableObject {
     @Published var signedIn: Bool? = nil
     @Published var is12TimeFmt: Bool = true
     @Published var screenMode: UIUserInterfaceStyle = .unspecified
-    @Published var schedules: [String:[ScheduleData]] = [:]
+    @Published var schedules: [ScheduleData] = []
     
     init() {
         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
@@ -80,11 +80,11 @@ final class FirebaseViewModel: ObservableObject {
             
             if let arr = try await fetchScheduleData(dateString: dateString) {
                 await MainActor.run {
-                    self.schedules[dateString] = arr
+                    self.schedules = arr
                 }
             }
             else {
-                self.schedules.removeValue(forKey: dateString)
+                self.schedules.removeAll()
             }
         } catch {
             print("Schedule Load Error: \(error.localizedDescription)")
