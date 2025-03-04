@@ -22,7 +22,8 @@ class ScheduleViewModel: ObservableObject {
         return ScheduleData(
             id: id == nil ? UUID() : id!,
             title: title,
-            timeLine: (startDate, endDate),
+            startDate: startDate,
+            endDate: endDate,
             allDay: allDay,
             cycleOption: cycleOption,
             location: location,
@@ -33,8 +34,8 @@ class ScheduleViewModel: ObservableObject {
     
     func setSchedule(schedule: ScheduleData) {
         title = schedule.title
-        startDate = schedule.timeLine.0
-        endDate = schedule.timeLine.1
+        startDate = schedule.startDate
+        endDate = schedule.endDate
         allDay = schedule.allDay
         cycleOption = schedule.cycleOption
         location = schedule.location
