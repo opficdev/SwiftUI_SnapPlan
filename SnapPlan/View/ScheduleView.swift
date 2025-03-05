@@ -400,13 +400,15 @@ struct ScheduleView: View {
             }
             .padding()
             .presentationDetents(currentDetent, selection: $selectedDetent)
-            .onChange(of: schedule) { value in
-                if let _ = value {
+            .onChange(of: schedule) { schedule in
+                if let schedule = schedule {
                     currentDetent = currentDetent.union([.large, .fraction(0.4)])
                     selectedDetent = .fraction(0.4)
                     DispatchQueue.main.async {
                         currentDetent = currentDetent.subtracting([.fraction(0.07)])
                     }
+                    scheduleVM.startDate = schedule.startDate
+                    scheduleVM.endDate = schedule.endDate
                 }
                 else {
                     currentDetent = currentDetent.union([.fraction(0.07)])
@@ -425,6 +427,8 @@ struct ScheduleView: View {
                         scheduleVM.endDate = date.addingTimeInterval(1800)
                     }
                 }
+                schedule?.startDate = date
+                schedule?.endDate = scheduleVM.endDate
             }
             .onChange(of: scheduleVM.endDate) { date in
                 if date < scheduleVM.startDate {
@@ -435,6 +439,8 @@ struct ScheduleView: View {
                         scheduleVM.startDate = date.addingTimeInterval(-1800)
                     }
                 }
+                schedule?.startDate = scheduleVM.startDate
+                schedule?.endDate = date
             }
             .background(
                 GeometryReader { proxy in
