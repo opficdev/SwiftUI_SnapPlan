@@ -403,7 +403,9 @@ struct ScheduleView: View {
             .onChange(of: schedule) { schedule in
                 if let schedule = schedule {
                     currentDetent = currentDetent.union([.large, .fraction(0.4)])
-                    selectedDetent = .fraction(0.4)
+                    if selectedDetent == .fraction(0.07) {
+                        selectedDetent = .fraction(0.4)
+                    }
                     DispatchQueue.main.async {
                         currentDetent = currentDetent.subtracting([.fraction(0.07)])
                     }
