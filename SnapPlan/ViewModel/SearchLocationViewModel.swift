@@ -21,7 +21,7 @@ class SearchLocationViewModel: NSObject, ObservableObject, MKLocalSearchComplete
         searchCompleter.delegate = self
         searchCompleter.resultTypes = .pointOfInterest // 검색 타입 설정 (주소, POI 등)
         
-        // SwiftUI의 @Published query 값이 변경될 때마다 검색 수행
+        // @Published query 값이 변경될 때마다 검색 수행
         $query
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main) // 입력 지연 방지
             .sink { [weak self] newQuery in
