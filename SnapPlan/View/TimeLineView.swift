@@ -147,21 +147,18 @@ struct TimeLineView: View {
                                                             }
                                                         }
                                                         
-                                                        
-                                                        let dateString = DateFormatter.yyyyMMdd.string(from: date)
-                                                        if let arr = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
-                                                            ForEach(Array(zip(arr.indices, arr)), id: \.1.id) { idx, scheduleData in
-                                                                //  종일 일정과 현재 조작중인 스케줄이 아닌 것들만 출력
-                                                                if schedule?.id != scheduleData.id && !scheduleData.allDay {
-                                                                    ScheduleBox(
-                                                                        gap: gap,
-                                                                        timeZoneHeight: timeZoneSize.height,
-                                                                        isChanging: false,
-                                                                        schedule: .constant(scheduleData)
-                                                                    )
-                                                                    .onTapGesture {
-                                                                        schedule = scheduleData
-                                                                    }
+                                                        let schedules = findSchedules(containing: date, in: firebaseVM.schedules)
+                                                        ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
+                                                            //  종일 일정과 현재 조작중인 스케줄이 아닌 것들만 출력
+                                                            if schedule?.id != scheduleData.id && !scheduleData.allDay {
+                                                                ScheduleBox(
+                                                                    gap: gap,
+                                                                    timeZoneHeight: timeZoneSize.height,
+                                                                    isChanging: false,
+                                                                    schedule: .constant(scheduleData)
+                                                                )
+                                                                .onTapGesture {
+                                                                    schedule = scheduleData
                                                                 }
                                                             }
                                                         }
@@ -232,15 +229,13 @@ struct TimeLineView: View {
                             .frame(width: timeZoneSize.width, height: uiVM.allDayPadding, alignment: .trailing)
                         
                         VStack(spacing: 3) {
-                            let dateString = DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)
-                            if let arr = firebaseVM.schedules[dateString] {   //  저장된 스케줄 목록
-                                ForEach(Array(zip(arr.indices, arr)), id: \.1.id) { idx, scheduleData in
-                                    //  종일 일정을 출력
-                                    if schedule?.id != scheduleData.id && scheduleData.allDay {
-                                        AllDayScheduleBox(height: $timeZoneSize.height, schedule: .constant(scheduleData))
-                                        .onTapGesture {
-                                            schedule = scheduleData
-                                        }
+                            let todaySchedules = findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules)
+                            ForEach(Array(zip(todaySchedules.indices, todaySchedules)), id: \.1.id) { idx, scheduleData in
+                                //  종일 일정을 출력
+                                if schedule?.id != scheduleData.id && scheduleData.allDay {
+                                    AllDayScheduleBox(height: $timeZoneSize.height, schedule: .constant(scheduleData))
+                                    .onTapGesture {
+                                        schedule = scheduleData
                                     }
                                 }
                             }
@@ -263,8 +258,8 @@ struct TimeLineView: View {
                     .border(Color.gray)
                     .onAppear {
                         DispatchQueue.main.async {
-                            let arr = firebaseVM.schedules[DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)] ?? []
-                            let count = arr.filter { $0.allDay }.count
+                            let todaySchedules = findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules)
+                            let count = todaySchedules.filter { $0.allDay }.count
                             if count < 2 {
                                 uiVM.allDayPadding = timeZoneSize.height * 2
                             }
@@ -275,8 +270,8 @@ struct TimeLineView: View {
                     }
                     .onChange(of: firebaseVM.schedules) { schedules in
                         DispatchQueue.main.async {
-                            let arr = schedules[DateFormatter.yyyyMMdd.string(from: plannerVM.selectDate)] ?? []
-                            let count = arr.filter { $0.allDay }.count
+                            let todaySchedules = findSchedules(containing: plannerVM.selectDate, in: schedules)
+                            let count = todaySchedules.filter { $0.allDay }.count
                             if count < 2 {
                                 uiVM.allDayPadding = timeZoneSize.height * 2
                             }
@@ -326,8 +321,8 @@ struct TimeLineView: View {
                 )!
             }
             DispatchQueue.main.async {
-                let arr = firebaseVM.schedules[DateFormatter.yyyyMMdd.string(from: date)] ?? []
-                let count = arr.filter { $0.allDay }.count
+                let todaySchedules = findSchedules(containing: date, in: firebaseVM.schedules)
+                let count = todaySchedules.filter { $0.allDay }.count
                 if count < 2 {
                     uiVM.allDayPadding = timeZoneSize.height * 2
                 }
@@ -370,6 +365,14 @@ struct TimeLineView: View {
                         }
                     }
                 }
+        }
+    }
+    
+    func findSchedules(containing date: Date, in dict: [String: ScheduleData]) -> [ScheduleData] {
+        return dict.values.filter { schedule in
+            let startDate = Calendar.current.startOfDay(for: schedule.startDate)
+            let endDate = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: schedule.endDate)!
+            return startDate <= date && date <= endDate
         }
     }
 }
