@@ -36,7 +36,7 @@ final class FirebaseViewModel: ObservableObject {
                 Task {
                     await self.loadTimeFormat()
                     await self.loadScreenMode()
-                    await self.loadScheduleData()
+                    await self.loadScheduleData()   //  MARK: 오늘 일정만 가져오고 있는데 넉넉하게 일주일 일정까지 가지고 오면 좋지않을까?
                     self.signedIn = true
                 }
             }
