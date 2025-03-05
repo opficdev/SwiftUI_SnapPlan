@@ -20,7 +20,7 @@ final class FirebaseViewModel: ObservableObject {
     @Published var signedIn: Bool? = nil
     @Published var is12TimeFmt: Bool = true
     @Published var screenMode: UIUserInterfaceStyle = .unspecified
-    @Published var schedules: [ScheduleData] = []
+    @Published var schedules: [String:ScheduleData] = [:]
     
     init() {
         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
@@ -76,9 +76,9 @@ final class FirebaseViewModel: ObservableObject {
     /// 사용자의 오늘을 포함한 달의 전체 스케줄 데이터를 불러오는 메소드
     func loadScheduleData(date: Date = Date()) async {
         do {
-            if let arr = try await fetchScheduleData(date: date) {
+            if let dict = try await fetchScheduleData(date: date) {
                 await MainActor.run {
-                    self.schedules = arr
+                    self.schedules.merge(dict) { _, new in new }
                 }
             }
             else {
@@ -243,7 +243,7 @@ extension FirebaseViewModel {
     }
 
     
-    func fetchScheduleData(date: Date) async throws -> [ScheduleData]? {
+    func fetchScheduleData(date: Date) async throws -> [String:ScheduleData]? {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
         }
@@ -294,7 +294,9 @@ extension FirebaseViewModel {
                 )
             }
             
-            return schedules.isEmpty ? nil : schedules
+            let dict = Dictionary(uniqueKeysWithValues: schedules.map { ($0.id.uuidString, $0) })
+            
+            return schedules.isEmpty ? nil : dict
         } catch {
             throw error
         }
