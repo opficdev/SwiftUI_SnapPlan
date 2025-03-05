@@ -81,9 +81,6 @@ final class FirebaseViewModel: ObservableObject {
                     self.schedules.merge(dict) { _, new in new }
                 }
             }
-            else {
-                self.schedules.removeAll()
-            }
         } catch {
             print("Schedule Load Error: \(error.localizedDescription)")
         }
