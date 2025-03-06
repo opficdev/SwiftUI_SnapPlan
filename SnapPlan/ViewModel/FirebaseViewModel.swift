@@ -233,7 +233,7 @@ extension FirebaseViewModel {
             throw URLError(.userAuthenticationRequired)
         }
         do {
-            try await deleteScheduleData(schedule: schedule)
+//            try await deleteScheduleData(schedule: schedule)
             try await addScheduleData(schedule: schedule)
         } catch {
             print("Schedule Modify Error: \(error.localizedDescription)")
