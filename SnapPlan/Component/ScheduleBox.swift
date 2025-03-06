@@ -66,9 +66,6 @@ struct ScheduleBox: View {
                         }
                     }
                 }
-                .onChange(of: schedule?.color) { color in
-                    colorIdx = color ?? 0
-                }
                 .onChange(of: schedule?.startDate) { date in
                     if let date = date {
                         if !didDateChangedByDrag {
