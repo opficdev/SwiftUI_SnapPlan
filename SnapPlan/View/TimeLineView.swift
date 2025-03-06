@@ -10,6 +10,7 @@ import SwiftUIIntrospect
 
 struct TimeLineView: View {
     @StateObject var uiVM = UIViewModel()
+    @StateObject private var scheduleVM = ScheduleViewModel()
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
@@ -19,7 +20,6 @@ struct TimeLineView: View {
     @State private var calendarData = [Date]()
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
-    @State private var schedule: ScheduleData? = nil    //  현재 선택 또는 추가될 스케줄
     @State private var didScheduleAdd = false    //  FirebaseVM의 생성자에서 오늘 날짜의 스케줄을 불러왔는지 최초 확인
     let screenWidth = UIScreen.main.bounds.width
     
@@ -125,10 +125,10 @@ struct TimeLineView: View {
                                                                         .fill(Color.timeLine)
                                                                         .frame(maxHeight: .infinity)
                                                                         .onTapGesture {
-                                                                            if schedule == nil && 0 < index {
+                                                                            if scheduleVM.schedule == nil && 0 < index {
                                                                                 let endDate = plannerVM.getDateFromIndex(index: index)
                                                                                 let startDate = endDate.addingTimeInterval(-1800)
-                                                                                schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
+                                                                                scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
                                                                             }
                                                                         }
                                                                     Divider()
@@ -136,10 +136,10 @@ struct TimeLineView: View {
                                                                         .fill(Color.timeLine)
                                                                         .frame(maxHeight: .infinity)
                                                                         .onTapGesture {
-                                                                            if schedule == nil && index < 24{
+                                                                            if scheduleVM.schedule == nil && index < 24{
                                                                                 let startDate = plannerVM.getDateFromIndex(index: index)
                                                                                 let endDate = startDate.addingTimeInterval(1800)
-                                                                                schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
+                                                                                scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
                                                                             }
                                                                         }
                                                                 }
@@ -150,7 +150,7 @@ struct TimeLineView: View {
                                                         let schedules = findSchedules(containing: date, in: firebaseVM.schedules)
                                                         ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
                                                             //  종일 일정과 현재 조작중인 스케줄이 아닌 것들만 출력
-                                                            if schedule?.id != scheduleData.id && !scheduleData.allDay {
+                                                            if scheduleVM.id != scheduleData.id && !scheduleData.allDay {
                                                                 ScheduleBox(
                                                                     gap: gap,
                                                                     timeZoneHeight: timeZoneSize.height,
@@ -158,21 +158,21 @@ struct TimeLineView: View {
                                                                     schedule: .constant(scheduleData)
                                                                 )
                                                                 .onTapGesture {
-                                                                    schedule = scheduleData
+                                                                    scheduleVM.schedule = scheduleData
                                                                 }
                                                             }
                                                         }
-                                                        
-                                                        if schedule != nil && !schedule!.allDay {    //  현재 조작중인 스케줄
-                                                            if plannerVM.isSameDate(date1: schedule!.startDate, date2: date, components: [.year, .month, .day]) {
+//                                                        
+                                                        if scheduleVM.schedule != nil && !scheduleVM.allDay {    //  현재 조작중인 스케줄
+                                                            if plannerVM.isSameDate(date1: scheduleVM.startDate, date2: date, components: [.year, .month, .day]) {
                                                                 ScheduleBox(
                                                                     gap: gap,
                                                                     timeZoneHeight: timeZoneSize.height,
                                                                     isChanging: true,
-                                                                    schedule: $schedule
+                                                                    schedule: $scheduleVM.schedule
                                                                 )
                                                                 .onTapGesture {
-                                                                    schedule = nil
+                                                                    scheduleVM.schedule = nil
                                                                 }
                                                             }
                                                         }
@@ -204,15 +204,15 @@ struct TimeLineView: View {
                                         .frame(width: screenWidth - timeZoneSize.width)
                                     }
                                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-//                                .simultaneousGesture(
-//                                    MagnificationGesture()    //  줌 효과 -> 수정 필요
-//                                        .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
-//                                            gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
-//                                        }
-//                                        .onEnded { _ in
-//                                            lastGap = max(gap, screenWidth / 24)
-//                                        }
-//                                )
+//                                    .simultaneousGesture(
+//                                        MagnificationGesture()    //  줌 효과 -> 수정 필요
+//                                            .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
+//                                                gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
+//                                            }
+//                                            .onEnded { _ in
+//                                                lastGap = max(gap, screenWidth / 24)
+//                                            }
+//                                    )
                                 }
                             }
                         }
@@ -232,17 +232,17 @@ struct TimeLineView: View {
                             let todaySchedules = findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules)
                             ForEach(Array(zip(todaySchedules.indices, todaySchedules)), id: \.1.id) { idx, scheduleData in
                                 //  종일 일정을 출력
-                                if schedule?.id != scheduleData.id && scheduleData.allDay {
+                                if scheduleVM.id != scheduleData.id && scheduleData.allDay {
                                     AllDayScheduleBox(height: $timeZoneSize.height, schedule: .constant(scheduleData))
                                     .onTapGesture {
-                                        schedule = scheduleData
+                                        scheduleVM.schedule = scheduleData
                                     }
                                 }
                             }
-                            if let schedule = schedule, schedule.allDay {    //  현재 조작중인 종일 스케줄
-                                AllDayScheduleBox(height: $timeZoneSize.height, schedule: .constant(self.schedule!))
+                            if scheduleVM.schedule != nil && scheduleVM.allDay {    //  현재 조작중인 종일 스케줄
+                                AllDayScheduleBox(height: $timeZoneSize.height, schedule: $scheduleVM.schedule)
                                     .onTapGesture {
-                                        self.schedule = nil
+                                        scheduleVM.schedule = nil
                                     }
                             }
                         }
@@ -251,7 +251,7 @@ struct TimeLineView: View {
                         .onTapGesture {
                             let startDate = Calendar.current.startOfDay(for: plannerVM.selectDate).addingTimeInterval(60 * 60 * 12)
                             let endDate = startDate.addingTimeInterval(1800)
-                            schedule = ScheduleData(startDate: startDate, endDate: endDate, allDay: true)
+                            scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, allDay: true)
                         }
                     }
                     .background(Color.timeLine)
@@ -352,10 +352,11 @@ struct TimeLineView: View {
             }
         }
         .sheet(isPresented: $showScheduleView) {
-            ScheduleView(schedule: $schedule)
+            ScheduleView()
                 .environmentObject(plannerVM)
                 .environmentObject(firebaseVM)
                 .environmentObject(uiVM)
+                .environmentObject(scheduleVM)
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled(true)   //  사용자가 임의로 sheet를 완전히 내리는 것을 방지
                 .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌

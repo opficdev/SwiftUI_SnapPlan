@@ -14,16 +14,14 @@ struct ScheduleView: View {
         Color.macOrange, Color.macYellow, Color.macGreen
     ]
     let screenWidth = UIScreen.main.bounds.width
-    @Binding var schedule: ScheduleData?
     @EnvironmentObject var plannerVM: PlannerViewModel
     @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var scheduleVM: ScheduleViewModel
     @EnvironmentObject var uiVM: UIViewModel
-    @StateObject var scheduleVM = ScheduleViewModel()
     @StateObject var searchVM = SearchLocationViewModel()
     
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
-    @State private var addSchedule = false  //  스케줄 버튼 탭 여부
     @State private var tapStartTime = false //  시작 시간 탭 여부
     @State private var tapStartDate = false //  시작 날짜 탭 여부
     @State private var tapEndTime = false   //  종료 시간 탭 여부
@@ -40,136 +38,85 @@ struct ScheduleView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if !addSchedule && schedule == nil {
-                    HStack {
-                        Text("선택된 이벤트 없음")
-                            .font(.footnote)
-                            .foregroundStyle(Color.gray)
-                            .padding(.leading)
-                        Spacer()
-                        Button(action: {
-                            addSchedule = true
-                            titleFocus = true
-                            currentDetent = currentDetent.union([.large])
-                            selectedDetent = .large
-                            DispatchQueue.main.async {
-                                currentDetent = currentDetent.subtracting([.fraction(0.07)])
-                            }
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .symbolRenderingMode(.palette)
-                                .foregroundStyle(Color.white, Color.gray.opacity(0.2))
-                                .font(.system(size: 30))
-                        }
-                    }
-                    .onDisappear {
-                        if let schedule = schedule {
-                            scheduleVM.setSchedule(schedule: schedule)
-                        }
-                        else {
-                            let startDate = plannerVM.getMergedDate(
-                                for: plannerVM.selectDate,
-                                with: plannerVM.today,
-                                forComponents: [.year, .month, .day],
-                                withComponents: [.hour, .minute]
-                            )
-                            scheduleVM.setSchedule(startDate: startDate)
-                        }
-                    }
-                }
-                else {
+                if scheduleVM.schedule != nil {
                     VStack {
                         HStack {
                             Spacer()
                             if scheduleVM.title.isEmpty {
                                 Button(action: {
-                                    addSchedule = false
                                     titleFocus = false
                                     descriptionFocus = false
-                                    if schedule == nil {
-                                        currentDetent = currentDetent.union([.fraction(0.07)])
-                                        selectedDetent = .fraction(0.07)
-                                        DispatchQueue.main.async {
-                                            currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
-                                        }
-                                    }
-                                    else {
-                                        schedule = nil  //  schedule이 nil이 아님에서 nil이 되었으므로 onChange(of: schedule) 실행
-                                    }
+                                    //  MARK: 이부분 수정
+//                                    if schedule == nil {
+//                                        currentDetent = currentDetent.union([.fraction(0.07)])
+//                                        selectedDetent = .fraction(0.07)
+//                                        DispatchQueue.main.async {
+//                                            currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
+//                                        }
+//                                    }
+//                                    else {
+//                                        schedule = nil  //  schedule이 nil이 아님에서 nil이 되었으므로 onChange(of: schedule) 실행
+//                                    }
+                                    scheduleVM.schedule = nil  //  schedule이 nil이 아님에서 nil이 되었으므로 onChange(of: schedule) 실행
                                 }) {
-                                    Image(systemName: "plus.circle.fill")
+                                    Image(systemName: "xmark.circle.fill")
                                         .symbolRenderingMode(.palette)
                                         .foregroundStyle(Color.white, Color.gray.opacity(0.2))
                                         .font(.system(size: 30))
-                                        .rotationEffect(.degrees(45))
                                 }
                             }
                             else {
-                                if let schedule = schedule {
-                                    Menu(content: {
-                                        Button(action: {
-                                            titleFocus = false
-                                            descriptionFocus = false
-                                            addSchedule = false
-                                            self.schedule = nil
-                                        }) {
-                                            Label("취소", systemImage: "xmark")
-                                        }
-                                        Button(action: {
-                                            let copy = ScheduleData(
-                                                title: schedule.title,
-                                                startDate: schedule.startDate.addingTimeInterval(3600),
-                                                endDate: schedule.endDate.addingTimeInterval(3600),
-                                                location: schedule.location,
-                                                description: schedule.description,
-                                                color: schedule.color
-                                            )
-                                            Task {
-                                                try await firebaseVM.addScheduleData(schedule: copy)
-                                                await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
-                                            }
-                                        }) {
-                                            Label("복제", systemImage: "doc.on.doc")
-                                        }
-                                        Button(role: .destructive, action: {
-                                            tapDeleteSchedule = true
-                                        }) {
-                                            Label("삭제", systemImage: "trash")
+                                Menu(content: {
+                                    Button(action: {
+                                        titleFocus = false
+                                        descriptionFocus = false
+                                        scheduleVM.schedule = nil
+                                    }) {
+                                        Label("취소", systemImage: "xmark")
+                                    }
+                                    Button(action: {
+                                        let copy = ScheduleData(
+                                            title: scheduleVM.title,
+                                            startDate: scheduleVM.startDate.addingTimeInterval(3600),
+                                            endDate: scheduleVM.endDate.addingTimeInterval(3600),
+                                            location: scheduleVM.location,
+                                            description: scheduleVM.description,
+                                            color: scheduleVM.color
+                                        )
+                                        Task {
+                                            try await firebaseVM.addScheduleData(schedule: copy)
+                                            await firebaseVM.loadScheduleData(date: copy.startDate)
                                         }
                                     }) {
-                                        Image(systemName: "ellipsis")
-                                            .font(.system(size: 20))
-                                            .foregroundStyle(Color.gray)
-                                            .padding()
+                                        Label("복제", systemImage: "doc.on.doc")
                                     }
+                                    Button(role: .destructive, action: {
+                                        tapDeleteSchedule = true
+                                    }) {
+                                        Label("삭제", systemImage: "trash")
+                                    }
+                                }) {
+                                    Image(systemName: "ellipsis")
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(Color.gray)
+                                        .padding()
                                 }
+                                
                                 Button(action: {
-                                    if let schedule = schedule, !schedule.title.isEmpty {
-                                        Task {
-                                            do {
-                                                let newSchedule = scheduleVM.getSchedule(id: schedule.id)
-                                                try await firebaseVM.modifyScheduleData(schedule: newSchedule)
-                                                await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
-                                            } catch {
-                                                print("스케줄 수정 실패: \(error.localizedDescription)")
+                                    Task {
+                                        do {
+                                            defer { //  firebase에서 오류가 나도 실행
+                                                scheduleVM.schedule = nil
                                             }
+                                            try await firebaseVM.addScheduleData(schedule: scheduleVM.schedule!)
+                                            await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
+                                        }
+                                        catch {
+                                            print("스케줄 추가/수정 실패: \(error.localizedDescription)")
                                         }
                                     }
-                                    else {
-                                        Task {
-                                            do {
-                                                let schedule = scheduleVM.getSchedule(id: nil)
-                                                try await firebaseVM.addScheduleData(schedule: schedule)
-                                                await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
-                                            } catch {
-                                                print("스케줄 추가 실패: \(error.localizedDescription)")
-                                            }
-                                        }
-                                    }
-                                    addSchedule = false
                                     titleFocus = false
                                     descriptionFocus = false
-                                    schedule = nil
                                     currentDetent = currentDetent.union([.fraction(0.07)])
                                     selectedDetent = .fraction(0.07)
                                     DispatchQueue.main.async {
@@ -310,7 +257,7 @@ struct ScheduleView: View {
                                         .navigationTitle("")
                                         Spacer()
                                         if !scheduleVM.location.isEmpty {
-                                            NavigationLink(destination: SearchLocationView().environmentObject(scheduleVM).environmentObject(searchVM)) {
+                                            NavigationLink(destination: SearchLocationView().environmentObject(searchVM).environmentObject(scheduleVM)) {
                                                 Image(systemName: "pencil")
                                                     .foregroundStyle(Color.gray)
                                                     .bold()
@@ -330,12 +277,14 @@ struct ScheduleView: View {
                         Spacer()
                     }
                     .onChange(of: scheduleVM.startDate) { date in
-                        scheduleVM.endDate = plannerVM.getMergedDate(
-                            for: scheduleVM.startDate,
-                            with: scheduleVM.endDate,
-                            forComponents: [.year, .month, .day],
-                            withComponents: [.hour, .minute]
-                        )
+                        if date >= scheduleVM.endDate {
+                            scheduleVM.endDate = Calendar.current.date(byAdding: .minute, value: 30, to: date)!
+                        }
+                    }
+                    .onChange(of: scheduleVM.endDate) { date in
+                        if date <= scheduleVM.startDate {
+                            scheduleVM.startDate = Calendar.current.date(byAdding: .minute, value: -30, to: date)!
+                        }
                     }
                     .onTapGesture {
                         if titleFocus {
@@ -371,20 +320,20 @@ struct ScheduleView: View {
                         )
                     }
                     .sheet(isPresented: $tapRepeat) {
-                        CycleOptionView(schedule: $schedule)
+                        CycleOptionView()
                             .environmentObject(plannerVM)
+                            .environmentObject(scheduleVM)
                     }
                     .confirmationDialog("스케줄을 삭제하시겠습니까?", isPresented: $tapDeleteSchedule, titleVisibility: .visible) {
                         Button(role: .destructive, action: {
-                            addSchedule = false
                             titleFocus = false
                             descriptionFocus = false
                             Task {
                                 do {
                                     defer { //  firebase에서 오류가 나도 실행
-                                        schedule = nil
+                                        scheduleVM.schedule = nil
                                     }
-                                    try await firebaseVM.deleteScheduleData(schedule: schedule!)
+                                    try await firebaseVM.deleteScheduleData(schedule: scheduleVM.schedule!)
                                     await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                 }
                             }
@@ -398,11 +347,41 @@ struct ScheduleView: View {
                         }
                     }
                 }
+                else {
+                    HStack {
+                        Text("선택된 이벤트 없음")
+                            .font(.footnote)
+                            .foregroundStyle(Color.gray)
+                            .padding(.leading)
+                        Spacer()
+                        Button(action: {
+                            titleFocus = true
+                            currentDetent = currentDetent.union([.large])
+                            selectedDetent = .large
+                            var startDate = Calendar.current.date(
+                                byAdding: .minute,
+                                value: 5 - Calendar.current.component(.minute, from: Date()) % 5,
+                                to: Date()
+                            )!
+                            startDate = Calendar.current.date(byAdding: .second, value: -Calendar.current.component(.second, from: startDate), to: startDate)!
+                            let endDate = startDate.addingTimeInterval(1800)
+                            scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate)
+                            DispatchQueue.main.async {
+                                currentDetent = currentDetent.subtracting([.fraction(0.07)])
+                            }
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(Color.white, Color.gray.opacity(0.2))
+                                .font(.system(size: 30))
+                        }
+                    }
+                }
             }
             .padding()
             .presentationDetents(currentDetent, selection: $selectedDetent)
-            .onChange(of: schedule) { schedule in
-                if let schedule = schedule {
+            .onChange(of: scheduleVM.schedule) { schedule in
+                if schedule != nil {
                     currentDetent = currentDetent.union([.large, .fraction(0.4)])
                     if selectedDetent == .fraction(0.07) {
                         selectedDetent = .fraction(0.4)
@@ -410,8 +389,6 @@ struct ScheduleView: View {
                     DispatchQueue.main.async {
                         currentDetent = currentDetent.subtracting([.fraction(0.07)])
                     }
-                    scheduleVM.startDate = schedule.startDate
-                    scheduleVM.endDate = schedule.endDate
                 }
                 else {
                     currentDetent = currentDetent.union([.fraction(0.07)])
@@ -420,30 +397,6 @@ struct ScheduleView: View {
                         currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
                     }
                 }
-            }
-            .onChange(of: scheduleVM.startDate) { date in
-                if scheduleVM.endDate < date {
-                    if scheduleVM.allDay {
-                        scheduleVM.endDate = plannerVM.getMergedDate(for: date, with: scheduleVM.endDate, forComponents: [.year, .month, .day], withComponents: [.hour, .minute])
-                    }
-                    else {
-                        scheduleVM.endDate = date.addingTimeInterval(1800)
-                    }
-                }
-                schedule?.startDate = date
-                schedule?.endDate = scheduleVM.endDate
-            }
-            .onChange(of: scheduleVM.endDate) { date in
-                if date < scheduleVM.startDate {
-                    if scheduleVM.allDay {
-                        scheduleVM.startDate = plannerVM.getMergedDate(for: date, with: scheduleVM.startDate, forComponents: [.year, .month, .day], withComponents: [.hour, .minute])
-                    }
-                    else {
-                        scheduleVM.startDate = date.addingTimeInterval(-1800)
-                    }
-                }
-                schedule?.startDate = scheduleVM.startDate
-                schedule?.endDate = date
             }
             .background(
                 GeometryReader { proxy in
@@ -462,12 +415,13 @@ struct ScheduleView: View {
     
     @ViewBuilder
     private var LocationView: some View {
-        Group {
-            if scheduleVM.address.isEmpty {
+        VStack {
+            if scheduleVM.location.isEmpty {
                 SearchLocationView()
-                    .environmentObject(scheduleVM)
                     .environmentObject(searchVM)
-            } else {
+                    .environmentObject(scheduleVM)
+            }
+            else {
                 MapView()
                     .environmentObject(scheduleVM)
             }
@@ -483,22 +437,4 @@ struct ScheduleView: View {
             currentDetent = currentDetent.union([.fraction(0.4)])
         }
     }
-}
-
-#Preview {
-    ScheduleView(
-        schedule: .constant(
-            ScheduleData(
-                title: "Test Title",
-                startDate: Date(),
-                endDate: Date(),
-                location: "Test Location",
-                description: "Test Description",
-                color: 0
-            )
-        )
-    )
-    .environmentObject(PlannerViewModel())
-    .environmentObject(FirebaseViewModel())
-    .environmentObject(UIViewModel())
 }

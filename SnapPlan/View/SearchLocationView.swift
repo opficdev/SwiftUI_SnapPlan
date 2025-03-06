@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct SearchLocationView: View {
-    @EnvironmentObject var scheduleVM: ScheduleViewModel
     @EnvironmentObject var searchVM: SearchLocationViewModel
+    @EnvironmentObject var scheduleVM: ScheduleViewModel
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @FocusState private var focused: Bool
-    
     @State private var address = ""
     
     var body: some View {
@@ -78,11 +77,3 @@ struct SearchLocationView: View {
         }
     }
 }
-
-#Preview {
-    SearchLocationView()
-        .environmentObject(ScheduleViewModel())
-        .environmentObject(SearchLocationViewModel())
-}
-
-
