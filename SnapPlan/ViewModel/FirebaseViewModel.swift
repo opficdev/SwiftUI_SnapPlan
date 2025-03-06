@@ -222,6 +222,7 @@ extension FirebaseViewModel {
         }
         do {
             try await db.collection(userId).document("schedules").collection("data").document(schedule.id.uuidString).delete()
+            schedules.removeValue(forKey: schedule.id.uuidString)
         } catch {
             print("Schedule Delete Error: \(error.localizedDescription)")
         }
