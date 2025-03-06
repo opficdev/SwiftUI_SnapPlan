@@ -13,28 +13,26 @@ struct AllDayScheduleBox: View {
         Color.macOrange, Color.macYellow, Color.macGreen
     ]
     @Environment(\.colorScheme) var colorScheme
-    @Binding var schedule: ScheduleData
+    @Binding var schedule: ScheduleData?
     @Binding var boxHeight: CGFloat
-    @State private var colorIdx: Int
     
-    init(height: Binding<CGFloat>, schedule: Binding<ScheduleData>) {
+    init(height: Binding<CGFloat>, schedule: Binding<ScheduleData?>) {
         self._boxHeight = height
         self._schedule = schedule
-        self._colorIdx = State(initialValue: schedule.wrappedValue.color)
     }
     
     var body: some View {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: 4)
-                .stroke(colorArr[colorIdx], lineWidth: 2)
+                .stroke(colorArr[schedule!.color], lineWidth: 2)
                 .brightness(colorScheme == .light ? 0.4 : 0)
                 .background(
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(colorArr[colorIdx])
+                        .fill(colorArr[schedule!.color])
                         .brightness(colorScheme == .light ? 0.4 : 0)
                         .opacity(0.8)
                 )
-            Text(schedule.title)
+            Text(schedule!.title)
                 .font(.caption)
                 .foregroundStyle(Color.gray)
         }
