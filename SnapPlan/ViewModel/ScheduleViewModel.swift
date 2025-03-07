@@ -66,16 +66,16 @@ class ScheduleViewModel: ObservableObject {
             )
         )
         .map { [weak self] first, second, third -> ScheduleData? in
-            guard let self = self, let currentSchedule = self.schedule else {
-                return nil
-            }
+//            guard let self = self, let currentSchedule = self.schedule else {
+//                return nil
+//            }
             
             let (id, title, startDate) = first
             let (endDate, allDay, cycleOption) = second
             let (location, description, address, color) = third
             
             // id가 nil이면 기존 schedule 유지, 그렇지 않으면 새로운 ScheduleData 생성
-            return id == nil ? currentSchedule : ScheduleData(
+            return id == nil ? self?.schedule : ScheduleData(
                 id: id!,
                 title: title,
                 startDate: startDate,
