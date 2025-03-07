@@ -162,18 +162,16 @@ struct TimeLineView: View {
                                                                 }
                                                             }
                                                         }
-//                                                        
+                                                        
                                                         if scheduleVM.schedule != nil && !scheduleVM.allDay {    //  현재 조작중인 스케줄
-                                                            if plannerVM.isSameDate(date1: scheduleVM.startDate, date2: date, components: [.year, .month, .day]) {
-                                                                ScheduleBox(
-                                                                    gap: gap,
-                                                                    timeZoneHeight: timeZoneSize.height,
-                                                                    isChanging: true,
-                                                                    schedule: $scheduleVM.schedule
-                                                                )
-                                                                .onTapGesture {
-                                                                    scheduleVM.schedule = nil
-                                                                }
+                                                            ScheduleBox(
+                                                                gap: gap,
+                                                                timeZoneHeight: timeZoneSize.height,
+                                                                isChanging: true,
+                                                                schedule: $scheduleVM.schedule
+                                                            )
+                                                            .onTapGesture {
+                                                                scheduleVM.schedule = nil
                                                             }
                                                         }
                                                         
