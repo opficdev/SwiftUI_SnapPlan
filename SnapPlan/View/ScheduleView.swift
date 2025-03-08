@@ -106,6 +106,11 @@ struct ScheduleView: View {
                                     Task {
                                         do {
                                             defer { //  firebase에서 오류가 나도 실행
+                                                //  MARK: 이 코드는 do 코드가 다 끝난 후 실행됨
+                                                //  MARK: 그래서 확인 버튼을 누르면 일정 딜레이가 발생함
+                                                //  MARK: schduleVM.schedule을 defer 밖에서 nil 처리해야 딜레이가 없어지지 않을까?
+                                                //  MARK: 근데 그렇게 하면 딜레이는 사라지지만, scheduleVM.schedule이 nil이되는 순간 ~ Firestore에서 수정된 해당 데이터를 받아와야 하는 그 사이의 시간 동안
+                                                //  MARK: 나 변경됐어요 하고 대놓고 티가 남
                                                 scheduleVM.schedule = nil
                                             }
                                             try await firebaseVM.addScheduleData(schedule: scheduleVM.schedule!)
