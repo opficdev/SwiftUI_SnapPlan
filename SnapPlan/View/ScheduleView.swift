@@ -20,6 +20,7 @@ struct ScheduleView: View {
     @EnvironmentObject var uiVM: UIViewModel
     @StateObject var searchVM = SearchLocationViewModel()
     
+    @State private var startTask = false     //  스케줄 CRUD 작업 시작여부
     @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
     @State private var selectedDetent: PresentationDetent = .fraction(0.07)
     @State private var tapStartTime = false //  시작 시간 탭 여부
@@ -38,7 +39,7 @@ struct ScheduleView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if scheduleVM.schedule != nil {
+                if startTask {
                     VStack {
                         HStack {
                             Spacer()
@@ -46,18 +47,7 @@ struct ScheduleView: View {
                                 Button(action: {
                                     titleFocus = false
                                     descriptionFocus = false
-                                    //  MARK: 이부분 수정
-//                                    if schedule == nil {
-//                                        currentDetent = currentDetent.union([.fraction(0.07)])
-//                                        selectedDetent = .fraction(0.07)
-//                                        DispatchQueue.main.async {
-//                                            currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
-//                                        }
-//                                    }
-//                                    else {
-//                                        schedule = nil  //  schedule이 nil이 아님에서 nil이 되었으므로 onChange(of: schedule) 실행
-//                                    }
-                                    scheduleVM.schedule = nil  //  schedule이 nil이 아님에서 nil이 되었으므로 onChange(of: schedule) 실행
+                                    scheduleVM.schedule = nil
                                 }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .symbolRenderingMode(.palette)
@@ -106,13 +96,9 @@ struct ScheduleView: View {
                                     Task {
                                         do {
                                             defer { //  firebase에서 오류가 나도 실행
-                                                //  MARK: 이 코드는 do 코드가 다 끝난 후 실행됨
-                                                //  MARK: 그래서 확인 버튼을 누르면 일정 딜레이가 발생함
-                                                //  MARK: schduleVM.schedule을 defer 밖에서 nil 처리해야 딜레이가 없어지지 않을까?
-                                                //  MARK: 근데 그렇게 하면 딜레이는 사라지지만, scheduleVM.schedule이 nil이되는 순간 ~ Firestore에서 수정된 해당 데이터를 받아와야 하는 그 사이의 시간 동안
-                                                //  MARK: 나 변경됐어요 하고 대놓고 티가 남
                                                 scheduleVM.schedule = nil
                                             }
+                                            startTask = false
                                             try await firebaseVM.addScheduleData(schedule: scheduleVM.schedule!)
                                             await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                         }
@@ -338,6 +324,7 @@ struct ScheduleView: View {
                                     defer { //  firebase에서 오류가 나도 실행
                                         scheduleVM.schedule = nil
                                     }
+                                    startTask = false
                                     try await firebaseVM.deleteScheduleData(schedule: scheduleVM.schedule!)
                                     await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
                                 }
@@ -371,9 +358,6 @@ struct ScheduleView: View {
                             startDate = Calendar.current.date(byAdding: .second, value: -Calendar.current.component(.second, from: startDate), to: startDate)!
                             let endDate = startDate.addingTimeInterval(1800)
                             scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate)
-                            DispatchQueue.main.async {
-                                currentDetent = currentDetent.subtracting([.fraction(0.07)])
-                            }
                         }) {
                             Image(systemName: "plus.circle.fill")
                                 .symbolRenderingMode(.palette)
@@ -386,7 +370,12 @@ struct ScheduleView: View {
             .padding()
             .presentationDetents(currentDetent, selection: $selectedDetent)
             .onChange(of: scheduleVM.schedule) { schedule in
-                if schedule != nil {
+                startTask = schedule != nil
+                //  MARK: defer 내에서 scheduleVM.schedule이 nil이 될 때 startTask가 false가 되지만
+                //  MARK: 이미 starTask는 false임
+            }
+            .onChange(of: startTask) { value in
+                if value {
                     currentDetent = currentDetent.union([.large, .fraction(0.4)])
                     if selectedDetent == .fraction(0.07) {
                         selectedDetent = .fraction(0.4)
