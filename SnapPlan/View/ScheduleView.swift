@@ -333,7 +333,7 @@ struct ScheduleView: View {
                             Text("삭제")
                         }
                         Button(role: .cancel, action: {
-                            
+                            scheduleVM.schedule = nil
                         }) {
                             Text("취소")
                         }
