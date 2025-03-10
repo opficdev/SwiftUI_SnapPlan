@@ -250,9 +250,11 @@ struct TimeLineView: View {
                         .frame(width: screenWidth * 6 / 7, height: uiVM.allDayPadding, alignment: .top)
                         .background(Color.timeLine) //  터치 이벤트
                         .onTapGesture {
-                            let startDate = Calendar.current.startOfDay(for: plannerVM.selectDate).addingTimeInterval(60 * 60 * 12)
-                            let endDate = startDate.addingTimeInterval(1800)
-                            scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, allDay: true)
+                            if scheduleVM.schedule == nil {
+                                let startDate = Calendar.current.startOfDay(for: plannerVM.selectDate).addingTimeInterval(60 * 60 * 12)
+                                let endDate = startDate.addingTimeInterval(1800)
+                                scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, allDay: true)
+                            }
                         }
                     }
                     .background(Color.timeLine)
