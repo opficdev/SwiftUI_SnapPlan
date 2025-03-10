@@ -14,10 +14,10 @@ struct AllDayScheduleBox: View {
     ]
     @Environment(\.colorScheme) var colorScheme
     @Binding var schedule: ScheduleData?
-    @Binding var boxHeight: CGFloat
+    @State private var boxHeight: CGFloat
     
-    init(height: Binding<CGFloat>, schedule: Binding<ScheduleData?>) {
-        self._boxHeight = height
+    init(height: CGFloat, schedule: Binding<ScheduleData?>) {
+        self._boxHeight = State(initialValue: height)
         self._schedule = schedule
     }
     
@@ -43,7 +43,7 @@ struct AllDayScheduleBox: View {
 
 #Preview {
     AllDayScheduleBox(
-        height: .constant(20),
+        height: 20,
         schedule: .constant(ScheduleData(startDate: Date(), endDate: Date()))
     )
 }
