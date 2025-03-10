@@ -147,7 +147,7 @@ struct TimeLineView: View {
                                                             }
                                                         }
                                                         
-                                                        let schedules = findSchedules(containing: date, in: firebaseVM.schedules)
+                                                        let schedules = uiVM.findSchedules(containing: date, in: firebaseVM.schedules)
                                                         ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
                                                             //  종일 일정과 현재 조작중인 스케줄이 아닌 것들만 출력
                                                             if scheduleVM.id != scheduleData.id && !scheduleData.allDay {
@@ -227,7 +227,7 @@ struct TimeLineView: View {
                             .frame(width: timeZoneSize.width, height: uiVM.allDayPadding, alignment: .trailing)
                         
                         VStack(spacing: 3) {
-                            let todaySchedules = findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules)
+                            let todaySchedules = uiVM.findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules).sorted(by: { $0.title < $1.title })
                             ForEach(Array(zip(todaySchedules.indices, todaySchedules)), id: \.1.id) { idx, scheduleData in
                                 //  종일 일정을 출력
                                 if scheduleVM.id != scheduleData.id && scheduleData.allDay {
@@ -364,14 +364,6 @@ struct TimeLineView: View {
                         }
                     }
                 }
-        }
-    }
-    
-    func findSchedules(containing date: Date, in dict: [String: ScheduleData]) -> [ScheduleData] {
-        return dict.values.filter { schedule in
-            let startDate = Calendar.current.startOfDay(for: schedule.startDate)
-            let endDate = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: schedule.endDate)!
-            return startDate <= date && date <= endDate
         }
     }
 }
