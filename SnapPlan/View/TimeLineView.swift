@@ -259,31 +259,9 @@ struct TimeLineView: View {
                     }
                     .background(Color.timeLine)
                     .border(Color.gray)
-                    .onAppear {
-                        DispatchQueue.main.async {
-                            let todaySchedules = findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules)
-                            let count = todaySchedules.filter { $0.allDay }.count
-                            if count < 2 {
-                                uiVM.allDayPadding = timeZoneSize.height * 2
-                            }
-                            else {
-                                uiVM.allDayPadding = (timeZoneSize.height + 3) * CGFloat(count) + 2
-                            }
-                        }
-                    }
                     .onChange(of: firebaseVM.schedules) { schedules in
-                        DispatchQueue.main.async {
-                            let todaySchedules = findSchedules(containing: plannerVM.selectDate, in: schedules)
-                            let count = todaySchedules.filter { $0.allDay }.count
-                            if count < 2 {
-                                uiVM.allDayPadding = timeZoneSize.height * 2
-                            }
-                            else {
-                                uiVM.allDayPadding = (timeZoneSize.height + 3) * CGFloat(count) + 2
-                            }
-                        }
+                        uiVM.setAllDayPadding(date: plannerVM.selectDate, height: timeZoneSize.height, schedules: schedules)
                     }
-                    
                     Rectangle()
                         .frame(width: 1)
                         .foregroundStyle(Color.gray)
@@ -323,16 +301,7 @@ struct TimeLineView: View {
                         components: [.year, .month, .day]) }
                 )!
             }
-            DispatchQueue.main.async {
-                let todaySchedules = findSchedules(containing: date, in: firebaseVM.schedules)
-                let count = todaySchedules.filter { $0.allDay }.count
-                if count < 2 {
-                    uiVM.allDayPadding = timeZoneSize.height * 2
-                }
-                else {
-                    uiVM.allDayPadding = (timeZoneSize.height + 3) * CGFloat(count) + 2
-                }
-            }
+            uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
         }
         .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로 뷰가 로딩되면 알아서 onChange가 실행됨
             Task {
