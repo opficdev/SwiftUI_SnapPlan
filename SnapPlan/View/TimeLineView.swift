@@ -230,19 +230,22 @@ struct TimeLineView: View {
                             let todaySchedules = uiVM.findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules).sorted(by: { $0.title < $1.title })
                             ForEach(Array(zip(todaySchedules.indices, todaySchedules)), id: \.1.id) { idx, scheduleData in
                                 //  종일 일정을 출력
-                                if scheduleVM.id != scheduleData.id && scheduleData.allDay {
-                                    AllDayScheduleBox(height: $timeZoneSize.height, schedule: .constant(scheduleData))
-                                    .onTapGesture {
-                                        scheduleVM.schedule = scheduleData
+                                if scheduleData.allDay {
+                                    if scheduleVM.id == scheduleData.id {
+                                        AllDayScheduleBox(height: timeZoneSize.height, schedule: $scheduleVM.schedule)
+                                            .onTapGesture {
+                                                scheduleVM.schedule = nil
+                                            }
+                                    }
+                                    else {
+                                        AllDayScheduleBox(height: timeZoneSize.height, schedule: .constant(scheduleData))
+                                            .onTapGesture {
+                                                scheduleVM.schedule = scheduleData
+                                            }
                                     }
                                 }
                             }
-                            if scheduleVM.schedule != nil && scheduleVM.allDay {    //  현재 조작중인 종일 스케줄
-                                AllDayScheduleBox(height: $timeZoneSize.height, schedule: $scheduleVM.schedule)
-                                    .onTapGesture {
-                                        scheduleVM.schedule = nil
-                                    }
-                            }
+                            .frame(height: timeZoneSize.height)
                         }
                         .frame(width: screenWidth * 6 / 7, height: uiVM.allDayPadding, alignment: .top)
                         .background(Color.timeLine) //  터치 이벤트
