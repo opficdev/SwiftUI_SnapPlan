@@ -150,10 +150,26 @@ struct TimeLineView: View {
                                                             }
                                                         }
                                                         
+                                                        //  MARK: 반복 일정
+                                                        let cyecleSchedules = firebaseVM.schedules.values.filter { $0.cycleOption != .none }
+                                                        ForEach(Array(zip(cyecleSchedules.indices, cyecleSchedules)), id: \.1.id) { idx, scheduleData in
+                                                            if scheduleVM.id != scheduleData.id && !scheduleData.allDay {
+                                                                ScheduleBox(
+                                                                    gap: gap,
+                                                                    timeZoneHeight: timeZoneSize.height,
+                                                                    isChanging: false,
+                                                                    schedule: .constant(scheduleData)
+                                                                )
+                                                                .onTapGesture {
+                                                                    scheduleVM.schedule = scheduleData
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                        //  MARK: 반복, 종일 설정이 없는 일정
                                                         let schedules = uiVM.findSchedules(containing: date, in: firebaseVM.schedules)
                                                         ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
-                                                            //  종일 일정과 현재 조작중인 스케줄이 아닌 것들만 출력
-                                                            if scheduleVM.id != scheduleData.id && !scheduleData.allDay {
+                                                            if scheduleVM.id != scheduleData.id && !scheduleData.allDay && scheduleData.cycleOption == .none {
                                                                 ScheduleBox(
                                                                     gap: gap,
                                                                     timeZoneHeight: timeZoneSize.height,
