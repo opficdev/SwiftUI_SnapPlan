@@ -107,6 +107,9 @@ struct TimeLineView: View {
                                                 gap: gap)
                                             )
                                         }
+                                        Rectangle()
+                                            .fill(Color.clear)
+                                            .frame(width: timeZoneSize.width, height: uiVM.sheetPadding)
                                     }
                                     
                                     //  좌우로 드래그 가능한 TimeLine
@@ -195,6 +198,9 @@ struct TimeLineView: View {
                                                             gap: gap)
                                                         )
                                                     }
+                                                    Rectangle()
+                                                        .fill(Color.clear)
+                                                        .frame(width: screenWidth - timeZoneSize.width, height: uiVM.sheetPadding)
                                                 }
                                             }
                                             .tag(idx)
@@ -214,9 +220,6 @@ struct TimeLineView: View {
                                 }
                             }
                         }
-                        Rectangle()
-                            .fill(Color.clear)
-                            .frame(height: uiVM.sheetPadding)
                     }
                     
                     HStack(alignment:. top, spacing: 2) {
