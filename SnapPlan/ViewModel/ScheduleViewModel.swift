@@ -90,4 +90,46 @@ class ScheduleViewModel: ObservableObject {
         }
         .assign(to: &$schedule)
     }
+    
+    func isCycleConfirm(date: Date, schedule: ScheduleData) -> Bool {
+        if schedule.cycleOption == .daily {
+            return true
+        }
+        else if schedule.cycleOption == .weekly {
+            if isSameDate(date1: date, date2: schedule.startDate, components: [.weekday]) {
+                return true
+            }
+        }
+        else if schedule.cycleOption == .weekdays {
+            if Calendar.current.component(.weekday, from: date) >= 2 && Calendar.current.component(.weekday, from: date) <= 6 {
+                return true
+            }
+        }
+        else if schedule.cycleOption == .biweekly {
+            if isSameDate(date1: date, date2: schedule.startDate, components: [.weekday]) &&
+                Calendar.current.component(.weekOfYear, from: date) % 2 == Calendar.current.component(.weekOfYear, from: schedule.startDate) % 2 {
+                return true
+            }
+        }
+        else if schedule.cycleOption == .monthly {
+            if isSameDate(date1: date, date2: schedule.startDate, components: [.day]) {
+                return true
+            }
+        }
+        else if schedule.cycleOption == .yearly {
+            if isSameDate(date1: date, date2: schedule.startDate, components: [.month, .day]) {
+                return true
+            }
+        }
+        else if schedule.cycleOption == .custom {
+            
+        }
+ 
+        //  schedule.cycleOption == .none
+        return false
+    }
+    
+    private func isSameDate(date1: Date, date2: Date, components: Set<Calendar.Component>) -> Bool {
+        return Calendar.current.dateComponents(components, from: date1) == Calendar.current.dateComponents(components, from: date2)
+    }
 }
