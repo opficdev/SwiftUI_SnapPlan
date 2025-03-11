@@ -246,60 +246,66 @@ extension FirebaseViewModel {
             throw URLError(.userAuthenticationRequired)
         }
         
+        var dict: [String: ScheduleData] = [:]
+        
         let startOfDay = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: date)!
         let endOfDay = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
+
+        let dbRef = db.collection(userId).document("schedules").collection("data")
         
-        
-        let docRef = db.collection(userId).document("schedules").collection("data")
+        async let snapshot1 = dbRef
             .whereField("startDate", isLessThanOrEqualTo: endOfDay)
             .whereField("endDate", isGreaterThanOrEqualTo: startOfDay)
-     
-        do {
-            let snapshot = try await docRef.getDocuments()
-            
-            if snapshot.documents.isEmpty {
+            .getDocuments()
+        
+        async let snapshot2 = dbRef
+            .whereField("cycleOption", isNotEqualTo: "none")
+            .getDocuments()
+
+        let (result1, result2) = try await (snapshot1, snapshot2)
+
+        var seenDocumentIDs: Set<String> = Set()
+
+        let schedules: [ScheduleData] = (result1.documents + result2.documents).compactMap { document in
+            let documentIdString = document.documentID
+            guard !seenDocumentIDs.contains(documentIdString) else {
                 return nil
             }
+            seenDocumentIDs.insert(documentIdString)
+
+            let data = document.data()
             
-            let schedules: [ScheduleData] = snapshot.documents.compactMap { document in
-                let documentId = UUID(uuidString: document.documentID) ?? UUID()
-                let data = document.data()
-                
-                guard let title = data["title"] as? String,
-                      let startDate = data["startDate"] as? Timestamp,
-                      let endDate = data["endDate"] as? Timestamp,
-                      let color = data["color"] as? Int,
-                      let allDay = data["allDay"] as? Bool,
-                      let cycleOption = ScheduleData.CycleOption(rawValue: data["cycleOption"] as? String ?? "none"),
-                      let location = data["location"] as? String,
-                      let address = data["address"] as? String,
-                      let description = data["description"] as? String else {
-                    return nil
-                }
-                
-                return ScheduleData(
-                    id: documentId,
-                    title: title,
-                    startDate: startDate.dateValue(),
-                    endDate: endDate.dateValue(),
-                    isChanging: false,
-                    allDay: allDay,
-                    cycleOption: cycleOption,
-                    location: location,
-                    address: address,
-                    description: description,
-                    color: color
-                )
+            guard let title = data["title"] as? String,
+                  let startDate = data["startDate"] as? Timestamp,
+                  let endDate = data["endDate"] as? Timestamp,
+                  let color = data["color"] as? Int,
+                  let allDay = data["allDay"] as? Bool,
+                  let cycleOption = ScheduleData.CycleOption(rawValue: data["cycleOption"] as? String ?? "none"),
+                  let location = data["location"] as? String,
+                  let address = data["address"] as? String,
+                  let description = data["description"] as? String else {
+                return nil
             }
-            
-            let dict = Dictionary(uniqueKeysWithValues: schedules.map { ($0.id.uuidString, $0) })
-            
-            return schedules.isEmpty ? nil : dict
-        } catch {
-            throw error
+
+            return ScheduleData(
+                id: UUID(uuidString: documentIdString)!,
+                title: title,
+                startDate: startDate.dateValue(),
+                endDate: endDate.dateValue(),
+                isChanging: false,
+                allDay: allDay,
+                cycleOption: cycleOption,
+                location: location,
+                address: address,
+                description: description,
+                color: color
+            )
         }
-    }
-}
+
+        dict = Dictionary(uniqueKeysWithValues: schedules.map { ($0.id.uuidString, $0) })
+
+        return dict.isEmpty ? nil : dict
+    }}
 
 // MARK: - Google 로그인 관련 기능
 extension FirebaseViewModel {
