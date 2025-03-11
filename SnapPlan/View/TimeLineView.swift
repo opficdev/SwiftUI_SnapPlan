@@ -121,6 +121,7 @@ struct TimeLineView: View {
                                                     .foregroundStyle(Color.gray.opacity(0.3))
                                                 VStack {
                                                     ZStack(alignment: .top) {
+                                                        //  MARK: 시간 구분선
                                                         VStack(spacing: 0) {
                                                             ForEach(0...24, id: \.self) { index in
                                                                 VStack(spacing: 0) {
@@ -182,7 +183,8 @@ struct TimeLineView: View {
                                                             }
                                                         }
                                                         
-                                                        if scheduleVM.schedule != nil && !scheduleVM.allDay {    //  현재 조작중인 스케줄
+                                                        //  MARK: 현재 조작중인 스케줄
+                                                        if scheduleVM.schedule != nil && !scheduleVM.allDay {
                                                             ScheduleBox(
                                                                 gap: gap,
                                                                 timeZoneHeight: timeZoneSize.height,
@@ -194,7 +196,7 @@ struct TimeLineView: View {
                                                             }
                                                         }
                                                         
-                                                        //  현 시간 표시하는 TimeBar
+                                                        //  MARK: 현 시간 표시하는 TimeBar
                                                         TimeBar(
                                                             height: timeZoneSize.height,
                                                             showVerticalLine: plannerVM.isSameDate(
@@ -246,9 +248,9 @@ struct TimeLineView: View {
                             .frame(width: timeZoneSize.width, height: uiVM.allDayPadding, alignment: .trailing)
                         
                         VStack(spacing: 3) {
+                            //  MARK: 종일 일정 부분
                             let todaySchedules = uiVM.findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules).sorted(by: { $0.title < $1.title })
                             ForEach(Array(zip(todaySchedules.indices, todaySchedules)), id: \.1.id) { idx, scheduleData in
-                                //  종일 일정을 출력
                                 if scheduleData.allDay {
                                     if scheduleVM.id == scheduleData.id {
                                         AllDayScheduleBox(height: timeZoneSize.height, schedule: $scheduleVM.schedule)
