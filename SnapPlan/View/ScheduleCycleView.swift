@@ -87,12 +87,12 @@ struct CycleOptionView: View {
             }
             .padding(.leading, screenWidth / 5)
             Divider()
-            Text("사용자 지정")
-                .onTapGesture {
-                    scheduleVM.cycleOption = .custom
-                }
-                .foregroundStyle(scheduleVM.cycleOption == .custom ? Color.blue : Color.primary)
-                .padding(.leading, screenWidth / 5)
+//            Text("사용자 지정")
+//                .onTapGesture {
+//                    scheduleVM.cycleOption = .custom
+//                }
+//                .foregroundStyle(scheduleVM.cycleOption == .custom ? Color.blue : Color.primary)
+//                .padding(.leading, screenWidth / 5)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
