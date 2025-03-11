@@ -17,7 +17,7 @@ struct TimeLineView: View {
     @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
     @State private var selection = 0
-    @State private var calendarData = [Date]()
+    @State private var calendarData = [Date]()  //  MARK: 현재는 달 단위로 저장하지만, 너무 커서 주 단위로 변경해야 함
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
     @State private var didScheduleAdd = false    //  FirebaseVM의 생성자에서 오늘 날짜의 스케줄을 불러왔는지 최초 확인
@@ -305,9 +305,6 @@ struct TimeLineView: View {
                 plannerVM.wasPast = plannerVM.selectDate < calendarData[value]
                 plannerVM.selectDate = calendarData[value]
                 plannerVM.currentDate = calendarData[value]
-            }
-            if selection == 0 || selection == calendarData.count - 1 {
-                calendarData = plannerVM.calendarData[1]
             }
         }
         .onChange(of: plannerVM.selectDate) { date in
