@@ -312,13 +312,13 @@ struct TimeLineView: View {
                 if !calendarData.contains(date) {
                     calendarData = plannerVM.calendarDates(date: date)
                 }
-                selection = calendarData.firstIndex(where: {
-                    plannerVM.isSameDate(
-                        date1: $0,
-                        date2: date,
-                        components: [.year, .month, .day]) }
-                )!
             }
+            selection = calendarData.firstIndex(where: {
+                plannerVM.isSameDate(
+                    date1: $0,
+                    date2: date,
+                    components: [.year, .month, .day]) }
+            )!
             uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
         }
         .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로 뷰가 로딩되면 알아서 onChange가 실행됨
