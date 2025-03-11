@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CalendarCell: View {
-    @EnvironmentObject var viewModel: PlannerViewModel
+    @EnvironmentObject var plannerVM: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
     @Binding var wasPast: Bool //  이전 날짜인지 확인
     @State private var date: Date //  셀의 날짜
@@ -21,7 +21,7 @@ struct CalendarCell: View {
     
     var body: some View {
         ZStack {
-            if viewModel.isSameDate(date1: date, date2: viewModel.selectDate, components: [.year, .month, .day]) {
+            if plannerVM.isSameDate(date1: date, date2: plannerVM.selectDate, components: [.year, .month, .day]) {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(
                         Color.gray.opacity(0.5)
@@ -33,21 +33,21 @@ struct CalendarCell: View {
                     ))
             }
             
-            if viewModel.isSameDate(date1: date, date2: viewModel.today, components: [.year, .month, .day]) {
+            if plannerVM.isSameDate(date1: date, date2: plannerVM.today, components: [.year, .month, .day]) {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color.timeBar)
                     .frame(width: screenWidth / 12, height: screenWidth / 12)
             }
             
-            Text(viewModel.dateString(date: date, component: .day))
+            Text(plannerVM.dateString(date: date, component: .day))
                 .font(.subheadline)
-                .foregroundStyle(viewModel.setDayForegroundColor(date: date, colorScheme: colorScheme))
+                .foregroundStyle(plannerVM.setDayForegroundColor(date: date, colorScheme: colorScheme))
                 .frame(width: screenWidth / 10, height: screenWidth / 10)
         }
         .onTapGesture {
             withAnimation(.easeInOut(duration: 0.2)) {
-                wasPast = viewModel.selectDate < date
-                viewModel.selectDate = date
+                wasPast = plannerVM.selectDate < date
+                plannerVM.selectDate = date
             }
         }
     }
