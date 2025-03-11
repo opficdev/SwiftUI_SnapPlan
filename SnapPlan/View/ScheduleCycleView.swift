@@ -30,57 +30,57 @@ struct CycleOptionView: View {
             Group {
                 Text("매일")
                     .onTapGesture {
-                        scheduleVM.cycleOption = .everyDay
+                        scheduleVM.cycleOption = .daily
                         dismiss()
                     }
-                    .foregroundStyle(scheduleVM.cycleOption == .everyDay ? Color.blue : Color.primary)
+                    .foregroundStyle(scheduleVM.cycleOption == .daily ? Color.blue : Color.primary)
                 HStack {
                     Text("매 평일")
                         .onTapGesture {
-                            scheduleVM.cycleOption = .everyWeekDays
+                            scheduleVM.cycleOption = .weekdays
                             dismiss()
                         }
-                        .foregroundStyle(scheduleVM.cycleOption == .everyWeekDays ? Color.blue : Color.primary)
+                        .foregroundStyle(scheduleVM.cycleOption == .weekdays ? Color.blue : Color.primary)
                     Text("월~금")
                         .foregroundStyle(Color.gray)
                 }
                 HStack {
                     Text("매주")
                         .onTapGesture {
-                            scheduleVM.cycleOption = .everyWeek
+                            scheduleVM.cycleOption = .weekly
                             dismiss()
                         }
-                        .foregroundStyle(scheduleVM.cycleOption == .everyWeek ? Color.blue : Color.primary)
+                        .foregroundStyle(scheduleVM.cycleOption == .weekly ? Color.blue : Color.primary)
                     Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.weekday]))
                         .foregroundStyle(Color.gray)
                 }
                 HStack {
                     Text("매 2주")
                         .onTapGesture {
-                            scheduleVM.cycleOption = .every2Week
+                            scheduleVM.cycleOption = .biweekly
                             dismiss()
                         }
-                        .foregroundStyle(scheduleVM.cycleOption == .every2Week ? Color.blue : Color.primary)
+                        .foregroundStyle(scheduleVM.cycleOption == .biweekly ? Color.blue : Color.primary)
                     Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.weekday]))
                         .foregroundStyle(Color.gray)
                 }
                 HStack {
                     Text("매달")
                         .onTapGesture {
-                            scheduleVM.cycleOption = .everyMonth
+                            scheduleVM.cycleOption = .monthly
                             dismiss()
                         }
-                        .foregroundStyle(scheduleVM.cycleOption == .everyMonth ? Color.blue : Color.primary)
+                        .foregroundStyle(scheduleVM.cycleOption == .monthly ? Color.blue : Color.primary)
                     Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.day]))
                         .foregroundStyle(Color.gray)
                 }
                 HStack {
                     Text("매년")
                         .onTapGesture {
-                            scheduleVM.cycleOption = .everyYear
+                            scheduleVM.cycleOption = .yearly
                             dismiss()
                         }
-                        .foregroundStyle(scheduleVM.cycleOption == .everyYear ? Color.blue : Color.primary)
+                        .foregroundStyle(scheduleVM.cycleOption == .yearly ? Color.blue : Color.primary)
                     Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.month, .day]))
                         .foregroundStyle(Color.gray)
                 }
