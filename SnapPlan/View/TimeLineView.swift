@@ -154,7 +154,7 @@ struct TimeLineView: View {
                                                         //  MARK: 반복 일정
                                                         let cyecleSchedules = firebaseVM.schedules.values.filter { $0.cycleOption != .none }
                                                         ForEach(Array(zip(cyecleSchedules.indices, cyecleSchedules)), id: \.1.id) { idx, scheduleData in
-                                                            if scheduleVM.id != scheduleData.id && !scheduleData.allDay {
+                                                            if (scheduleVM.id != scheduleData.id && !scheduleData.allDay) && scheduleVM.isCycleConfirm(date: date, schedule: scheduleData) {
                                                                 ScheduleBox(
                                                                     gap: gap,
                                                                     timeZoneHeight: timeZoneSize.height,
