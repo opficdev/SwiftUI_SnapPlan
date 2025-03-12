@@ -238,6 +238,13 @@ struct TimeLineView: View {
                                                     scrollProxy.scrollTo(selection)
                                                 }
                                             }
+                                            .onChange(of: selection) { value in
+                                                plannerVM.selectDate = calendarData[selection]
+                                            }
+                                        }
+                                        .frame(width: screenWidth - timeZoneSize.width)
+                                        .introspect(.scrollView, on: .iOS(.v16, .v17, .v18)) { view in
+                                            view.isPagingEnabled = true
                                         }
                                     }
 //                                    .simultaneousGesture(
