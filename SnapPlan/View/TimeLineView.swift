@@ -113,119 +113,133 @@ struct TimeLineView: View {
                                     }
                                     
                                     //  좌우로 드래그 가능한 TimeLine
-                                    TabView(selection: $selection) {
-                                        ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
-                                            HStack(spacing: 0) {
-                                                Rectangle()
-                                                    .frame(width: 1)
-                                                    .foregroundStyle(Color.gray.opacity(0.3))
-                                                VStack {
-                                                    ZStack(alignment: .top) {
-                                                        //  MARK: 시간 구분선
-                                                        VStack(spacing: 0) {
-                                                            ForEach(0...24, id: \.self) { index in
+                                    ScrollViewReader { scrollProxy in
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            LazyHStack(spacing: 0) {
+                                                ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, date in
+                                                    HStack(spacing: 0) {
+                                                        Rectangle()
+                                                            .frame(width: 1)
+                                                            .foregroundStyle(Color.gray.opacity(0.3))
+                                                        VStack {
+                                                            ZStack(alignment: .top) {
+                                                                //  MARK: 시간 구분선
                                                                 VStack(spacing: 0) {
-                                                                    Rectangle()
-                                                                        .fill(Color.timeLine)
-                                                                        .frame(maxHeight: .infinity)
-                                                                        .onTapGesture {
-                                                                            if scheduleVM.schedule == nil && 0 < index {
-                                                                                let endDate = plannerVM.getDateFromIndex(index: index)
-                                                                                let startDate = endDate.addingTimeInterval(-1800)
-                                                                                scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
-                                                                            }
+                                                                    ForEach(0...24, id: \.self) { index in
+                                                                        VStack(spacing: 0) {
+                                                                            Rectangle()
+                                                                                .fill(Color.timeLine)
+                                                                                .frame(maxHeight: .infinity)
+                                                                                .onTapGesture {
+                                                                                    if scheduleVM.schedule == nil && 0 < index {
+                                                                                        let endDate = plannerVM.getDateFromIndex(index: index)
+                                                                                        let startDate = endDate.addingTimeInterval(-1800)
+                                                                                        scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
+                                                                                    }
+                                                                                }
+                                                                            Divider()
+                                                                            Rectangle()
+                                                                                .fill(Color.timeLine)
+                                                                                .frame(maxHeight: .infinity)
+                                                                                .onTapGesture {
+                                                                                    if scheduleVM.schedule == nil && index < 24{
+                                                                                        let startDate = plannerVM.getDateFromIndex(index: index)
+                                                                                        let endDate = startDate.addingTimeInterval(1800)
+                                                                                        scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
+                                                                                    }
+                                                                                }
                                                                         }
-                                                                    Divider()
-                                                                    Rectangle()
-                                                                        .fill(Color.timeLine)
-                                                                        .frame(maxHeight: .infinity)
+                                                                        .frame(height: timeZoneSize.height + gap)
+                                                                    }
+                                                                }
+                                                                
+                                                                //  MARK: 반복 일정
+                                                                let cyecleSchedules = firebaseVM.schedules.values.filter { $0.cycleOption != .none }
+                                                                ForEach(Array(zip(cyecleSchedules.indices, cyecleSchedules)), id: \.1.id) { idx, scheduleData in
+                                                                    if (scheduleVM.id != scheduleData.id && !scheduleData.allDay) && scheduleVM.isCycleConfirm(date: date, schedule: scheduleData) {
+                                                                        ScheduleBox(
+                                                                            gap: gap,
+                                                                            timeZoneHeight: timeZoneSize.height,
+                                                                            isChanging: false,
+                                                                            schedule: .constant(scheduleData)
+                                                                        )
                                                                         .onTapGesture {
-                                                                            if scheduleVM.schedule == nil && index < 24{
-                                                                                let startDate = plannerVM.getDateFromIndex(index: index)
-                                                                                let endDate = startDate.addingTimeInterval(1800)
-                                                                                scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, isChanging: true)
-                                                                            }
+                                                                            scheduleVM.schedule = scheduleData
                                                                         }
+                                                                    }
                                                                 }
-                                                                .frame(height: timeZoneSize.height + gap)
-                                                            }
-                                                        }
-                                                        
-                                                        //  MARK: 반복 일정
-                                                        let cyecleSchedules = firebaseVM.schedules.values.filter { $0.cycleOption != .none }
-                                                        ForEach(Array(zip(cyecleSchedules.indices, cyecleSchedules)), id: \.1.id) { idx, scheduleData in
-                                                            if (scheduleVM.id != scheduleData.id && !scheduleData.allDay) && scheduleVM.isCycleConfirm(date: date, schedule: scheduleData) {
-                                                                ScheduleBox(
-                                                                    gap: gap,
-                                                                    timeZoneHeight: timeZoneSize.height,
-                                                                    isChanging: false,
-                                                                    schedule: .constant(scheduleData)
+                                                                
+                                                                //  MARK: 반복, 종일 설정이 없는 일정
+                                                                let schedules = uiVM.findSchedules(containing: date, in: firebaseVM.schedules)
+                                                                ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
+                                                                    if scheduleVM.id != scheduleData.id && !scheduleData.allDay && scheduleData.cycleOption == .none {
+                                                                        ScheduleBox(
+                                                                            gap: gap,
+                                                                            timeZoneHeight: timeZoneSize.height,
+                                                                            isChanging: false,
+                                                                            schedule: .constant(scheduleData)
+                                                                        )
+                                                                        .onTapGesture {
+                                                                            scheduleVM.schedule = scheduleData
+                                                                        }
+                                                                    }
+                                                                }
+                                                                
+                                                                //  MARK: 현재 조작중인 스케줄
+                                                                if scheduleVM.schedule != nil && !scheduleVM.allDay {
+                                                                    ScheduleBox(
+                                                                        gap: gap,
+                                                                        timeZoneHeight: timeZoneSize.height,
+                                                                        isChanging: true,
+                                                                        schedule: $scheduleVM.schedule
+                                                                    )
+                                                                    .onTapGesture {
+                                                                        scheduleVM.schedule = nil
+                                                                    }
+                                                                }
+                                                                
+                                                                //  MARK: 현 시간 표시하는 TimeBar
+                                                                TimeBar(
+                                                                    height: timeZoneSize.height,
+                                                                    showVerticalLine: plannerVM.isSameDate(
+                                                                        date1: date,
+                                                                        date2: plannerVM.today,
+                                                                        components: [.year, .month, .day])
                                                                 )
-                                                                .onTapGesture {
-                                                                    scheduleVM.schedule = scheduleData
-                                                                }
-                                                            }
-                                                        }
-                                                        
-                                                        //  MARK: 반복, 종일 설정이 없는 일정
-                                                        let schedules = uiVM.findSchedules(containing: date, in: firebaseVM.schedules)
-                                                        ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
-                                                            if scheduleVM.id != scheduleData.id && !scheduleData.allDay && scheduleData.cycleOption == .none {
-                                                                ScheduleBox(
-                                                                    gap: gap,
-                                                                    timeZoneHeight: timeZoneSize.height,
-                                                                    isChanging: false,
-                                                                    schedule: .constant(scheduleData)
+                                                                .padding(
+                                                                    .leading, plannerVM.isSameDate(
+                                                                        date1: date,
+                                                                        date2: plannerVM.today,
+                                                                        components: [.year, .month, .day]) ? 2 : 0
                                                                 )
-                                                                .onTapGesture {
-                                                                    scheduleVM.schedule = scheduleData
-                                                                }
+                                                                .offset(y: plannerVM.getOffsetFromDate(
+                                                                    for: plannerVM.today,
+                                                                    timeZoneHeight: timeZoneSize.height,
+                                                                    gap: gap)
+                                                                )
                                                             }
+                                                            Rectangle()
+                                                                .fill(Color.clear)
+                                                                .frame(width: screenWidth - timeZoneSize.width, height: uiVM.sheetPadding)
                                                         }
-                                                        
-                                                        //  MARK: 현재 조작중인 스케줄
-                                                        if scheduleVM.schedule != nil && !scheduleVM.allDay {
-                                                            ScheduleBox(
-                                                                gap: gap,
-                                                                timeZoneHeight: timeZoneSize.height,
-                                                                isChanging: true,
-                                                                schedule: $scheduleVM.schedule
-                                                            )
-                                                            .onTapGesture {
-                                                                scheduleVM.schedule = nil
-                                                            }
-                                                        }
-                                                        
-                                                        //  MARK: 현 시간 표시하는 TimeBar
-                                                        TimeBar(
-                                                            height: timeZoneSize.height,
-                                                            showVerticalLine: plannerVM.isSameDate(
-                                                                date1: date,
-                                                                date2: plannerVM.today,
-                                                                components: [.year, .month, .day])
-                                                        )
-                                                        .padding(
-                                                            .leading, plannerVM.isSameDate(
-                                                                date1: date,
-                                                                date2: plannerVM.today,
-                                                                components: [.year, .month, .day]) ? 2 : 0
-                                                        )
-                                                        .offset(y: plannerVM.getOffsetFromDate(
-                                                            for: plannerVM.today,
-                                                            timeZoneHeight: timeZoneSize.height,
-                                                            gap: gap)
-                                                        )
                                                     }
-                                                    Rectangle()
-                                                        .fill(Color.clear)
-                                                        .frame(width: screenWidth - timeZoneSize.width, height: uiVM.sheetPadding)
+                                                    .id(idx)
                                                 }
                                             }
-                                            .tag(idx)
+                                            .onAppear {
+                                                calendarData = plannerVM.calendarData[1]
+                                                selection = calendarData.firstIndex(where: {
+                                                    plannerVM.isSameDate(
+                                                        date1: $0,
+                                                        date2: plannerVM.selectDate,
+                                                        components: [.year, .month, .day]) }
+                                                )!
+                                                DispatchQueue.main.async {
+                                                    scrollProxy.scrollTo(selection)
+                                                }
+                                            }
                                         }
-                                        .frame(width: screenWidth - timeZoneSize.width)
                                     }
-                                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 //                                    .simultaneousGesture(
 //                                        MagnificationGesture()    //  줌 효과 -> 수정 필요
 //                                            .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
@@ -239,7 +253,6 @@ struct TimeLineView: View {
                             }
                         }
                     }
-                    
                     HStack(alignment:. top, spacing: 2) {
                         Text("종일")
                             .font(.caption)
@@ -291,15 +304,6 @@ struct TimeLineView: View {
                
             }
         }
-        .onAppear {
-            calendarData = plannerVM.calendarData[1]
-            selection = calendarData.firstIndex(where: {
-                plannerVM.isSameDate(
-                    date1: $0,
-                    date2: plannerVM.selectDate,
-                    components: [.year, .month, .day]) }
-            )!
-        }
         .onChange(of: selection) { value in
             withAnimation {
                 plannerVM.wasPast = plannerVM.selectDate < calendarData[value]
@@ -321,15 +325,15 @@ struct TimeLineView: View {
             )!
             uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
         }
-        .onChange(of: calendarData) { month in  //  onAppear가 없는 이유: calendarData는 빈 상태로 초기화되므로 뷰가 로딩되면 알아서 onChange가 실행됨
+        .onChange(of: calendarData) { month in
             Task {
-                if didScheduleAdd {
-                    firebaseVM.schedules.removeAll()
-                }
+//                if didScheduleAdd {
+//                    firebaseVM.schedules.removeAll()
+//                }
                 for date in month {
                     await firebaseVM.loadScheduleData(date: date)
                 }
-                didScheduleAdd = true
+//                didScheduleAdd = true
             }
         }
         .onChange(of: firebaseVM.is12TimeFmt) { value in
