@@ -109,6 +109,7 @@ struct CalendarView: View {
                                 .environmentObject(plannerVM)
                                 .tag(idx)
                                 .onDisappear {
+                                    // 전 달로 이동
                                     if selection == 0 {
                                         let lastDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
                                         let lastMonth = plannerVM.calendarDates(date: lastDate)
@@ -116,6 +117,7 @@ struct CalendarView: View {
                                         plannerVM.calendarData.removeLast()
                                         plannerVM.currentDate = plannerVM.date(byAdding: .month, value: -1, to: plannerVM.currentDate)!
                                     }
+                                    // 다음 달로 이동
                                     else if selection == 2 {
                                         let nextDate = plannerVM.date(byAdding: .month, value: 2, to: plannerVM.currentDate)!
                                         let nextMonth = plannerVM.calendarDates(date: nextDate)
