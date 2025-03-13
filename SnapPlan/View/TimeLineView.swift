@@ -224,6 +224,16 @@ struct TimeLineView: View {
                                                         }
                                                     }
                                                     .id(idx)
+                                                    .background(
+                                                        GeometryReader { geometryProxy in
+                                                            Color.clear.onChange(of: geometryProxy.frame(in: .global).midX) { x in
+                                                                if timeZoneSize.width <= x && x <= screenWidth {
+                                                                    selection = idx
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                    )
                                                 }
                                                 .frame(width: screenWidth - timeZoneSize.width)
                                             }
