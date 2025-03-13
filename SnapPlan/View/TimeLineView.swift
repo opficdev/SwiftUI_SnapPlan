@@ -249,6 +249,21 @@ struct TimeLineView: View {
                                                     scrollProxy.scrollTo(selection)
                                                 }
                                             }
+                                            .onChange(of: selection) { value in
+                                                plannerVM.wasPast = plannerVM.selectDate < calendarData[value]
+                                                withAnimation {
+                                                    plannerVM.selectDate = calendarData[value]
+                                                    plannerVM.currentDate = plannerVM.selectDate
+                                                }
+
+                                                if plannerVM.didChangedDateByTap {
+                                                    //  MARK: CalendarView의 withAnimation과 겹치는 부분이 있음
+                                                    //  MARK: 스크롤만 animation을 넣는 받법을 찾아야함
+//                                                    withAnimation {
+                                                        scrollProxy.scrollTo(value)
+//                                                    }
+                                                }
+                                            }
                                         }
                                         .frame(width: screenWidth - timeZoneSize.width)
                                         .scrollDisabled(scheduleVM.schedule != nil)
@@ -320,12 +335,14 @@ struct TimeLineView: View {
                
             }
         }
-        .onChange(of: selection) { value in
-            withAnimation {
-                plannerVM.wasPast = plannerVM.selectDate < calendarData[value]
-                plannerVM.selectDate = calendarData[value]
-                plannerVM.currentDate = calendarData[value]
-            }
+        .onChange(of: plannerVM.calendarData) { data in
+            calendarData = data[1]
+            selection = calendarData.firstIndex(where: {
+                plannerVM.isSameDate(
+                    date1: $0,
+                    date2: plannerVM.selectDate,
+                    components: [.year, .month, .day]) }
+            )!
         }
         .onChange(of: plannerVM.selectDate) { date in
             withAnimation {
