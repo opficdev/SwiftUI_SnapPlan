@@ -79,11 +79,9 @@ struct CalendarView: View {
                     )
                     .onTapGesture{
                         if !plannerVM.isSameDate(date1: plannerVM.today, date2: plannerVM.selectDate, components: [.year, .month, .day]) {
-                            withAnimation {
-                                plannerVM.wasPast = plannerVM.selectDate < plannerVM.today
-                                plannerVM.selectDate = plannerVM.today
-                                selection = 1
-                            }
+                            plannerVM.wasPast = plannerVM.selectDate < plannerVM.today
+                            plannerVM.selectDate = plannerVM.today
+                            selection = 1
                         }
                     }
             }
