@@ -134,6 +134,7 @@ struct CalendarView: View {
                                 plannerVM.setCalendarData(date: newDate)
                             }
                             selection = 1
+                            plannerVM.didChangedDateByTap = true
                         }
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
