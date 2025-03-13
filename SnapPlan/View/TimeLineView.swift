@@ -243,6 +243,7 @@ struct TimeLineView: View {
                                             }
                                         }
                                         .frame(width: screenWidth - timeZoneSize.width)
+                                        .scrollDisabled(scheduleVM.schedule != nil)
                                         .introspect(.scrollView, on: .iOS(.v16, .v17, .v18)) { view in
                                             view.isPagingEnabled = true
                                         }
