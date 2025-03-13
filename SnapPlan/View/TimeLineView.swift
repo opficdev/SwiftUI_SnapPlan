@@ -228,6 +228,7 @@ struct TimeLineView: View {
                                                             Color.clear.onChange(of: geometryProxy.frame(in: .global).midX) { x in
                                                                 if timeZoneSize.width <= x && x <= screenWidth {
                                                                     selection = idx
+                                                                    plannerVM.didChangedDateByTap = false
                                                                 }
                                                             }
                                                         }
