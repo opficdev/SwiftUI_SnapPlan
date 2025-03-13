@@ -16,8 +16,8 @@ struct TimeLineView: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
-    @State private var selection = 0
-    @State private var calendarData = [Date]()  //  MARK: 현재는 달 단위로 저장하지만, 너무 커서 주 단위로 변경해야 함
+    @State private var selection = -1   //  초기값을 -1로 지정하면 무조건 onChange(of:) 에서 반응할 것임
+    @State private var calendarData = [Date]()
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
     let screenWidth = UIScreen.main.bounds.width
