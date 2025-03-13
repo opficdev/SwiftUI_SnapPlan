@@ -225,6 +225,7 @@ struct TimeLineView: View {
                                                     }
                                                     .id(idx)
                                                 }
+                                                .frame(width: screenWidth - timeZoneSize.width)
                                             }
                                             .onAppear {
                                                 calendarData = plannerVM.calendarData[1]
