@@ -255,6 +255,14 @@ struct TimeLineView: View {
                                                     plannerVM.selectDate = calendarData[value]
                                                     plannerVM.currentDate = plannerVM.selectDate
                                                 }
+                                                
+                                                if value == 0 && plannerVM.isSameDate(date1: plannerVM.selectDate, date2: plannerVM.currentDate, components: [.year, .month, .day]) {
+                                                    calendarData = Array(plannerVM.calendarData[0][28..<35]) + calendarData
+                                                    DispatchQueue.main.async {
+                                                        scrollProxy.scrollTo(7)
+                                                        selection = 7
+                                                    }
+                                                }
 
                                                 if plannerVM.didChangedDateByTap {
                                                     //  MARK: CalendarView의 withAnimation과 겹치는 부분이 있음
@@ -344,13 +352,6 @@ struct TimeLineView: View {
                         date2: plannerVM.selectDate,
                         components: [.year, .month, .day]) }
                 )!
-                if selection == 0 { //  새로 지정받은 selection이 0이면 좌측 스크롤이 멈추는 현상이 있음
-                    calendarData = Array(data[0][35...]) + calendarData
-                    selection = 7
-                }
-            }
-            else {
-                
             }
         }
         .onChange(of: plannerVM.selectDate) { date in
