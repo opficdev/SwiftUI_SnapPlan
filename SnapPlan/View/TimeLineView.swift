@@ -336,26 +336,31 @@ struct TimeLineView: View {
             }
         }
         .onChange(of: plannerVM.calendarData) { data in
-            calendarData = data[1]
-            selection = calendarData.firstIndex(where: {
-                plannerVM.isSameDate(
-                    date1: $0,
-                    date2: plannerVM.selectDate,
-                    components: [.year, .month, .day]) }
-            )!
-        }
-        .onChange(of: plannerVM.selectDate) { date in
-            withAnimation {
-                if !calendarData.contains(date) {
-                    calendarData = plannerVM.calendarDates(date: date)
+            if plannerVM.selectDate == plannerVM.currentDate {  //  CalendarView에서 달이 바뀌었지만 전달 or 다음달의 날짜를 탭 해서 바뀐 경우
+                calendarData = data[1]
+                selection = calendarData.firstIndex(where: {
+                    plannerVM.isSameDate(
+                        date1: $0,
+                        date2: plannerVM.selectDate,
+                        components: [.year, .month, .day]) }
+                )!
+                if selection == 0 { //  새로 지정받은 selection이 0이면 좌측 스크롤이 멈추는 현상이 있음
+                    calendarData = Array(data[0][35...]) + calendarData
+                    selection = 7
                 }
             }
-            selection = calendarData.firstIndex(where: {
-                plannerVM.isSameDate(
-                    date1: $0,
-                    date2: date,
-                    components: [.year, .month, .day]) }
-            )!
+            else {
+                
+            }
+        }
+        .onChange(of: plannerVM.selectDate) { date in
+            if !calendarData.contains(where: {plannerVM.isSameDate(date1: $0, date2: date, components: [.year, .month, .day]) }) {
+//                withAnimation {
+//                    plannerVM.setCalendarData(date: date)
+//                }
+                calendarData = plannerVM.calendarData[1]
+            }
+            selection = calendarData.firstIndex(where: {plannerVM.isSameDate(date1: $0, date2: date, components: [.year, .month, .day]) })!
             uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
         }
         .onChange(of: calendarData) { month in
