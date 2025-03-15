@@ -270,6 +270,7 @@ struct TimeLineView: View {
 //                                                    withAnimation {
                                                         scrollProxy.scrollTo(value)
 //                                                    }
+                                                    plannerVM.changedDateFromCalendarView = false
                                                 }
                                             }
                                         }
