@@ -228,7 +228,7 @@ struct TimeLineView: View {
                                                             Color.clear.onChange(of: geometryProxy.frame(in: .global).midX) { x in
                                                                 if timeZoneSize.width <= x && x <= screenWidth {
                                                                     selection = idx
-                                                                    plannerVM.didChangedDateByTap = false
+                                                                    plannerVM.ChangedDateFromCalendarView = false
                                                                 }
                                                             }
                                                         }
@@ -264,7 +264,7 @@ struct TimeLineView: View {
                                                     }
                                                 }
 
-                                                if plannerVM.didChangedDateByTap {
+                                                if plannerVM.ChangedDateFromCalendarView {
                                                     //  MARK: CalendarView의 withAnimation과 겹치는 부분이 있음
                                                     //  MARK: 스크롤만 animation을 넣는 받법을 찾아야함
 //                                                    withAnimation {
