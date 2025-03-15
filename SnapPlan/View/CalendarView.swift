@@ -81,7 +81,7 @@ struct CalendarView: View {
                         if !plannerVM.isSameDate(date1: plannerVM.today, date2: plannerVM.selectDate, components: [.year, .month, .day]) {
                             plannerVM.wasPast = plannerVM.selectDate < plannerVM.today
                             plannerVM.selectDate = plannerVM.today
-                            plannerVM.ChangedDateFromCalendarView = true
+                            plannerVM.changedDateFromCalendarView = true
                             selection = 1
                         }
                     }
@@ -133,7 +133,7 @@ struct CalendarView: View {
                                 plannerVM.setCalendarData(date: newDate)
                             }
                             selection = 1
-                            plannerVM.ChangedDateFromCalendarView = true
+                            plannerVM.changedDateFromCalendarView = true
                         }
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
