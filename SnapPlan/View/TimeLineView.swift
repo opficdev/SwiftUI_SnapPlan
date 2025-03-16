@@ -332,13 +332,13 @@ struct TimeLineView: View {
                         }
                     }
                     .background(Color.timeLine)
-                    .border(Color.gray)
+                    .border(Color.gray.opacity(0.3))
                     .onChange(of: firebaseVM.schedules) { schedules in
                         uiVM.setAllDayPadding(date: plannerVM.selectDate, height: timeZoneSize.height, schedules: schedules)
                     }
                     Rectangle()
                         .frame(width: 1)
-                        .foregroundStyle(Color.gray)
+                        .foregroundStyle(Color.gray.opacity(0.3))
                         .offset(x: timeZoneSize.width)
                 }
                
