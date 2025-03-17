@@ -31,6 +31,7 @@
 		DF4F8B1A2D23944700ACA504 /* Exceptions for "SnapPlan" folder in "SnapPlan" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Config.xcconfig,
 				Info.plist,
 			);
 			target = DF4F8AF42D228F2700ACA504 /* SnapPlan */;
