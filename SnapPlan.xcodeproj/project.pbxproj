@@ -16,6 +16,10 @@
 		DF6B55012D2399A3006BB54A /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = DF6B55002D2399A3006BB54A /* GoogleSignIn */; };
 		DF6B55032D2399A3006BB54A /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = DF6B55022D2399A3006BB54A /* GoogleSignInSwift */; };
 		DF9A76A62D2ED2BC00D1CAF4 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DF9A76A52D2ED2BC00D1CAF4 /* README.md */; };
+		DFB750772D8848CF004AD2AD /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = DFB750762D8848CF004AD2AD /* Auth */; };
+		DFB750792D8848CF004AD2AD /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = DFB750782D8848CF004AD2AD /* PostgREST */; };
+		DFB7507B2D8848CF004AD2AD /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = DFB7507A2D8848CF004AD2AD /* Storage */; };
+		DFB7507D2D8848CF004AD2AD /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = DFB7507C2D8848CF004AD2AD /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,9 +60,13 @@
 			files = (
 				DF4E0FC72D3AA28500024F67 /* FirebaseMessaging in Frameworks */,
 				DF6B55032D2399A3006BB54A /* GoogleSignInSwift in Frameworks */,
+				DFB7507B2D8848CF004AD2AD /* Storage in Frameworks */,
+				DFB750772D8848CF004AD2AD /* Auth in Frameworks */,
 				DF4E0FC12D3AA28500024F67 /* FirebaseAuth in Frameworks */,
+				DFB750792D8848CF004AD2AD /* PostgREST in Frameworks */,
 				DF4E0FC32D3AA28500024F67 /* FirebaseCore in Frameworks */,
 				DF4E0FC92D3AA28500024F67 /* FirebaseStorage in Frameworks */,
+				DFB7507D2D8848CF004AD2AD /* Supabase in Frameworks */,
 				DF4E0FC52D3AA28500024F67 /* FirebaseFirestore in Frameworks */,
 				DF6B55012D2399A3006BB54A /* GoogleSignIn in Frameworks */,
 				DF379BC12D44891800E10867 /* SwiftUIIntrospect in Frameworks */,
@@ -115,6 +123,10 @@
 				DF4E0FC62D3AA28500024F67 /* FirebaseMessaging */,
 				DF4E0FC82D3AA28500024F67 /* FirebaseStorage */,
 				DF379BC02D44891800E10867 /* SwiftUIIntrospect */,
+				DFB750762D8848CF004AD2AD /* Auth */,
+				DFB750782D8848CF004AD2AD /* PostgREST */,
+				DFB7507A2D8848CF004AD2AD /* Storage */,
+				DFB7507C2D8848CF004AD2AD /* Supabase */,
 			);
 			productName = SwiftUI_SnapPlan;
 			productReference = DF4F8AF52D228F2700ACA504 /* SnapPlan.app */;
@@ -147,6 +159,7 @@
 				DF6B54FF2D2399A3006BB54A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				DF4E0FBF2D3AA28500024F67 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				DF379BBF2D44891800E10867 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				DFB750752D8848CF004AD2AD /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DF4F8AF62D228F2700ACA504 /* Products */;
@@ -330,7 +343,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = opfic.SnapPlan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -370,7 +383,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = opfic.SnapPlan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -431,6 +444,14 @@
 				minimumVersion = 8.0.0;
 			};
 		};
+		DFB750752D8848CF004AD2AD /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -473,6 +494,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DF6B54FF2D2399A3006BB54A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		DFB750762D8848CF004AD2AD /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFB750752D8848CF004AD2AD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		DFB750782D8848CF004AD2AD /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFB750752D8848CF004AD2AD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		DFB7507A2D8848CF004AD2AD /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFB750752D8848CF004AD2AD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		DFB7507C2D8848CF004AD2AD /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFB750752D8848CF004AD2AD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
