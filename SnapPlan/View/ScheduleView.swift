@@ -36,6 +36,8 @@ struct ScheduleView: View {
     @State private var titleFocus = false    //  제목 포커싱 여부
     @State private var descriptionFocus = false   //  설명 포커싱 여부
     
+    @State private var didChangedStartDate = false
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -157,7 +159,8 @@ struct ScheduleView: View {
                                                 .disabled(scheduleVM.allDay)
                                         }
                                         HStack(spacing: 0) {
-                                            Text(plannerVM.getDateString(for: scheduleVM.startDate, components: [.month, .day]))
+                                            let startDate = scheduleVM.cycleOption != .none && !didChangedStartDate ? plannerVM.selectDate : scheduleVM.startDate
+                                            Text(plannerVM.getDateString(for: startDate, components: [.month, .day]))
                                                 .foregroundStyle(tapStartDate ? Color.blue : Color.primary)
                                                 .onTapGesture {
                                                     tapStartDate.toggle()
@@ -268,6 +271,7 @@ struct ScheduleView: View {
                         Spacer()
                     }
                     .onChange(of: scheduleVM.startDate) { date in
+                        didChangedStartDate = true
                         if date >= scheduleVM.endDate {
                             scheduleVM.endDate = Calendar.current.date(byAdding: .minute, value: 30, to: date)!
                         }
@@ -387,6 +391,7 @@ struct ScheduleView: View {
                 else {
                     currentDetent = currentDetent.union([.fraction(0.07)])
                     selectedDetent = .fraction(0.07)
+                    didChangedStartDate = false
                     DispatchQueue.main.async {
                         currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
                     }
