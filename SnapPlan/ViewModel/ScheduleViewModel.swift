@@ -66,9 +66,6 @@ class ScheduleViewModel: ObservableObject {
             )
         )
         .map { [weak self] first, second, third -> ScheduleData? in
-//            guard let self = self, let currentSchedule = self.schedule else {
-//                return nil
-//            }
             
             let (id, title, startDate) = first
             let (endDate, isAllDay, cycleOption) = second
