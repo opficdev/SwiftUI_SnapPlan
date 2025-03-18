@@ -33,7 +33,7 @@ struct ScheduleView: View {
     @State private var tapDeleteSchedule = false   //  스케줄 삭제 탭 여부
     @State private var sheetMinHeight = CGFloat.zero //    sheet 최소 높이
     
-    @State private var titleFocus = false    //  제목 포커싱 여부
+    @FocusState private var titleFocus: Bool    //  제목 포커싱 여부
     @State private var descriptionFocus = false   //  설명 포커싱 여부
     
     @State private var didChangedStartDate = false
@@ -129,8 +129,11 @@ struct ScheduleView: View {
                         .frame(height: 30)
                         ScrollView {
                             VStack(alignment: .leading) {
-                                UIKitTextEditor(text: $scheduleVM.title, isFocused: $titleFocus, placeholder: "제목", font: .title2)
+                                TextField("제목", text: $scheduleVM.title)
                                     .textSelection(.enabled)
+                                    .font(.title2)
+                                    .focused($titleFocus)
+                                    .padding(.top)
                                 Divider()
                                     .padding(.vertical)
                                 HStack(alignment: .top) {
