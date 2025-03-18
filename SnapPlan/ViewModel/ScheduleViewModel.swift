@@ -71,8 +71,8 @@ class ScheduleViewModel: ObservableObject {
 //            }
             
             let (id, title, startDate) = first
-            let (endDate, allDay, cycleOption) = second
-            let (location, description, address, color) = third
+            let (endDate, isAllDay, cycleOption) = second
+            let (location, address, description, color) = third
             
             // id가 nil이면 기존 schedule 유지, 그렇지 않으면 새로운 ScheduleData 생성
             return id == nil ? self?.schedule : ScheduleData(
