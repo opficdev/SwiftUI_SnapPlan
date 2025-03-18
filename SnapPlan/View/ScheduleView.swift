@@ -140,23 +140,23 @@ struct ScheduleView: View {
                                     VStack(alignment: .leading, spacing: 10) {
                                         HStack(spacing: 0) {
                                             Text(plannerVM.getDateString(for: scheduleVM.startDate, components: [.hour, .minute]))
-                                                .foregroundStyle(tapStartTime ? Color.blue : (scheduleVM.allDay ? Color.gray : Color.primary))
+                                                .foregroundStyle(tapStartTime ? Color.blue : (scheduleVM.isAllDay ? Color.gray : Color.primary))
                                                 .onTapGesture {
                                                     tapStartTime.toggle()
                                                     tapEndTime = false
                                                 }
                                                 .frame(width: screenWidth / 4, alignment: .leading)
-                                                .disabled(scheduleVM.allDay)
+                                                .disabled(scheduleVM.isAllDay)
                                             Image(systemName: "arrow.right")
                                                 .foregroundStyle(Color.gray)
                                                 .frame(width: screenWidth / 10, alignment: .leading)
                                             Text(plannerVM.getDateString(for: scheduleVM.endDate, components: [.hour, .minute]))
-                                                .foregroundStyle(tapEndTime ? Color.blue : (scheduleVM.allDay ? Color.gray : Color.primary))
+                                                .foregroundStyle(tapEndTime ? Color.blue : (scheduleVM.isAllDay ? Color.gray : Color.primary))
                                                 .onTapGesture {
                                                     tapEndTime.toggle()
                                                     tapStartTime = false
                                                 }
-                                                .disabled(scheduleVM.allDay)
+                                                .disabled(scheduleVM.isAllDay)
                                         }
                                         HStack(spacing: 0) {
                                             let startDate = scheduleVM.cycleOption != .none && !didChangedStartDate ? plannerVM.selectDate : scheduleVM.startDate
@@ -167,7 +167,7 @@ struct ScheduleView: View {
                                                     tapEndDate = false
                                                 }
                                                 .frame(width: screenWidth / 4 + screenWidth / 10, alignment: .leading)
-                                            if !plannerVM.isSameDate(date1: scheduleVM.startDate, date2: scheduleVM.endDate, components: [.year, .month, .day]) || scheduleVM.allDay {
+                                            if !plannerVM.isSameDate(date1: scheduleVM.startDate, date2: scheduleVM.endDate, components: [.year, .month, .day]) || scheduleVM.isAllDay {
                                                 Text(plannerVM.getDateString(for: scheduleVM.endDate, components: [.month, .day]))
                                                     .foregroundStyle(tapEndDate ? Color.blue : Color.primary)
                                                     .onTapGesture {
@@ -183,7 +183,7 @@ struct ScheduleView: View {
                                     Image(systemName: "sun.max")
                                         .foregroundStyle(Color.gray)
                                         .frame(width: 25)
-                                    Toggle("종일", isOn: $scheduleVM.allDay)
+                                    Toggle("종일", isOn: $scheduleVM.isAllDay)
                                         .toggleStyle(SwitchToggleStyle(tint: Color.blue))
                                         .frame(width: screenWidth / 4)
                                 }

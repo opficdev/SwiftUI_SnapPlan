@@ -155,7 +155,7 @@ struct TimeLineView: View {
                                                                 //  MARK: 반복 일정
                                                                 let cyecleSchedules = firebaseVM.schedules.values.filter { $0.cycleOption != .none }
                                                                 ForEach(Array(zip(cyecleSchedules.indices, cyecleSchedules)), id: \.1.id) { idx, scheduleData in
-                                                                    if (scheduleVM.id != scheduleData.id && !scheduleData.allDay) && scheduleVM.isCycleConfirm(date: date, schedule: scheduleData) {
+                                                                    if (scheduleVM.id != scheduleData.id && !scheduleData.isAllDay) && scheduleVM.isCycleConfirm(date: date, schedule: scheduleData) {
                                                                         ScheduleBox(
                                                                             gap: gap,
                                                                             timeZoneHeight: timeZoneSize.height,
@@ -171,7 +171,7 @@ struct TimeLineView: View {
                                                                 //  MARK: 반복, 종일 설정이 없는 일정
                                                                 let schedules = uiVM.findSchedules(containing: date, in: firebaseVM.schedules)
                                                                 ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
-                                                                    if scheduleVM.id != scheduleData.id && !scheduleData.allDay && scheduleData.cycleOption == .none {
+                                                                    if scheduleVM.id != scheduleData.id && !scheduleData.isAllDay && scheduleData.cycleOption == .none {
                                                                         ScheduleBox(
                                                                             gap: gap,
                                                                             timeZoneHeight: timeZoneSize.height,
@@ -185,7 +185,7 @@ struct TimeLineView: View {
                                                                 }
                                                                 
                                                                 //  MARK: 현재 조작중인 스케줄
-                                                                if scheduleVM.schedule != nil && !scheduleVM.allDay {
+                                                                if scheduleVM.schedule != nil && !scheduleVM.isAllDay {
                                                                     ScheduleBox(
                                                                         gap: gap,
                                                                         timeZoneHeight: timeZoneSize.height,
@@ -304,7 +304,7 @@ struct TimeLineView: View {
                             //  MARK: 종일 일정 부분
                             let todaySchedules = uiVM.findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules).sorted(by: { $0.title < $1.title })
                             ForEach(Array(zip(todaySchedules.indices, todaySchedules)), id: \.1.id) { idx, scheduleData in
-                                if scheduleData.allDay {
+                                if scheduleData.isAllDay {
                                     if scheduleVM.id == scheduleData.id {
                                         AllDayScheduleBox(height: timeZoneSize.height, schedule: $scheduleVM.schedule)
                                             .onTapGesture {
@@ -327,7 +327,7 @@ struct TimeLineView: View {
                             if scheduleVM.schedule == nil {
                                 let startDate = Calendar.current.startOfDay(for: plannerVM.selectDate).addingTimeInterval(60 * 60 * 12)
                                 let endDate = startDate.addingTimeInterval(1800)
-                                scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, allDay: true)
+                                scheduleVM.schedule = ScheduleData(startDate: startDate, endDate: endDate, isAllDay: true)
                             }
                         }
                     }

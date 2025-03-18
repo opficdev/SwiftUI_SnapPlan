@@ -23,7 +23,7 @@ class UIViewModel: ObservableObject {
     func setAllDayPadding(date: Date, height: CGFloat, schedules: [String:ScheduleData]) {
         DispatchQueue.main.async {
             let todaySchedules = self.findSchedules(containing: date, in: schedules)
-            let count = todaySchedules.filter { $0.allDay }.count
+            let count = todaySchedules.filter { $0.isAllDay }.count
             withAnimation(self.onAppear ? nil : .easeInOut) {
                 if count < 2 {
                     self.allDayPadding = height * 2

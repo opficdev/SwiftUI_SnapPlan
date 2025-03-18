@@ -15,7 +15,7 @@ class ScheduleViewModel: ObservableObject {
     @Published var title = ""
     @Published var startDate = Date()
     @Published var endDate = Date()
-    @Published var allDay = false
+    @Published var isAllDay = false
     @Published var cycleOption = ScheduleData.CycleOption.none
     @Published var location = ""
     @Published var address = ""
@@ -37,7 +37,7 @@ class ScheduleViewModel: ObservableObject {
                     self?.title = schedule.title
                     self?.startDate = schedule.startDate
                     self?.endDate = schedule.endDate
-                    self?.allDay = schedule.allDay
+                    self?.isAllDay = schedule.isAllDay
                     self?.cycleOption = schedule.cycleOption
                     self?.location = schedule.location
                     self?.address = schedule.address
@@ -55,7 +55,7 @@ class ScheduleViewModel: ObservableObject {
         .combineLatest(
             Publishers.CombineLatest3(
                 $endDate,
-                $allDay,
+                $isAllDay,
                 $cycleOption
             ),
             Publishers.CombineLatest4(
@@ -80,7 +80,7 @@ class ScheduleViewModel: ObservableObject {
                 title: title,
                 startDate: startDate,
                 endDate: endDate,
-                allDay: allDay,
+                isAllDay: isAllDay,
                 cycleOption: cycleOption,
                 location: location,
                 address: address,
