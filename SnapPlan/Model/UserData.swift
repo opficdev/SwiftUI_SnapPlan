@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct UserData: Codable {
     let uid: UUID
@@ -13,6 +14,6 @@ struct UserData: Codable {
     let email: String
     let is12TimeFmt: Bool
     let name: String
-    let screenMode: String
+    let screenMode: UIUserInterfaceStyle
     let signedAt: Date
 }
