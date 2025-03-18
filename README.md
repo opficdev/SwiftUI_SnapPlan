@@ -62,27 +62,23 @@
 </table>
 
 
-## Firestore 구조
-```
-User UID (컬렉션) ⬅️ FirebaseAuth와 연동
-│
-├── info (문서)
-│   ├── displayName: String
-│   ├── email: String
-│   ├── is12TimeFmt: Bool
-│   ├── signedAt: TimeStamp
-│   └── User UID: String
-│
-└── schedules (문서)
-    └── data (서브 컬렉션)
-        ├── UUID().uuidString (문서)
-        │   ├── address: String
-        │   ├── allDay: Bool
-        │   ├── color: Int
-        │   ├── cycleOption: String
-        │   ├── description: String
-        │   ├── endDate: TimeStamp
-        │   ├── location: String
-        │   ├── startDate: TimeStamp
-        │   └── title: String
-```
+## Supabase Database 구조
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./Image/Table.png" width="100%">
+      <p><strong>Table</strong></p>
+    </td>
+    <td align="center" width="50%">
+      <img src="./Image/Enum.png" width="100%">
+      <p><strong>Enum</strong></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <p><strong>외래 키</strong>: Schedule.uid → User.uid (1대다 관계)</p>
+    </td>
+  </tr>
+</table>
+
