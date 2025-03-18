@@ -17,6 +17,8 @@ class ScheduleViewModel: ObservableObject {
     @Published var endDate = Date()
     @Published var isAllDay = false
     @Published var cycleOption = ScheduleData.CycleOption.none
+    @Published var records: [String] = []
+    @Published var images: [String] = []
     @Published var location = ""
     @Published var address = ""
     @Published var description = ""
@@ -39,6 +41,8 @@ class ScheduleViewModel: ObservableObject {
                     self?.endDate = schedule.endDate
                     self?.isAllDay = schedule.isAllDay
                     self?.cycleOption = schedule.cycleOption
+                    self?.records = schedule.records
+                    self?.images = schedule.images
                     self?.location = schedule.location
                     self?.address = schedule.address
                     self?.description = schedule.description
@@ -47,16 +51,18 @@ class ScheduleViewModel: ObservableObject {
             }
             .store(in: &cancellable)
         //  MARK: Combine으로 각 변수들이 변경되면 자동으로 schedule 구조체 변수에 적용
-        Publishers.CombineLatest3(
+        Publishers.CombineLatest4(
             $id,
             $title,
-            $startDate
+            $startDate,
+            $endDate
         )
         .combineLatest(
-            Publishers.CombineLatest3(
-                $endDate,
+            Publishers.CombineLatest4(
                 $isAllDay,
-                $cycleOption
+                $cycleOption,
+                $records,
+                $images
             ),
             Publishers.CombineLatest4(
                 $location,
@@ -67,8 +73,8 @@ class ScheduleViewModel: ObservableObject {
         )
         .map { [weak self] first, second, third -> ScheduleData? in
             
-            let (id, title, startDate) = first
-            let (endDate, isAllDay, cycleOption) = second
+            let (id, title, startDate, endDate) = first
+            let (isAllDay, cycleOption, records, images) = second
             let (location, address, description, color) = third
             
             // id가 nil이면 기존 schedule 유지, 그렇지 않으면 새로운 ScheduleData 생성
@@ -79,6 +85,8 @@ class ScheduleViewModel: ObservableObject {
                 endDate: endDate,
                 isAllDay: isAllDay,
                 cycleOption: cycleOption,
+                records: records,
+                images: images,
                 location: location,
                 address: address,
                 description: description,
