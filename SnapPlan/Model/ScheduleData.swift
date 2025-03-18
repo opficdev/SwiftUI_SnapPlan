@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ScheduleData: Identifiable {
+struct ScheduleData: Identifiable, Codable {
     let id: UUID //  UUID
     var title: String   // 일정 제목
     var startDate: Date // 일정 시작 날짜
@@ -46,7 +46,7 @@ struct ScheduleData: Identifiable {
         self.color = color
     }
     
-    enum CycleOption: String {
+    enum CycleOption: String, Codable {
         case none = "none"  // 반복 없음
         case daily = "daily"    // 매일
         case weekdays = "weekdays"  // 평일
