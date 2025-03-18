@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingView: View {
-    @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var supabaseVM: SupabaseViewModel
     @Environment(\.dismiss) var dismiss
     @State private var logoutAlert = false
     @State private var deleteAlert = false
@@ -20,7 +20,7 @@ struct SettingView: View {
             VStack(alignment: .trailing, spacing: 0) {
                 List {
                     Section(header: Text("계정")) {
-                        Text(firebaseVM.email)
+                        Text(supabaseVM.email)
                     }
                     .listRowBackground(Color.timeLine)
                     Section(header: Text("일정")) {
@@ -114,7 +114,7 @@ struct SettingView: View {
                         }
                         Button(role: .destructive, action: {
                             Task {
-                                try await firebaseVM.deleteAccount()
+                                try supabaseVM.deleteUser()
                             }
                         }) {
                             Text("탈퇴")
@@ -134,7 +134,7 @@ struct SettingView: View {
                 }
                 Button(role: .destructive, action: {
                     Task {
-                        await firebaseVM.signOutGoogle()
+                        await supabaseVM.signOutGoogle()
                     }
                 }) {
                     Text("확인")
@@ -164,5 +164,5 @@ struct SettingView: View {
 
 #Preview {
     SettingView()
-        .environmentObject(FirebaseViewModel())
+        .environmentObject(SupabaseViewModel())
 }

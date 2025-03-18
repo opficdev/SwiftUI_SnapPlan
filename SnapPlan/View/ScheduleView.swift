@@ -15,7 +15,7 @@ struct ScheduleView: View {
     ]
     let screenWidth = UIScreen.main.bounds.width
     @EnvironmentObject var plannerVM: PlannerViewModel
-    @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var supabaseVM: SupabaseViewModel
     @EnvironmentObject var scheduleVM: ScheduleViewModel
     @EnvironmentObject var uiVM: UIViewModel
     @StateObject var searchVM = SearchLocationViewModel()
@@ -76,8 +76,8 @@ struct ScheduleView: View {
                                             color: scheduleVM.color
                                         )
                                         Task {
-                                            try await firebaseVM.addScheduleData(schedule: copy)
-                                            await firebaseVM.loadScheduleData(date: copy.startDate)
+                                            try await supabaseVM.upsertSchedule(schedule: copy)
+                                            try await supabaseVM.fetchSchedule(date: copy.startDate)
                                         }
                                     }) {
                                         Label("복제", systemImage: "doc.on.doc")
@@ -101,8 +101,8 @@ struct ScheduleView: View {
                                                 scheduleVM.schedule = nil
                                             }
                                             startTask = false
-                                            try await firebaseVM.addScheduleData(schedule: scheduleVM.schedule!)
-                                            await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
+                                            try await supabaseVM.upsertSchedule(schedule: scheduleVM.schedule!)
+                                            try await supabaseVM.fetchSchedule(date: scheduleVM.startDate)
                                         }
                                         catch {
                                             print("스케줄 추가/수정 실패: \(error.localizedDescription)")
@@ -332,8 +332,8 @@ struct ScheduleView: View {
                                         scheduleVM.schedule = nil
                                     }
                                     startTask = false
-                                    try await firebaseVM.deleteScheduleData(schedule: scheduleVM.schedule!)
-                                    await firebaseVM.loadScheduleData(date: scheduleVM.startDate)
+                                    try await supabaseVM.deleteSchedule(schedule: scheduleVM.schedule!)
+                                    try await supabaseVM.fetchSchedule(date: scheduleVM.startDate)
                                 }
                             }
                         }) {

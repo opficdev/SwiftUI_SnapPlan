@@ -12,7 +12,7 @@ struct TimeLineView: View {
     @StateObject var uiVM = UIViewModel()
     @StateObject private var scheduleVM = ScheduleViewModel()
     @EnvironmentObject private var plannerVM: PlannerViewModel
-    @EnvironmentObject private var firebaseVM: FirebaseViewModel
+    @EnvironmentObject private var supabaseVM: SupabaseViewModel
     @Environment(\.colorScheme) var colorScheme
     @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
@@ -27,11 +27,11 @@ struct TimeLineView: View {
             Color.timeLine.ignoresSafeArea()
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 0) {
-                    Text(firebaseVM.is12TimeFmt ? "12시간제" : "24시간제")
+                    Text(supabaseVM.is12TimeFmt ? "12시간제" : "24시간제")
                         .frame(width: screenWidth / 7)
                         .font(.caption)
                         .onTapGesture {
-                            firebaseVM.is12TimeFmt.toggle()
+                            supabaseVM.is12TimeFmt.toggle()
                         }
                     
                     HStack {
@@ -67,7 +67,7 @@ struct TimeLineView: View {
                                     VStack {
                                         ZStack(alignment: .topTrailing) {
                                             VStack(alignment: .trailing, spacing: gap) {
-                                                let hours = plannerVM.getHours(is12hoursFmt: firebaseVM.is12TimeFmt)
+                                                let hours = plannerVM.getHours(is12hoursFmt: supabaseVM.is12TimeFmt)
                                                 ForEach(Array(zip(hours.indices, hours)), id: \.1.id) { index, hour in
                                                     Text("\(hour.timePeriod) \(hour.time)")
                                                         .font(.caption)
@@ -95,7 +95,7 @@ struct TimeLineView: View {
                                                 plannerVM.getDateString(
                                                     for: plannerVM.today,
                                                     components: [.hour, .minute],
-                                                    is12hoursFmt: firebaseVM.is12TimeFmt
+                                                    is12hoursFmt: supabaseVM.is12TimeFmt
                                                 )
                                             )
                                             .font(.caption)
@@ -153,7 +153,7 @@ struct TimeLineView: View {
                                                                 }
                                                                 
                                                                 //  MARK: 반복 일정
-                                                                let cyecleSchedules = firebaseVM.schedules.values.filter { $0.cycleOption != .none }
+                                                                let cyecleSchedules = supabaseVM.schedules.values.filter { $0.cycleOption != .none }
                                                                 ForEach(Array(zip(cyecleSchedules.indices, cyecleSchedules)), id: \.1.id) { idx, scheduleData in
                                                                     if (scheduleVM.id != scheduleData.id && !scheduleData.isAllDay) && scheduleVM.isCycleConfirm(date: date, schedule: scheduleData) {
                                                                         ScheduleBox(
@@ -169,7 +169,7 @@ struct TimeLineView: View {
                                                                 }
                                                                 
                                                                 //  MARK: 반복, 종일 설정이 없는 일정
-                                                                let schedules = uiVM.findSchedules(containing: date, in: firebaseVM.schedules)
+                                                                let schedules = uiVM.findSchedules(containing: date, in: supabaseVM.schedules)
                                                                 ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
                                                                     if scheduleVM.id != scheduleData.id && !scheduleData.isAllDay && scheduleData.cycleOption == .none {
                                                                         ScheduleBox(
@@ -302,7 +302,7 @@ struct TimeLineView: View {
                         
                         VStack(spacing: 3) {
                             //  MARK: 종일 일정 부분
-                            let todaySchedules = uiVM.findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules).sorted(by: { $0.title < $1.title })
+                            let todaySchedules = uiVM.findSchedules(containing: plannerVM.selectDate, in: supabaseVM.schedules).sorted(by: { $0.title < $1.title })
                             ForEach(Array(zip(todaySchedules.indices, todaySchedules)), id: \.1.id) { idx, scheduleData in
                                 if scheduleData.isAllDay {
                                     if scheduleVM.id == scheduleData.id {
@@ -333,7 +333,7 @@ struct TimeLineView: View {
                     }
                     .background(Color.timeLine)
                     .border(Color.gray.opacity(0.3))
-                    .onChange(of: firebaseVM.schedules) { schedules in
+                    .onChange(of: supabaseVM.schedules) { schedules in
                         uiVM.setAllDayPadding(date: plannerVM.selectDate, height: timeZoneSize.height, schedules: schedules)
                     }
                     Rectangle()
@@ -363,19 +363,20 @@ struct TimeLineView: View {
                 calendarData = plannerVM.calendarData[1]
             }
             selection = calendarData.firstIndex(where: {plannerVM.isSameDate(date1: $0, date2: date, components: [.year, .month, .day]) })!
-            uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
+            uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: supabaseVM.schedules)
         }
         .onChange(of: calendarData) { month in
             Task {
+                supabaseVM.schedules.removeAll()
                 for date in month {
-                    await firebaseVM.loadScheduleData(date: date)
+                    try await supabaseVM.fetchSchedule(date: date)
                 }
             }
         }
-        .onChange(of: firebaseVM.is12TimeFmt) { value in
+        .onChange(of: supabaseVM.is12TimeFmt) { value in
             Task {
                 do {
-                    try await firebaseVM.set12TimeFmt(timeFmt: value)
+                    try await supabaseVM.updateTimeFormat(is12TimeFmt: value)
                 } catch {
                     print("12시간제 변경 에러", error.localizedDescription)
                 }
@@ -384,7 +385,7 @@ struct TimeLineView: View {
         .sheet(isPresented: $showScheduleView) {
             ScheduleView()
                 .environmentObject(plannerVM)
-                .environmentObject(firebaseVM)
+                .environmentObject(supabaseVM)
                 .environmentObject(uiVM)
                 .environmentObject(scheduleVM)
                 .presentationDragIndicator(.visible)
@@ -403,5 +404,5 @@ struct TimeLineView: View {
 #Preview {
     TimeLineView(showScheduleView: .constant(true))
         .environmentObject(PlannerViewModel())
-        .environmentObject(FirebaseViewModel())
+        .environmentObject(SupabaseViewModel())
 }

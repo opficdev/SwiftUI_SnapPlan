@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
-    @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var supabaseVM: SupabaseViewModel
     @State private var showScheduleView = true
     @State private var showSettingView = false
     
@@ -17,10 +17,10 @@ struct PlannerView: View {
         VStack(spacing: 0) {
             CalendarView(showScheduleView: $showScheduleView, showSettingView: $showSettingView)
                 .environmentObject(plannerVM)
-                .environmentObject(firebaseVM)
+                .environmentObject(supabaseVM)
             TimeLineView(showScheduleView: $showScheduleView)
                 .environmentObject(plannerVM)
-                .environmentObject(firebaseVM)
+                .environmentObject(supabaseVM)
         }
         .ignoresSafeArea(.all, edges: .bottom)
     }
@@ -28,6 +28,6 @@ struct PlannerView: View {
 
 #Preview {
     PlannerView()
-        .environmentObject(FirebaseViewModel())
+        .environmentObject(SupabaseViewModel())
 }
 

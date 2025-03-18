@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LoginView: View {
-    @EnvironmentObject private var viewModel: FirebaseViewModel
+    @EnvironmentObject private var viewModel: SupabaseViewModel
     @Environment(\.colorScheme) var colorScheme
     
     let screenWidth = UIScreen.main.bounds.width
@@ -62,5 +62,5 @@ struct LoginView: View {
 
 #Preview {
     LoginView()
-        .environmentObject(FirebaseViewModel())
+        .environmentObject(SupabaseViewModel())
 }

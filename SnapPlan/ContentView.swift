@@ -8,25 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var firebaseVM = FirebaseViewModel()
+    @StateObject private var supabaseVM = SupabaseViewModel()
     // 앱이 설치되고 첫번째 로딩인지 저장하는 AppStorage
     @AppStorage("isFirstLaunch") var isFirstLaunch: Bool = true
     
     var body: some View {
         ZStack {
             Color.calendar.ignoresSafeArea()
-            if let signedIn = firebaseVM.signedIn {
+            if let signedIn = supabaseVM.signedIn {
                 if signedIn && !isFirstLaunch {
                     PlannerView()
-                        .environmentObject(firebaseVM)
+                        .environmentObject(supabaseVM)
                 }
                 else {
                     LoginView()
-                        .environmentObject(firebaseVM)
+                        .environmentObject(supabaseVM)
                         .onAppear {
                             if isFirstLaunch {
                                 Task {
-                                    await firebaseVM.signOutGoogle()
+                                    await supabaseVM.signOutGoogle()
                                     isFirstLaunch = false
                                 }
                             }
