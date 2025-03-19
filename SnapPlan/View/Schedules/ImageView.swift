@@ -78,7 +78,10 @@ struct ImageView: View {
                 )
             }
             else {
-                Text("저장된 사진이 없습니다.")
+                VStack {
+                    Text("저장된 사진이 없습니다.")
+                    Text("우측 상단 + 버튼을 눌러 사진을 추가해보세요.")
+                }
                     .foregroundStyle(Color.gray)
             }
         }
