@@ -39,24 +39,6 @@ struct ImageView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Spacer()
-//                PhotosPicker(
-//                    selection: $selectedPhotos,
-//                    maxSelectionCount: availableSelectedCount,
-//                    matching: matching,
-//                    photoLibrary: photoLibrary
-//                ) {
-//                    Image(systemName: "plus.circle.fill")
-//                        .symbolRenderingMode(.palette)
-//                        .foregroundStyle(Color.white, Color.gray.opacity(0.2))
-//                        .font(.system(size: 30))
-//                }
-//                .disabled(disabled)
-//                .onChange(of: selectedPhotos) { newValue in
-//                    handleSelectedPhotos(newValue)
-//                }
-            }
             if selectedImages.count > 0 {
                 ScrollView {
                     LazyVStack {
@@ -94,7 +76,6 @@ struct ImageView: View {
                     photoLibrary: photoLibrary
                 ) {
                     Image(systemName: "plus")
-                        .foregroundStyle(Color.primary)
                 }
                 .disabled(disabled)
                 .onChange(of: selectedPhotos) { newValue in
@@ -102,6 +83,7 @@ struct ImageView: View {
                 }
             }
         }
+        .navigationTitle("사진")
     }
     
     private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem]) {
