@@ -9,49 +9,96 @@ import SwiftUI
 import PhotosUI
 
 struct ImageView: View {
+    @State private var selectedImages: [UIImage]
     @State private var selectedPhotos: [PhotosPickerItem]
-    @Binding private var selectedImages: [UIImage]
-    @Binding private var isPresentedError: Bool
+    @State private var innerHeight = CGFloat.zero   //  ScrollView 내부 요소의 총 높이
+    @State private var outerHeight = CGFloat.zero   //  ScrollView의 높이
     private let maxSelectedCount: Int
     private var disabled: Bool {
-      selectedImages.count >= maxSelectedCount
+        selectedImages.count >= maxSelectedCount
     }
     private var availableSelectedCount: Int {
-      maxSelectedCount - selectedImages.count
+        maxSelectedCount - selectedImages.count
     }
     private let matching: PHPickerFilter
     private let photoLibrary: PHPhotoLibrary
     
-    public init(
-      selectedPhotos: [PhotosPickerItem] = [],
-      selectedImages: Binding<[UIImage]>,
-      isPresentedError: Binding<Bool> = .constant(false),
-      maxSelectedCount: Int = 5,
-      matching: PHPickerFilter = .images,
-      photoLibrary: PHPhotoLibrary = .shared()
+    init(
+        selectedPhotos: [PhotosPickerItem] = [],
+        selectedImages: [UIImage] = [],
+        maxSelectedCount: Int = 5,
+        matching: PHPickerFilter = .images,
+        photoLibrary: PHPhotoLibrary = .shared()
     ) {
-      self.selectedPhotos = selectedPhotos
-      self._selectedImages = selectedImages
-      self._isPresentedError = isPresentedError
-      self.maxSelectedCount = maxSelectedCount
-      self.matching = matching
-      self.photoLibrary = photoLibrary
-      
+        self._selectedPhotos = State(initialValue: selectedPhotos)
+        self._selectedImages = State(initialValue: selectedImages)
+        self.maxSelectedCount = maxSelectedCount
+        self.matching = matching
+        self.photoLibrary = photoLibrary
     }
     
-    public var body: some View {
-      PhotosPicker(
-        selection: $selectedPhotos,
-        maxSelectionCount: availableSelectedCount,
-        matching: matching,
-        photoLibrary: photoLibrary
-      ) {
-      
-      }
-      .disabled(disabled)
-      .onChange(of: selectedPhotos) { newValue in
-        handleSelectedPhotos(newValue)
-      }
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer()
+//                PhotosPicker(
+//                    selection: $selectedPhotos,
+//                    maxSelectionCount: availableSelectedCount,
+//                    matching: matching,
+//                    photoLibrary: photoLibrary
+//                ) {
+//                    Image(systemName: "plus.circle.fill")
+//                        .symbolRenderingMode(.palette)
+//                        .foregroundStyle(Color.white, Color.gray.opacity(0.2))
+//                        .font(.system(size: 30))
+//                }
+//                .disabled(disabled)
+//                .onChange(of: selectedPhotos) { newValue in
+//                    handleSelectedPhotos(newValue)
+//                }
+            }
+            if selectedImages.count > 0 {
+                ScrollView {
+                    LazyVStack {
+                        ForEach(selectedImages, id: \.self) { image in
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                        }
+                    }
+                }
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear.onAppear {
+                            outerHeight = proxy.size.height
+                        }
+                    }
+                )
+            }
+            else {
+                Text("저장된 사진이 없습니다.")
+                    .foregroundStyle(Color.gray)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                PhotosPicker(
+                    selection: $selectedPhotos,
+                    maxSelectionCount: availableSelectedCount,
+                    matching: matching,
+                    photoLibrary: photoLibrary
+                ) {
+                    Image(systemName: "plus")
+                        .foregroundStyle(Color.primary)
+                }
+                .disabled(disabled)
+                .onChange(of: selectedPhotos) { newValue in
+                    handleSelectedPhotos(newValue)
+                }
+            }
+        }
     }
     
     private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem]) {
@@ -67,7 +114,7 @@ struct ImageView: View {
                         }
                     }
                 case .failure:
-                    isPresentedError = true
+                    break
                 }
             }
         }
@@ -75,4 +122,8 @@ struct ImageView: View {
       selectedPhotos.removeAll()
     }
 
+}
+
+#Preview {
+    ImageView()
 }
