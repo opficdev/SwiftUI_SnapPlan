@@ -37,6 +37,7 @@ struct ScheduleView: View {
     @State private var descriptionFocus = false   //  설명 포커싱 여부
     
     @State private var didChangedStartDate = false
+    @State private var imageArr: [UIImage] = []
     
     var body: some View {
         NavigationStack {
@@ -225,13 +226,18 @@ struct ScheduleView: View {
 //                                        Text("음성 메모")
 //                                            .foregroundStyle(Color.gray)
 //                                    }
-//                                    HStack {
-//                                        Image(systemName: "photo")
-//                                            .frame(width: 25)
-//                                            .foregroundStyle(Color.gray)
-//                                        Text("사진")
-//                                            .foregroundStyle(Color.gray)
-//                                    }
+                                    HStack {
+                                        NavigationLink(destination: ImageView()) {
+                                            HStack {
+                                                Image(systemName: "photo")
+                                                    .frame(width: 25)
+                                                    .foregroundStyle(Color.gray)
+                                                Text("사진")
+                                                    .foregroundStyle(Color.gray)
+                                            }
+                                        }
+                                        Spacer()
+                                    }
                                     HStack {
                                         Image(systemName: "map")
                                             .frame(width: 25)
