@@ -50,6 +50,13 @@ struct ImageView: View {
                                 .padding(.vertical, 10)
                         }
                     }
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear.onChange(of: selectedImages) { _ in
+                                innerHeight = proxy.size.height
+                            }
+                        }
+                    )
                 }
                 .background(
                     GeometryReader { proxy in
@@ -58,6 +65,7 @@ struct ImageView: View {
                         }
                     }
                 )
+                .scrollDisabled(innerHeight <= outerHeight)
             }
             else {
                 VStack {
