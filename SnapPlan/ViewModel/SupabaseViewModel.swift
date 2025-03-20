@@ -298,3 +298,67 @@ extension SupabaseViewModel {
         }
     }
 }
+
+// MARK: - 일정 이미지 CRUD
+extension SupabaseViewModel {
+    func fetchImages(files: [String]) async throws -> [UIImage] {
+        guard let uid = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        var images: [UIImage] = []
+        do {
+            for fileName in files {
+                // uid 폴더 경로를 포함하여 다운로드
+                let filePath = "\(uid.uuidString)/\(fileName)"
+                let data = try await supabase.storage.from("images").download(path: filePath)
+                if let image = UIImage(data: data) {
+                    images.append(image)
+                }
+            }
+        } catch {
+            print("Fetch Image Error: \(error.localizedDescription)")
+        }
+        
+        return images
+    }
+
+    
+    func upsertImage(image: UIImage) async throws -> String? {
+        guard let uid = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        do {
+            print(uid.uuidString)
+            let data = image.pngData()
+            let fileName = "\(Date().timeIntervalSince1970).png"
+            let filePath = "\(uid.uuidString)/\(fileName)" // uid 폴더 안에 이미지 저장
+            
+            let _ = try await supabase.storage.from("images").upload(
+                filePath,
+                data: data!,
+                options: FileOptions(
+                    contentType: "image/png",
+                    upsert: true
+                )
+            )
+            return fileName
+        } catch {
+            print("Upsert Image Error: \(error.localizedDescription)")
+        }
+        
+        return nil
+    }
+
+
+    
+    func deleteImage(fileName: String) async throws {
+        guard let uid = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        do {
+            try await supabase.storage.from("images").remove(paths: ["\(uid.uuidString)/\(fileName)"])
+        } catch {
+            print("Delete Image Error: \(error.localizedDescription)")
+        }
+    }
+}
