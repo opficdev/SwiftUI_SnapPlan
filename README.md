@@ -10,8 +10,8 @@
 
 ## 특징
 - 노션 캘린더를 베이스로 한 UI 구현
-- Firestore를 통한 사용자 데이터 저장
-- FirebaseAuth를 통한 사용자 인증
+- Supabase Database를 통한 사용자 데이터 저장
+- Google OAuth를 통한 사용자 인증
 - Combine을 사용해 현재 시각을 0.1초 단위로 최신화
 - frame 측정에 대한 GeometryReader 사용 최소화
 - 라이트 / 다크 모드 지원
