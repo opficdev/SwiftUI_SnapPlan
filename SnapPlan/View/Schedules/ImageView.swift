@@ -9,10 +9,12 @@ import SwiftUI
 import PhotosUI
 
 struct ImageView: View {
+    @Environment(\.colorScheme) var colorScheme
+    @EnvironmentObject var supabaseVM: SupabaseViewModel
     @State private var selectedImages: [UIImage]
     @State private var selectedPhotos: [PhotosPickerItem]
     @State private var innerHeight = CGFloat.zero   //  ScrollView 내부 요소의 총 높이
-    @State private var outerHeight = CGFloat.zero   //  ScrollView의 높이
+    @State private var outerHeight = CGFloat.zero   //  ScrollView 자체 높이
     private let maxSelectedCount: Int
     private var disabled: Bool {
         selectedImages.count >= maxSelectedCount
@@ -22,11 +24,10 @@ struct ImageView: View {
     }
     private let matching: PHPickerFilter
     private let photoLibrary: PHPhotoLibrary
-    
     init(
         selectedPhotos: [PhotosPickerItem] = [],
         selectedImages: [UIImage] = [],
-        maxSelectedCount: Int = 5,
+        maxSelectedCount: Int = 6,
         matching: PHPickerFilter = .images,
         photoLibrary: PHPhotoLibrary = .shared()
     ) {
@@ -39,21 +40,30 @@ struct ImageView: View {
     
     var body: some View {
         VStack {
-            if selectedImages.count > 0 {
+            if !selectedImages.isEmpty {
                 ScrollView {
-                    LazyVStack {
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 0), GridItem(.flexible(), spacing: 0)], spacing: 0) {
                         ForEach(selectedImages, id: \.self) { image in
                             Image(uiImage: image)
                                 .resizable()
-                                .scaledToFit()
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
+                                .scaledToFill()
+                                .frame(width: UIScreen.main.bounds.width / 2)
+                                .clipped()
+                                .overlay (
+                                    Rectangle()
+                                        .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 1)
+                                )
                         }
+                            
                     }
                     .background(
                         GeometryReader { proxy in
-                            Color.clear.onChange(of: selectedImages) { _ in
-                                innerHeight = proxy.size.height
+                            Color.clear
+                                .onAppear {
+                                    innerHeight = proxy.size.height
+                                }
+                                .onChange(of: selectedImages) { _ in
+                                    innerHeight = proxy.size.height
                             }
                         }
                     )
