@@ -231,10 +231,10 @@ struct ScheduleView: View {
                                             HStack {
                                                 Image(systemName: "photo")
                                                     .frame(width: 25)
-                                                    .foregroundStyle(Color.gray)
                                                 Text("사진")
-                                                    .foregroundStyle(Color.gray)
+                                                    .underline(!imageArr.isEmpty)
                                             }
+                                            .foregroundStyle(imageArr.isEmpty ? Color.gray : Color.primary)
                                         }
                                         Spacer()
                                     }
