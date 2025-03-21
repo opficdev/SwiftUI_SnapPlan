@@ -17,14 +17,13 @@ class ScheduleViewModel: ObservableObject {
     @Published var endDate = Date()
     @Published var isAllDay = false
     @Published var cycleOption = ScheduleData.CycleOption.none
-    @Published var records: [String] = []
-    @Published var photos: [String] = []    //  사진 파일명을 저장하는 배열
-    @Published var photoFiles: [UIImage] = []   //  실제 사진을 저장하는 배열
     @Published var location = ""
     @Published var address = ""
     @Published var description = ""
     @Published var color = 0
     
+    @Published var records: [String] = []
+    @Published var photos: [UIImage] = []
     
     private var cancellable = Set<AnyCancellable>()
     
@@ -42,7 +41,6 @@ class ScheduleViewModel: ObservableObject {
                     self?.endDate = schedule.endDate
                     self?.isAllDay = schedule.isAllDay
                     self?.cycleOption = schedule.cycleOption
-                    self?.records = schedule.records
                     self?.location = schedule.location
                     self?.address = schedule.address
                     self?.description = schedule.description
@@ -58,10 +56,9 @@ class ScheduleViewModel: ObservableObject {
             $endDate
         )
         .combineLatest(
-            Publishers.CombineLatest4(
+            Publishers.CombineLatest3(
                 $isAllDay,
                 $cycleOption,
-                $records,
                 $location
             ),
             Publishers.CombineLatest3(
@@ -73,7 +70,7 @@ class ScheduleViewModel: ObservableObject {
         .map { [weak self] first, second, third -> ScheduleData? in
             
             let (id, title, startDate, endDate) = first
-            let (isAllDay, cycleOption, records, location) = second
+            let (isAllDay, cycleOption, location) = second
             let (address, description, color) = third
             
             // id가 nil이면 기존 schedule 유지, 그렇지 않으면 새로운 ScheduleData 생성
@@ -84,7 +81,6 @@ class ScheduleViewModel: ObservableObject {
                 endDate: endDate,
                 isAllDay: isAllDay,
                 cycleOption: cycleOption,
-                records: records,
                 location: location,
                 address: address,
                 description: description,
