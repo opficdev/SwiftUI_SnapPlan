@@ -1,5 +1,5 @@
 //
-//  ImageView.swift
+//  PhotoView.swift
 //  SnapPlan
 //
 //  Created by opfic on 3/4/25.
@@ -10,40 +10,28 @@ import PhotosUI
 
 struct ImageView: View {
     @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var supabaseVM: SupabaseViewModel
-    @State private var selectedImages: [UIImage]
-    @State private var selectedPhotos: [PhotosPickerItem]
+    @EnvironmentObject var scheduleVM: ScheduleViewModel
+    @State private var selectedPhotos: [PhotosPickerItem] = []
+    @State private var savedPhotos: [UIImage] = []
     @State private var innerHeight = CGFloat.zero   //  ScrollView 내부 요소의 총 높이
     @State private var outerHeight = CGFloat.zero   //  ScrollView 자체 높이
     private let maxSelectedCount: Int
     private var disabled: Bool {
-        selectedImages.count >= maxSelectedCount
+        scheduleVM.photoFiles.count >= maxSelectedCount
     }
     private var availableSelectedCount: Int {
-        maxSelectedCount - selectedImages.count
+        maxSelectedCount - scheduleVM.photoFiles.count
     }
-    private let matching: PHPickerFilter
-    private let photoLibrary: PHPhotoLibrary
-    init(
-        selectedPhotos: [PhotosPickerItem] = [],
-        selectedImages: [UIImage] = [],
-        maxSelectedCount: Int = 6,
-        matching: PHPickerFilter = .images,
-        photoLibrary: PHPhotoLibrary = .shared()
-    ) {
-        self._selectedPhotos = State(initialValue: selectedPhotos)
-        self._selectedImages = State(initialValue: selectedImages)
+    init(maxSelectedCount: Int = 6) {
         self.maxSelectedCount = maxSelectedCount
-        self.matching = matching
-        self.photoLibrary = photoLibrary
     }
     
     var body: some View {
         VStack {
-            if !selectedImages.isEmpty {
+            if !scheduleVM.photoFiles.isEmpty {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 0), GridItem(.flexible(), spacing: 0)], spacing: 0) {
-                        ForEach(selectedImages, id: \.self) { image in
+                        ForEach(scheduleVM.photoFiles, id: \.self) { image in
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFill()
@@ -62,12 +50,13 @@ struct ImageView: View {
                                 .onAppear {
                                     innerHeight = proxy.size.height
                                 }
-                                .onChange(of: selectedImages) { _ in
+                                .onChange(of: scheduleVM.photoFiles) { _ in
                                     innerHeight = proxy.size.height
                             }
                         }
                     )
                 }
+                .padding(.horizontal)
                 .background(
                     GeometryReader { proxy in
                         Color.clear.onAppear {
@@ -90,39 +79,39 @@ struct ImageView: View {
                 PhotosPicker(
                     selection: $selectedPhotos,
                     maxSelectionCount: availableSelectedCount,
-                    matching: matching,
-                    photoLibrary: photoLibrary
+                    matching: .images,
+                    photoLibrary: .shared()
                 ) {
                     Image(systemName: "plus")
                 }
                 .disabled(disabled)
                 .onChange(of: selectedPhotos) { newValue in
-                    handleSelectedPhotos(newValue)
+                    Task {
+                        scheduleVM.photoFiles = await handleSelectedPhotos(newValue)
+                    }
                 }
             }
         }
         .navigationTitle("사진")
+
     }
-    
-    private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem]) {
+
+    private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem]) async -> [UIImage] {
+        var photos: [UIImage] = []
+        
         for newPhoto in newPhotos {
-            newPhoto.loadTransferable(type: Data.self) { result in
-                switch result {
-                case .success(let data):
-                    if let data = data, let newImage = UIImage(data: data) {
-                        if !selectedImages.contains(where: { $0.pngData() == newImage.pngData() }) {
-                            DispatchQueue.main.async {
-                                selectedImages.append(newImage)
-                            }
-                        }
+            do {
+                if let data = try await newPhoto.loadTransferable(type: Data.self) {
+                    if let newImage = UIImage(data: data) {
+                        photos.append(newImage)
                     }
-                case .failure:
-                    break
                 }
+            } catch {
+                print("Failed to load photo: \(error)")
             }
         }
-      
-      selectedPhotos.removeAll()
+        
+        return photos
     }
 
 }
