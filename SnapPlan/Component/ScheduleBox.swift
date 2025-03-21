@@ -22,7 +22,7 @@ struct ScheduleBox: View {
     @State private var gap: CGFloat
     @State private var timeZoneHeight: CGFloat
     @State private var colorIdx: Int
-    @State private var didDateChangedByDrag = false //  드래그로 일정 시간 변경 시 true
+    @State private var didChangedDateByDragChangedByDrag = false //  드래그로 일정 시간 변경 시 true
     
     init(gap: CGFloat, timeZoneHeight: CGFloat, isChanging: Bool, schedule: Binding<ScheduleData?>) {
         self._isChanging = State(initialValue: isChanging)
@@ -68,7 +68,7 @@ struct ScheduleBox: View {
                 }
                 .onChange(of: schedule?.startDate) { date in
                     if let date = date {
-                        if !didDateChangedByDrag {
+                        if !didChangedDateByDragChangedByDrag {
                             startOffset = getOffsetFromDate(for: date, timeZoneHeight: timeZoneHeight, gap: gap)
                             boxHeight = getOffsetFromDate(for: schedule!.endDate, timeZoneHeight: timeZoneHeight, gap: gap) - startOffset
                             lastHeight = boxHeight
@@ -77,7 +77,7 @@ struct ScheduleBox: View {
                 }
                 .onChange(of: schedule?.endDate) { date in
                     if let date = date {
-                        if !didDateChangedByDrag {  //  드래그 시 알아서 시간이 변경되므로 조건 추가
+                        if !didChangedDateByDragChangedByDrag {  //  드래그 시 알아서 시간이 변경되므로 조건 추가
                             boxHeight = getOffsetFromDate(for: date, timeZoneHeight: timeZoneHeight, gap: gap) - startOffset
                             lastHeight = boxHeight
                         }
@@ -110,7 +110,7 @@ struct ScheduleBox: View {
                             .highPriorityGesture(
                                 DragGesture()
                                     .onChanged { offset in
-                                        didDateChangedByDrag = true
+                                        didChangedDateByDragChangedByDrag = true
                                         withAnimation(.linear(duration: 0.1)) {
                                             if let schedule = schedule {
                                                 boxHeight = max(lastHeight - offset.translation.height * 2, 4)
@@ -126,7 +126,7 @@ struct ScheduleBox: View {
                                     }
                                     .onEnded { _ in
                                         lastHeight = boxHeight
-                                        didDateChangedByDrag = false
+                                        didChangedDateByDragChangedByDrag = false
                                     }
                             )
                         
@@ -143,7 +143,7 @@ struct ScheduleBox: View {
                             .highPriorityGesture(   //  뷰의 제스처를 다른 뷰의 제스처(스크롤 포함)보다 우선적으로 처리
                                 DragGesture()
                                     .onChanged { offset in
-                                        didDateChangedByDrag = true
+                                        didChangedDateByDragChangedByDrag = true
                                         withAnimation(.linear(duration: 0.1)) { //  과도한 AnimatablePair 변경 방지
                                             if let schedule = schedule {
                                                 boxHeight = max(lastHeight + offset.translation.height * 2, 4)
@@ -158,7 +158,7 @@ struct ScheduleBox: View {
                                     }
                                     .onEnded{ _ in
                                         lastHeight = boxHeight
-                                        didDateChangedByDrag = false
+                                        didChangedDateByDragChangedByDrag = false
                                     }
                             )
                     }
