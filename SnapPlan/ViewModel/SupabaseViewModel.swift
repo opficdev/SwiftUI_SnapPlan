@@ -301,62 +301,65 @@ extension SupabaseViewModel {
 
 // MARK: - 일정 이미지 CRUD
 extension SupabaseViewModel {
-    func fetchImages(files: [String]) async throws -> [UIImage] {
-        guard let uid = userId else {
+    func fetchPhotos(schedule: UUID) async throws -> [UIImage] {
+        guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
-        var images: [UIImage] = []
+        var photos: [UIImage] = []
+        
         do {
-            for fileName in files {
-                // uid 폴더 경로를 포함하여 다운로드
-                let filePath = "\(uid.uuidString)/\(fileName)"
-                let data = try await supabase.storage.from("images").download(path: filePath)
+            let folderPath = "\(user.uuidString)/\(schedule.uuidString)"
+            let fileList = try await supabase.storage.from("photos").list(path: folderPath)
+            
+            for file in fileList {
+                let filePath = "\(folderPath)/\(file.name)"
+                
+                let signedURL = try await supabase.storage.from("photos").createSignedURL(path: filePath, expiresIn: 60)
+                
+                let (data, _) = try await URLSession.shared.data(from: signedURL)
                 if let image = UIImage(data: data) {
-                    images.append(image)
+                    photos.append(image)
                 }
             }
         } catch {
             print("Fetch Image Error: \(error.localizedDescription)")
         }
         
-        return images
+        return photos
     }
-
     
-    func upsertImage(image: UIImage) async throws -> String? {
-        guard let uid = userId else {
+    func upsertPhotos(id schedule: UUID, photos: [UIImage]) async throws {
+        guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         do {
-            print(uid.uuidString)
-            let data = image.pngData()
-            let fileName = "\(Date().timeIntervalSince1970).png"
-            let filePath = "\(uid.uuidString)/\(fileName)" // uid 폴더 안에 이미지 저장
-            
-            let _ = try await supabase.storage.from("images").upload(
-                filePath,
-                data: data!,
-                options: FileOptions(
-                    contentType: "image/png",
-                    upsert: true
+            for photo in photos {
+                let data = photo.pngData()
+                let fileName = "\(Date().timeIntervalSince1970).png"
+                let filePath = "\(user.uuidString)/\(schedule.uuidString)/\(fileName)"
+                
+                let _ = try await supabase.storage.from("photos").upload(
+                    filePath,
+                    data: data!,
+                    options: FileOptions(
+                        contentType: "image/png",
+                        upsert: true
+                    )
                 )
-            )
-            return fileName
+            }
         } catch {
             print("Upsert Image Error: \(error.localizedDescription)")
         }
-        
-        return nil
     }
 
 
     
-    func deleteImage(fileName: String) async throws {
-        guard let uid = userId else {
+    func deletePhoto(id schedule: UUID, fileName: String) async throws {
+        guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         do {
-            try await supabase.storage.from("images").remove(paths: ["\(uid.uuidString)/\(fileName)"])
+            try await supabase.storage.from("photos").remove(paths: ["\(user.uuidString)/\(schedule.uuidString)/\(fileName)"])
         } catch {
             print("Delete Image Error: \(error.localizedDescription)")
         }
