@@ -17,10 +17,10 @@ struct ImageView: View {
     @State private var outerHeight = CGFloat.zero   //  ScrollView 자체 높이
     private let maxSelectedCount: Int
     private var disabled: Bool {
-        scheduleVM.photoFiles.count >= maxSelectedCount
+        scheduleVM.photos.count >= maxSelectedCount
     }
     private var availableSelectedCount: Int {
-        maxSelectedCount - scheduleVM.photoFiles.count
+        maxSelectedCount - scheduleVM.photos.count
     }
     init(maxSelectedCount: Int = 6) {
         self.maxSelectedCount = maxSelectedCount
@@ -28,10 +28,10 @@ struct ImageView: View {
     
     var body: some View {
         VStack {
-            if !scheduleVM.photoFiles.isEmpty {
+            if !scheduleVM.photos.isEmpty {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 0), GridItem(.flexible(), spacing: 0)], spacing: 0) {
-                        ForEach(scheduleVM.photoFiles, id: \.self) { image in
+                        ForEach(scheduleVM.photos, id: \.self) { image in
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFill()
@@ -50,7 +50,7 @@ struct ImageView: View {
                                 .onAppear {
                                     innerHeight = proxy.size.height
                                 }
-                                .onChange(of: scheduleVM.photoFiles) { _ in
+                                .onChange(of: scheduleVM.photos) { _ in
                                     innerHeight = proxy.size.height
                             }
                         }

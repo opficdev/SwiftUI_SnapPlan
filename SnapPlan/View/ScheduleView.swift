@@ -221,7 +221,6 @@ struct ScheduleView: View {
                                 Divider()
                                     .padding(.vertical)
                                 VStack(alignment:. leading, spacing: 20) {
-                                    //  개발 우선순위 낮음
 //                                    HStack {
 //                                        Image(systemName: "memories.badge.plus")
 //                                            .frame(width: 25)
@@ -235,9 +234,9 @@ struct ScheduleView: View {
                                                 Image(systemName: "photo")
                                                     .frame(width: 25)
                                                 Text("사진")
-                                                    .underline(!scheduleVM.images.isEmpty)
+                                                    .underline(!scheduleVM.photos.isEmpty)
                                             }
-                                            .foregroundStyle(scheduleVM.images.isEmpty ? Color.gray : Color.primary)
+                                            .foregroundStyle(scheduleVM.photos.isEmpty ? Color.gray : Color.primary)
                                         }
                                         Spacer()
                                     }
