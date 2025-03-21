@@ -358,14 +358,24 @@ extension SupabaseViewModel {
         }
     }
     
-    func deletePhoto(id schedule: UUID, fileName: String) async throws {
+    func deletePhotos(id schedule: UUID) async throws {
         guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
-        do {
-            try await supabase.storage.from("photos").remove(paths: ["\(user.uuidString)/\(schedule.uuidString)/\(fileName)"])
-        } catch {
-            print("Delete Image Error: \(error.localizedDescription)")
+        
+        await withTaskGroup(of: Void.self) { group in
+            do {
+                let fileList = try await supabase.storage.from("photos").list(path: "\(user.uuidString)/\(schedule.uuidString)")
+                
+                for file in fileList {
+                    let filePath = "\(user.uuidString)/\(schedule.uuidString)/\(file.name)"
+                    
+                    try await supabase.storage.from("photos").remove(paths: [filePath])
+                }
+                
+            } catch {
+                print("Delete Image Error: \(error.localizedDescription)")
+            }
         }
     }
 }
