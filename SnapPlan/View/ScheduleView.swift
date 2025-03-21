@@ -35,7 +35,9 @@ struct ScheduleView: View {
     
     @FocusState private var titleFocus: Bool    //  제목 포커싱 여부
     @State private var descriptionFocus = false   //  설명 포커싱 여부
-    
+    //  plannerVM.selectDate와 scheduleVM.startDate의 년월일이 다른 경우
+    //  startDate가 변경되지 않는 이상 selectDate를 따르게 하려고
+    //  해당 변수를 추가하였음
     @State private var didChangedStartDate = false
     
     var body: some View {
