@@ -78,6 +78,7 @@ struct ScheduleView: View {
                                             color: scheduleVM.color
                                         )
                                         Task {
+                                            try await supabaseVM.upsertPhotos(id: scheduleVM.id!, photos: scheduleVM.photos)
                                             try await supabaseVM.upsertSchedule(schedule: copy)
                                             try await supabaseVM.fetchSchedule(date: copy.startDate)
                                         }
@@ -99,10 +100,11 @@ struct ScheduleView: View {
                                 Button(action: {
                                     Task {
                                         do {
-                                            defer { //  firebase에서 오류가 나도 실행
+                                            defer { //  supabase에서 오류가 나도 실행
                                                 scheduleVM.schedule = nil
                                             }
                                             startTask = false
+                                            try await supabaseVM.upsertPhotos(id: scheduleVM.id!, photos: scheduleVM.photos)
                                             try await supabaseVM.upsertSchedule(schedule: scheduleVM.schedule!)
                                             try await supabaseVM.fetchSchedule(date: scheduleVM.startDate)
                                         }
@@ -228,7 +230,7 @@ struct ScheduleView: View {
 //                                            .foregroundStyle(Color.gray)
 //                                    }
                                     HStack {
-                                        NavigationLink(destination: ImageView().environmentObject(supabaseVM)) {
+                                        NavigationLink(destination: ImageView().environmentObject(scheduleVM)) {
                                             HStack {
                                                 Image(systemName: "photo")
                                                     .frame(width: 25)
@@ -279,6 +281,13 @@ struct ScheduleView: View {
                         }
                         .scrollDisabled(!(titleFocus || descriptionFocus)) // 키보드가 내려가면 스크롤 비활성화
                         Spacer()
+                    }
+                    .onAppear {
+                        if !scheduleVM.didChangedPhotosFromVM {
+                            Task {
+                                scheduleVM.photos = try await supabaseVM.fetchPhotos(schedule: scheduleVM.id!)
+                            }
+                        }
                     }
                     .onChange(of: scheduleVM.startDate) { date in
                         didChangedStartDate = true
