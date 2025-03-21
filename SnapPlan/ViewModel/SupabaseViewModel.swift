@@ -332,27 +332,31 @@ extension SupabaseViewModel {
         guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
-        do {
+        
+        await withTaskGroup(of: Void.self) { group in
             for photo in photos {
-                let data = photo.pngData()
-                let fileName = "\(Date().timeIntervalSince1970).png"
-                let filePath = "\(user.uuidString)/\(schedule.uuidString)/\(fileName)"
-                
-                let _ = try await supabase.storage.from("photos").upload(
-                    filePath,
-                    data: data!,
-                    options: FileOptions(
-                        contentType: "image/png",
-                        upsert: true
-                    )
-                )
+                group.addTask {
+                    do {
+                        guard let data = photo.jpegData(compressionQuality: 0.8) else { return }
+                        
+                        let fileName = "\(Date().timeIntervalSince1970).jpg"
+                        let filePath = "\(user.uuidString)/\(schedule.uuidString)/\(fileName)"
+                        
+                        let _ = try await self.supabase.storage.from("photos").upload(
+                            filePath,
+                            data: data,
+                            options: FileOptions(
+                                contentType: "image/jpeg",
+                                upsert: true
+                            )
+                        )
+                    } catch {
+                        print("Upsert Image Error: \(error.localizedDescription)")
+                    }
+                }
             }
-        } catch {
-            print("Upsert Image Error: \(error.localizedDescription)")
         }
     }
-
-
     
     func deletePhoto(id schedule: UUID, fileName: String) async throws {
         guard let user = userId else {
