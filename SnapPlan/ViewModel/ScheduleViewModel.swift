@@ -6,7 +6,7 @@
 //
 //  현재 설정중인 스케줄을 처리하는 뷰모델
 
-import Foundation
+import SwiftUI
 import Combine
 
 class ScheduleViewModel: ObservableObject {
@@ -18,7 +18,8 @@ class ScheduleViewModel: ObservableObject {
     @Published var isAllDay = false
     @Published var cycleOption = ScheduleData.CycleOption.none
     @Published var records: [String] = []
-    @Published var images: [String] = []
+    @Published var photos: [String] = []    //  사진 파일명을 저장하는 배열
+    @Published var photoFiles: [UIImage] = []   //  실제 사진을 저장하는 배열
     @Published var location = ""
     @Published var address = ""
     @Published var description = ""
@@ -42,7 +43,6 @@ class ScheduleViewModel: ObservableObject {
                     self?.isAllDay = schedule.isAllDay
                     self?.cycleOption = schedule.cycleOption
                     self?.records = schedule.records
-                    self?.images = schedule.images
                     self?.location = schedule.location
                     self?.address = schedule.address
                     self?.description = schedule.description
@@ -62,10 +62,9 @@ class ScheduleViewModel: ObservableObject {
                 $isAllDay,
                 $cycleOption,
                 $records,
-                $images
+                $location
             ),
-            Publishers.CombineLatest4(
-                $location,
+            Publishers.CombineLatest3(
                 $address,
                 $description,
                 $color
@@ -74,8 +73,8 @@ class ScheduleViewModel: ObservableObject {
         .map { [weak self] first, second, third -> ScheduleData? in
             
             let (id, title, startDate, endDate) = first
-            let (isAllDay, cycleOption, records, images) = second
-            let (location, address, description, color) = third
+            let (isAllDay, cycleOption, records, location) = second
+            let (address, description, color) = third
             
             // id가 nil이면 기존 schedule 유지, 그렇지 않으면 새로운 ScheduleData 생성
             return id == nil ? self?.schedule : ScheduleData(
@@ -86,7 +85,6 @@ class ScheduleViewModel: ObservableObject {
                 isAllDay: isAllDay,
                 cycleOption: cycleOption,
                 records: records,
-                images: images,
                 location: location,
                 address: address,
                 description: description,
