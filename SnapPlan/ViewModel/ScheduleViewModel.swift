@@ -24,6 +24,7 @@ class ScheduleViewModel: ObservableObject {
     
     @Published var records: [String] = []
     @Published var photos: [UIImage] = []
+    @Published var didChangedPhotosFromVM = false
     
     private var cancellable = Set<AnyCancellable>()
     
@@ -33,6 +34,7 @@ class ScheduleViewModel: ObservableObject {
             .sink { [weak self] newSchedule in
                 if newSchedule == nil {
                     self?.id = nil  // schedule이 nil이면 id만 nil로 변경
+                    self?.didChangedPhotosFromVM = false
                 }
                 else if let schedule = newSchedule {
                     self?.id = schedule.id
