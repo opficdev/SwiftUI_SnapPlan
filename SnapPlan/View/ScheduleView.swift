@@ -78,7 +78,6 @@ struct ScheduleView: View {
                                             color: scheduleVM.color
                                         )
                                         Task {
-                                            try await supabaseVM.upsertPhotos(id: scheduleVM.id!, photos: scheduleVM.photos)
                                             try await supabaseVM.upsertSchedule(schedule: copy)
                                             try await supabaseVM.fetchSchedule(date: copy.startDate)
                                         }
@@ -99,17 +98,24 @@ struct ScheduleView: View {
                                 
                                 Button(action: {
                                     Task {
+                                        let id = scheduleVM.id!
+                                        let photos = scheduleVM.photos
                                         do {
                                             defer { //  supabase에서 오류가 나도 실행
                                                 scheduleVM.schedule = nil
                                             }
                                             startTask = false
-                                            try await supabaseVM.upsertPhotos(id: scheduleVM.id!, photos: scheduleVM.photos)
                                             try await supabaseVM.upsertSchedule(schedule: scheduleVM.schedule!)
                                             try await supabaseVM.fetchSchedule(date: scheduleVM.startDate)
                                         }
                                         catch {
                                             print("스케줄 추가/수정 실패: \(error.localizedDescription)")
+                                        }
+                                        do {
+                                            try await supabaseVM.upsertPhotos(id: id, photos: photos)
+                                        }
+                                        catch {
+                                            print("사진 추가/수정 실패: \(error.localizedDescription)")
                                         }
                                     }
                                     titleFocus = false
