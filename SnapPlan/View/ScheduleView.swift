@@ -81,6 +81,9 @@ struct ScheduleView: View {
                                             try await supabaseVM.upsertSchedule(schedule: copy)
                                             try await supabaseVM.fetchSchedule(date: copy.startDate)
                                         }
+                                        Task {
+                                            try await supabaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)             
+                                        }
                                     }) {
                                         Label("복제", systemImage: "doc.on.doc")
                                     }
