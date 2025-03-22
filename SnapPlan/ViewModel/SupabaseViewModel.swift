@@ -379,3 +379,8 @@ extension SupabaseViewModel {
         }
     }
 }
+
+// MARK: - 음성 메모 CRUD
+extension SupabaseViewModel {
+    
+}
