@@ -314,7 +314,7 @@ extension SupabaseViewModel {
             for file in fileList {
                 let filePath = "\(folderPath)/\(file.name)"
                 
-                let signedURL = try await supabase.storage.from("photos").createSignedURL(path: filePath, expiresIn: 60)
+                let signedURL = try await supabase.storage.from("photos").createSignedURL(path: filePath, expiresIn: 120)
                 
                 let (data, _) = try await URLSession.shared.data(from: signedURL)
                 if let image = UIImage(data: data) {
