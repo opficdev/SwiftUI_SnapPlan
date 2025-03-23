@@ -5,9 +5,9 @@
 //  Created by opfic on 3/17/25.
 //
 
-import UIKit
-import Foundation
+import SwiftUI
 import Combine
+import AVKit
 import Supabase
 import GoogleSignIn
 import GoogleSignInSwift
@@ -382,5 +382,59 @@ extension SupabaseViewModel {
 
 // MARK: - 음성 메모 CRUD
 extension SupabaseViewModel {
+    func fetchVoiceMemo(schedule: UUID) async throws -> AVAudioFile? {
+        guard let user = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        do {
+            let filePath = "\(user.uuidString)/\(schedule.uuidString)/voiceMemo.m4a"
+            let signedURL = try await supabase.storage.from("voiceMemo").createSignedURL(path: filePath, expiresIn: 60)
+            
+            let (data, _) = try await URLSession.shared.data(from: signedURL)
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent("voiceMemo.m4a")
+            try data.write(to: url)
+            
+            return try AVAudioFile(forReading: url)
+        } catch {
+            print("Fetch VoiceMemo Error: \(error.localizedDescription)")
+        }
+        
+        return nil
+    }
     
+    func upsertVoiceMemo(id schedule: UUID, memo: AVAudioFile) async throws {
+        guard let user = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        do {
+            let filePath = "\(user.uuidString)/\(schedule.uuidString)/voiceMemo.m4a"
+            let data = try Data(contentsOf: memo.url)
+            
+            let _ = try await supabase.storage.from("voiceMemo").upload(
+                filePath,
+                data: data,
+                options: FileOptions(
+                    contentType: "audio/m4a",
+                    upsert: true
+                )
+            )
+        } catch {
+            print("Upsert VoiceMemo Error: \(error.localizedDescription)")
+        }
+    }
+    
+    func deleteVoiceMemo(id schedule: UUID) async throws {
+        guard let user = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        do {
+            let filePath = "\(user.uuidString)/\(schedule.uuidString)/voiceMemo.m4a"
+            try await supabase.storage.from("voiceMemo").remove(paths: [filePath])
+        } catch {
+            print("Delete VoiceMemo Error: \(error.localizedDescription)")
+        }
+    }
 }
