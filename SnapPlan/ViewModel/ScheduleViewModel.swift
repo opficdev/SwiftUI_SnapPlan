@@ -28,6 +28,7 @@ class ScheduleViewModel: ObservableObject {
     @Published var didChangedPhotosFromVM = false
     
     private var cancellable = Set<AnyCancellable>()
+    private var audioRecorder: AVAudioRecorder? = nil
     
     init() {
         //  MARK: Combine으로 schedule 구조체 변수가 변경되면 자동으로 각 변수에 적용
@@ -133,5 +134,29 @@ class ScheduleViewModel: ObservableObject {
     
     private func isSameDate(date1: Date, date2: Date, components: Set<Calendar.Component>) -> Bool {
         return Calendar.current.dateComponents(components, from: date1) == Calendar.current.dateComponents(components, from: date2)
+    }
+    
+    func startRecord() {
+        let fileName = "\(Date()).m4a"
+        let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(fileName)
+        let settings = [
+             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+             AVSampleRateKey: 44100,
+             AVNumberOfChannelsKey: 1,
+             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ]
+        
+        do {
+            self.audioRecorder = try AVAudioRecorder(url: filePath, settings: settings)
+            self.audioRecorder?.record()
+            self.voiceMemo = try AVAudioFile(forReading: filePath)
+        } catch {
+            print("녹음 시작 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    func stopRecord() -> AVAudioFile? {
+        self.audioRecorder?.stop()
+        return voiceMemo
     }
 }
