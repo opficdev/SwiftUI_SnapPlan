@@ -230,13 +230,18 @@ struct ScheduleView: View {
                                 Divider()
                                     .padding(.vertical)
                                 VStack(alignment:. leading, spacing: 20) {
-//                                    HStack {
-//                                        Image(systemName: "memories.badge.plus")
-//                                            .frame(width: 25)
-//                                            .foregroundStyle(Color.gray)
-//                                        Text("음성 메모")
-//                                            .foregroundStyle(Color.gray)
-//                                    }
+                                    HStack {
+                                        Image(systemName: "microphone.fill")
+                                            .frame(width: 25)
+                                        Text("음성 메모")
+                                            .underline(scheduleVM.voiceMemo != nil)
+                                            .onTapGesture{
+                                                if scheduleVM.voiceMemo != nil {
+                                                    
+                                                }
+                                            }
+                                    }
+                                    .foregroundStyle(scheduleVM.voiceMemo == nil ? Color.gray : Color.primary)
                                     HStack {
                                         NavigationLink(destination: ImageView().environmentObject(scheduleVM)) {
                                             HStack {
