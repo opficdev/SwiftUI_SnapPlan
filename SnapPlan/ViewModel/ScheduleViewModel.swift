@@ -25,6 +25,7 @@ class ScheduleViewModel: ObservableObject {
     
     @Published var photos: [UIImage] = []
     @Published var voiceMemo: AVAudioFile? = nil
+    @Published var isRecording = false
     @Published var didChangedPhotosFromVM = false
     
     private var cancellable = Set<AnyCancellable>()
@@ -145,6 +146,7 @@ class ScheduleViewModel: ObservableObject {
              AVNumberOfChannelsKey: 1,
              AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
+        isRecording = true
         
         do {
             self.audioRecorder = try AVAudioRecorder(url: filePath, settings: settings)
@@ -157,6 +159,8 @@ class ScheduleViewModel: ObservableObject {
     
     func stopRecord() -> AVAudioFile? {
         self.audioRecorder?.stop()
+        isRecording = false
+        self.audioRecorder = nil
         return voiceMemo
     }
 }
