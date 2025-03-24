@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Combine
+import AVKit
 
 class ScheduleViewModel: ObservableObject {
     @Published var schedule: ScheduleData? = nil
@@ -22,8 +23,8 @@ class ScheduleViewModel: ObservableObject {
     @Published var description = ""
     @Published var color = 0
     
-    @Published var records: [String] = []
     @Published var photos: [UIImage] = []
+    @Published var voiceMemo: AVAudioFile? = nil
     @Published var didChangedPhotosFromVM = false
     
     private var cancellable = Set<AnyCancellable>()
