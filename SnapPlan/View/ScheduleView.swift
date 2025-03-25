@@ -351,6 +351,11 @@ struct ScheduleView: View {
                             .environmentObject(plannerVM)
                             .environmentObject(scheduleVM)
                     }
+                    .sheet(isPresented: $tapVoiceMemo) {
+                        VoiceMemoView()
+                            .environmentObject(scheduleVM)
+                            .presentationDragIndicator(.visible)
+                    }
                     .confirmationDialog("스케줄을 삭제하시겠습니까?", isPresented: $tapDeleteSchedule, titleVisibility: .visible) {
                         Button(role: .destructive, action: {
                             titleFocus = false
