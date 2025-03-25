@@ -25,11 +25,14 @@ class ScheduleViewModel: ObservableObject {
     
     @Published var photos: [UIImage] = []
     @Published var voiceMemo: AVAudioFile? = nil
+    @Published var audioLevels: [CGFloat] = []
     @Published var isRecording = false
     @Published var didChangedPhotosFromVM = false
     
     private var cancellable = Set<AnyCancellable>()
     private var audioRecorder: AVAudioRecorder? = nil
+    private var timer: Timer? = nil
+    private var recordedFileURL: URL? = nil
     
     init() {
         //  MARK: Combine으로 schedule 구조체 변수가 변경되면 자동으로 각 변수에 적용
@@ -140,27 +143,79 @@ class ScheduleViewModel: ObservableObject {
     func startRecord() {
         let fileName = "\(Date()).m4a"
         let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(fileName)
+
         let settings = [
-             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-             AVSampleRateKey: 44100,
-             AVNumberOfChannelsKey: 1,
-             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+            AVSampleRateKey: 44100,
+            AVNumberOfChannelsKey: 1,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
-        isRecording = true
         
         do {
+             try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default)
+             try AVAudioSession.sharedInstance().setActive(true)
+         } catch {
+             print("AudioSession 설정 실패: \(error.localizedDescription)")
+             return
+         }
+
+        do {
+            self.audioLevels.removeAll()
             self.audioRecorder = try AVAudioRecorder(url: filePath, settings: settings)
+            self.audioRecorder?.isMeteringEnabled = true
             self.audioRecorder?.record()
-            self.voiceMemo = try AVAudioFile(forReading: filePath)
+            self.recordedFileURL = filePath
+            self.startMonitoring()
         } catch {
             print("녹음 시작 실패: \(error.localizedDescription)")
+            return
+        }
+        isRecording = true
+    }
+
+    func stopRecord() {
+        guard let recordedFileURL else {
+            print("URL 에러: \(URLError(.badURL).localizedDescription)")
+            return
+        }
+        
+        audioRecorder?.stop()
+        audioRecorder = nil
+        
+        do {
+            try AVAudioSession.sharedInstance().setActive(false)
+        } catch {
+            print("AudioSession 비활성화 실패: \(error.localizedDescription)")
+        }
+        
+        if FileManager.default.fileExists(atPath: recordedFileURL.path) {
+            print("녹음 파일 존재: \(recordedFileURL.path)")
+        } else {
+            print("녹음 파일이 존재 X")
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            do {
+                self.voiceMemo = try AVAudioFile(forReading: recordedFileURL)
+                self.isRecording = false
+                self.stopMonitoring()
+                print("AVAudioFile 생성 성공")
+            } catch {
+                print("녹음 파일 열기 실패: \(error.localizedDescription)")
+            }
         }
     }
     
-    func stopRecord() -> AVAudioFile? {
-        self.audioRecorder?.stop()
-        isRecording = false
-        self.audioRecorder = nil
-        return voiceMemo
+    private func startMonitoring() {
+        self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            self?.audioRecorder?.updateMeters()
+            self?.audioLevels.append(CGFloat(self?.audioRecorder?.averagePower(forChannel: 0) ?? 0))
+        }
+    }
+    
+    private func stopMonitoring() {
+        self.timer?.invalidate()
+        self.timer = nil
     }
 }
