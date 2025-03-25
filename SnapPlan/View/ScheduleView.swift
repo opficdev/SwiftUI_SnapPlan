@@ -232,37 +232,17 @@ struct ScheduleView: View {
                                     .padding(.vertical)
                                 VStack(alignment:. leading, spacing: 20) {
                                     HStack {
-                                        Image(systemName: "microphone.fill")
-                                            .frame(width: 25)
-                                        Text("음성 메모")
-                                            .underline(scheduleVM.voiceMemo != nil)
-                                            .onTapGesture{
-                                                if scheduleVM.voiceMemo != nil {
-                                                    
-                                                }
-                                            }
-                                            //  if 녹음된 파일을 재생중이 아닐 때(종료 포함) {
-                                            //      Image(systemName: "play.circle.fill")
-                                            //          .onTapGesture {
-                                            //              재생 로직
-                                            //          }
-                                            //  }
-                                            //  else {
-                                            //      Image(systemName: "pause.circle.fill")
-                                            //          .onTapGesture {
-                                            //              일시정지 로직
-                                            //          }
-                                            //  }
-                                            //  드래그?할수있는 조절창
-                                        Image(systemName: "microphone.fill")
-                                            .frame(width: 25)
-                                        Text("음성 메모")
-                                            .underline(scheduleVM.voiceMemo != nil)
-                                            .onTapGesture{
-                                                if scheduleVM.voiceMemo != nil {
-                                                    
-                                                }
-                                            }
+                                        Group {
+                                            Image(systemName: "microphone.fill")
+                                                .frame(width: 25)
+                                            Text("음성 메모")
+                                        }
+                                        .onTapGesture {
+                                            tapVoiceMemo = true
+                                        }
+                                        if scheduleVM.voiceMemo != nil {
+                                            LinearAudioPlayer(file: scheduleVM.voiceMemo!)
+                                        }
                                     }
                                     .foregroundStyle(scheduleVM.voiceMemo == nil ? Color.gray : Color.primary)
                                     HStack {
