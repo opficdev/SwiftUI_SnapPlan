@@ -61,6 +61,7 @@ struct VoiceMemoView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: UIScreen.main.bounds.height * 0.4)
         .presentationDetents([.fraction(0.4)])
+        .presentationDragIndicator(.visible)
     }
 }
 

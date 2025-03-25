@@ -31,6 +31,7 @@ struct ScheduleView: View {
     @State private var tapLocation = false  //  위치 탭 여부
     @State private var tapColor = false  //  색상 탭 여부
     @State private var tapDeleteSchedule = false   //  스케줄 삭제 탭 여부
+    @State private var tapVoiceMemo = false   //  음성 메모 탭 여부
     @State private var sheetMinHeight = CGFloat.zero //    sheet 최소 높이
     
     @FocusState private var titleFocus: Bool    //  제목 포커싱 여부
@@ -240,6 +241,28 @@ struct ScheduleView: View {
                                                     
                                                 }
                                             }
+                                            //  if 녹음된 파일을 재생중이 아닐 때(종료 포함) {
+                                            //      Image(systemName: "play.circle.fill")
+                                            //          .onTapGesture {
+                                            //              재생 로직
+                                            //          }
+                                            //  }
+                                            //  else {
+                                            //      Image(systemName: "pause.circle.fill")
+                                            //          .onTapGesture {
+                                            //              일시정지 로직
+                                            //          }
+                                            //  }
+                                            //  드래그?할수있는 조절창
+                                        Image(systemName: "microphone.fill")
+                                            .frame(width: 25)
+                                        Text("음성 메모")
+                                            .underline(scheduleVM.voiceMemo != nil)
+                                            .onTapGesture{
+                                                if scheduleVM.voiceMemo != nil {
+                                                    
+                                                }
+                                            }
                                     }
                                     .foregroundStyle(scheduleVM.voiceMemo == nil ? Color.gray : Color.primary)
                                     HStack {
@@ -354,7 +377,6 @@ struct ScheduleView: View {
                     .sheet(isPresented: $tapVoiceMemo) {
                         VoiceMemoView()
                             .environmentObject(scheduleVM)
-                            .presentationDragIndicator(.visible)
                     }
                     .confirmationDialog("스케줄을 삭제하시겠습니까?", isPresented: $tapDeleteSchedule, titleVisibility: .visible) {
                         Button(role: .destructive, action: {
