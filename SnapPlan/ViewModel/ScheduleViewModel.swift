@@ -27,6 +27,7 @@ class ScheduleViewModel: ObservableObject {
     @Published var voiceMemo: AVAudioFile? = nil
     @Published var audioLevels: [CGFloat] = []
     @Published var isRecording = false
+    @Published var recordingTime = 0.0
     @Published var didChangedPhotosFromVM = false
     
     private var cancellable = Set<AnyCancellable>()
@@ -209,9 +210,19 @@ class ScheduleViewModel: ObservableObject {
     }
     
     private func startMonitoring() {
+        self.recordingTime = 0
         self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            self?.audioRecorder?.updateMeters()
-            self?.audioLevels.append(CGFloat(self?.audioRecorder?.averagePower(forChannel: 0) ?? 0))
+            guard let self = self else { return }
+            
+            self.audioRecorder?.updateMeters()
+            //  audioRecorder.averagePower(forChannel: 0)은 -160 ~ 0 사이의 값이므로 160을 더해서 0 ~ 160으로 변환
+            //  그리고 160으로 나누어 0 ~ 1 사이의 값으로 변환
+            self.audioLevels.append((160 + CGFloat(self.audioRecorder?.averagePower(forChannel: 0) ?? 0)) / 160)
+            
+            self.recordingTime += 0.1
+            if 60 * 60 <= self.recordingTime {
+                self.stopRecord()
+            }
         }
     }
     
