@@ -215,9 +215,11 @@ class ScheduleViewModel: ObservableObject {
             guard let self = self else { return }
             
             self.audioRecorder?.updateMeters()
-            //  audioRecorder.averagePower(forChannel: 0)은 -160 ~ 0 사이의 값이므로 160을 더해서 0 ~ 160으로 변환
-            //  그리고 160으로 나누어 0 ~ 1 사이의 값으로 변환
-            self.audioLevels.append((160 + CGFloat(self.audioRecorder?.averagePower(forChannel: 0) ?? 0)) / 160)
+            //  audioRecorder.averagePower(forChannel: 0)은 -160 ~ 0 사이의 값
+            //  일반적인 음성 녹음에서는 -60 ~ 0 이 나옴
+            //  이것을 0 ~ 1 사이의 값으로 변환
+            let power = max(CGFloat(self.audioRecorder?.averagePower(forChannel: 0) ?? 0), -60) + 60 //  [0, 60] 범위
+            self.audioLevels.append(max(0, power / 60)) //  [0, 1] 범위
             
             self.recordingTime += 0.1
             if 60 * 60 <= self.recordingTime {
