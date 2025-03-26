@@ -17,6 +17,9 @@ struct LinearAudioPlayer: View {
     init(file: AVAudioFile) {
         self.file = file
         do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            
             let data = try Data(contentsOf: file.url)
             self._player = State(initialValue: try AVAudioPlayer(data: data))
         } catch {
