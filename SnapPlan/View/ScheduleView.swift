@@ -236,6 +236,7 @@ struct ScheduleView: View {
                                             Image(systemName: "microphone.fill")
                                                 .frame(width: 25)
                                             Text("음성 메모")
+                                                .underline(scheduleVM.voiceMemo != nil)
                                         }
                                         .onTapGesture {
                                             tapVoiceMemo = true
