@@ -36,12 +36,22 @@ struct LinearAudioPlayer: View {
                 
                 Slider(value: Binding(
                     get: { progress },
-                    set: { newValue in
-                        progress = newValue
-                        player?.currentTime = newValue * (player?.duration ?? 0)
+                    set: { value in
+                        progress = value
+                        player?.currentTime = value * (player?.duration ?? 0)
                     }
                 ), in: 0...1)
                 .accentColor(.blue)
+                .onChange(of: progress) { value in
+                    if value == 0 {
+                        player?.pause()
+                        isPlaying = false
+                    }
+                    else if 1.0 <= value {
+                        progress = 0
+                        player?.currentTime = 0
+                    }
+                }
                 
                 Text(DateFormatter.audioTimeFmt(player?.duration ?? 0))
                     .font(.caption)
