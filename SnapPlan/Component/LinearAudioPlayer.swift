@@ -58,9 +58,6 @@ struct LinearAudioPlayer: View {
                     Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
                         .font(.system(size: 32))
                 }
-                
-                Image(systemName: "speaker.wave.2.fill")
-                    .foregroundColor(.gray)
             }
         }
         .padding()
