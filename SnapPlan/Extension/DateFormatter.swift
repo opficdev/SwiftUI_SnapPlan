@@ -33,4 +33,11 @@ extension DateFormatter {
         fmt.dateFormat = "yyyy-MM-dd"
         return fmt
     }()
+    
+    static func audioTimeFmt(_ time: TimeInterval) -> String {
+        let hour = Int(time) / 24
+        let minute = Int(time) / 60
+        let second = Int(time) % 60
+        return String(format: "%02d:%02d:%02d", hour, minute, second)
+    }
 }

@@ -24,16 +24,10 @@ struct LinearAudioPlayer: View {
         }
     }
     
-    private func formatTime(_ time: TimeInterval) -> String {
-        let minutes = Int(time) / 60
-        let seconds = Int(time) % 60
-        return String(format: "%d:%02d", minutes, seconds)
-    }
-    
     var body: some View {
         VStack(spacing: 8) {
             HStack {
-                Text(formatTime(player?.currentTime ?? 0))
+                Text(DateFormatter.audioTimeFmt(player?.currentTime ?? 0))
                     .font(.caption)
                     .foregroundColor(.gray)
                 
@@ -46,7 +40,7 @@ struct LinearAudioPlayer: View {
                 ), in: 0...1)
                 .accentColor(.blue)
                 
-                Text(formatTime(player?.duration ?? 0))
+                Text(DateFormatter.audioTimeFmt(player?.duration ?? 0))
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -55,7 +49,8 @@ struct LinearAudioPlayer: View {
                 Button(action: {
                     if isPlaying {
                         player?.pause()
-                    } else {
+                    }
+                    else {
                         player?.play()
                     }
                     isPlaying.toggle()
