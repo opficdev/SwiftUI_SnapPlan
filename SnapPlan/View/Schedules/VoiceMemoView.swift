@@ -13,30 +13,30 @@ struct VoiceMemoView: View {
     let circleRadius = UIScreen.main.bounds.width * 0.12
     
     var body: some View {
-        VStack(spacing: 100) {
+        VStack(spacing: 0) {
             Text("음성 메모")
                 .foregroundStyle(Color.gray)
                 .bold()
             
-//                HStack(spacing: 2) {
-//                    ForEach(scheduleVM.audioLevels, id: \.self) { level in
-//                        Rectangle()
-//                            .fill(Color.timeBar)
-//                            .frame(width: 4, height: level)
-//                    }
-//                    .frame(height: UIScreen.main.bounds.height * 0.2)
-//                    .background(
-//                        GeometryReader { proxy in
-//                            Color.clear.onChange(of: proxy.size.width) { width in
-//                                if UIScreen.main.bounds.width <= width {
-//                                    scheduleVM.audioLevels.removeFirst()
-//                                }
-//                            }
-//                        }
-//                    )
-//                }
-//                .frame(maxWidth: .infinity, alignment: .trailing)
-        
+                HStack(spacing: 2) {
+                    let audioLevels = scheduleVM.audioLevels
+                    ForEach(Array(zip(audioLevels.indices, audioLevels)), id: \.1) { _, level in
+                        Rectangle()
+                            .fill(Color.timeBar)
+                            .frame(width: 2, height: min(100, max(1, level * 100)))
+                    }
+                    .frame(height: UIScreen.main.bounds.height * 0.2)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear.onChange(of: proxy.size.width) { width in
+                                if UIScreen.main.bounds.width <= width {
+                                    scheduleVM.audioLevels.removeFirst()
+                                }
+                            }
+                        }
+                    )
+                }
+                .frame(width: UIScreen.main.bounds.width, height: 100, alignment: .trailing)
             
             ZStack {
                 Circle()
