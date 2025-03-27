@@ -14,9 +14,14 @@ struct VoiceMemoView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Text("음성 메모")
-                .foregroundStyle(Color.gray)
-                .bold()
+            HStack {
+                Text("음성 메모")
+                    .foregroundStyle(Color.gray)
+                    .bold()
+                Text("(\(DateFormatter.audioTimeFmt(scheduleVM.recordingTime)))")
+                    .foregroundStyle(Color.primary)
+                    .bold()
+            }
             
                 HStack(spacing: 2) {
                     let audioLevels = scheduleVM.audioLevels
