@@ -389,7 +389,7 @@ extension SupabaseViewModel {
         
         do {
             let filePath = "\(user.uuidString)/\(schedule.uuidString)/voiceMemo.m4a"
-            let signedURL = try await supabase.storage.from("voiceMemo").createSignedURL(path: filePath, expiresIn: 60)
+            let signedURL = try await supabase.storage.from("voicememos").createSignedURL(path: filePath, expiresIn: 60)
             
             let (data, _) = try await URLSession.shared.data(from: signedURL)
             let url = FileManager.default.temporaryDirectory.appendingPathComponent("voiceMemo.m4a")
@@ -412,7 +412,7 @@ extension SupabaseViewModel {
             let filePath = "\(user.uuidString)/\(schedule.uuidString)/voiceMemo.m4a"
             let data = try Data(contentsOf: memo.url)
             
-            let _ = try await supabase.storage.from("voiceMemo").upload(
+            let _ = try await supabase.storage.from("voicememos").upload(
                 filePath,
                 data: data,
                 options: FileOptions(
@@ -432,7 +432,7 @@ extension SupabaseViewModel {
         
         do {
             let filePath = "\(user.uuidString)/\(schedule.uuidString)/voiceMemo.m4a"
-            try await supabase.storage.from("voiceMemo").remove(paths: [filePath])
+            try await supabase.storage.from("voicememos").remove(paths: [filePath])
         } catch {
             print("Delete VoiceMemo Error: \(error.localizedDescription)")
         }
