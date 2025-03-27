@@ -218,7 +218,7 @@ struct TimeLineView: View {
                                                             }
                                                             Rectangle()
                                                                 .fill(Color.clear)
-                                                                .frame(width: screenWidth - timeZoneSize.width, height: uiVM.sheetPadding)
+                                                                .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)), height: uiVM.sheetPadding)
                                                         }
                                                     }
                                                     .id(idx)
@@ -234,7 +234,7 @@ struct TimeLineView: View {
                                                         
                                                     )
                                                 }
-                                                .frame(width: screenWidth - timeZoneSize.width)
+                                                .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
                                             }
                                             .onAppear {
                                                 calendarData = plannerVM.calendarData[1]
@@ -245,7 +245,7 @@ struct TimeLineView: View {
                                                         components: [.year, .month, .day]) }
                                                 )!
                                                 DispatchQueue.main.async {
-                                                    scrollProxy.scrollTo(selection)
+                                                    scrollProxy.scrollTo(selection, anchor: .top)
                                                 }
                                             }
                                             .onChange(of: selection) { value in
@@ -273,7 +273,7 @@ struct TimeLineView: View {
                                                 }
                                             }
                                         }
-                                        .frame(width: screenWidth - timeZoneSize.width)
+                                        .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
                                         .scrollDisabled(scheduleVM.schedule != nil)
                                         .introspect(.scrollView, on: .iOS(.v16, .v17, .v18)) { view in
                                             view.isPagingEnabled = true
@@ -404,4 +404,20 @@ struct TimeLineView: View {
     TimeLineView(showScheduleView: .constant(true))
         .environmentObject(PlannerViewModel())
         .environmentObject(SupabaseViewModel())
+}
+
+class ScrollViewDelegateHandler: NSObject, UIScrollViewDelegate {
+    static let shared = ScrollViewDelegateHandler()
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let pageWidth = scrollView.frame.width
+        let currentPage = Int((scrollView.contentOffset.x + (0.5 * pageWidth)) / pageWidth)
+        print("현재 페이지: \(currentPage)")
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let pageWidth = scrollView.frame.width
+        let currentPage = round(scrollView.contentOffset.x / pageWidth)
+        scrollView.setContentOffset(CGPoint(x: currentPage * pageWidth, y: 0), animated: true)
+    }
 }
