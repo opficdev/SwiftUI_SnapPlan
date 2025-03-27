@@ -83,9 +83,8 @@ struct TimeLineView: View {
                                                         .background(
                                                             GeometryReader { geometry in
                                                                 Color.clear.onAppear {
-                                                                    if timeZoneSize == CGSizeZero {
-                                                                        timeZoneSize = geometry.size
-                                                                    }
+                                                                    timeZoneSize.width = max(timeZoneSize.width, geometry.size.width)
+                                                                    timeZoneSize.height = max(timeZoneSize.height, geometry.size.height)
                                                                 }
                                                             }
                                                         )
