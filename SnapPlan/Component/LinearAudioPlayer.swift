@@ -9,18 +9,18 @@ import SwiftUI
 import AVKit
 
 struct LinearAudioPlayer: View {
-    @State private var file: AVAudioFile
+    @Binding var file: AVAudioFile
     @State private var player: AVAudioPlayer?
     @State private var isPlaying = false
     @State private var progress: Double = 0
     
-    init(file: AVAudioFile) {
-        self.file = file
+    init(file: Binding<AVAudioFile>) {
+        self._file = file
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
             
-            let data = try Data(contentsOf: file.url)
+            let data = try Data(contentsOf: file.wrappedValue.url)
             self._player = State(initialValue: try AVAudioPlayer(data: data))
         } catch {
             print("Error initializing player: \(error)")
@@ -58,20 +58,19 @@ struct LinearAudioPlayer: View {
                     .foregroundColor(.gray)
             }
             
-            HStack(spacing: 20) {
-                Button(action: {
-                    if isPlaying {
-                        player?.pause()
-                    }
-                    else {
-                        player?.play()
-                    }
-                    isPlaying.toggle()
-                }) {
-                    Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                        .font(.system(size: 32))
+            Button(action: {
+                if isPlaying {
+                    player?.pause()
                 }
+                else {
+                    player?.play()
+                }
+                isPlaying.toggle()
+            }) {
+                Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                    .font(.system(size: 32))
             }
+            
         }
         .padding()
         .frame(maxWidth: .infinity)
@@ -84,6 +83,15 @@ struct LinearAudioPlayer: View {
                 if let player = player {
                     progress = player.currentTime / player.duration
                 }
+            }
+        }
+        .onChange(of: self.file) { file in
+            do {
+                let data = try Data(contentsOf: file.url)
+                self.player = try AVAudioPlayer(data: data)
+            }
+            catch {
+                print("Error initializing player: \(error.localizedDescription)")
             }
         }
     }

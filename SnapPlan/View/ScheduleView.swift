@@ -243,7 +243,7 @@ struct ScheduleView: View {
                                             scheduleVM.audioLevels.removeAll()
                                         }
                                         if let voiceMemo = scheduleVM.voiceMemo {
-                                            LinearAudioPlayer(file: voiceMemo)
+                                            LinearAudioPlayer(file: .constant(voiceMemo))
                                             Button(action: {
                                                 scheduleVM.voiceMemo = nil
                                                 scheduleVM.recordingTime = 0.0
