@@ -240,9 +240,18 @@ struct ScheduleView: View {
                                         }
                                         .onTapGesture {
                                             tapVoiceMemo = true
+                                            scheduleVM.audioLevels.removeAll()
                                         }
-                                        if scheduleVM.voiceMemo != nil {
-                                            LinearAudioPlayer(file: scheduleVM.voiceMemo!)
+                                        if let voiceMemo = scheduleVM.voiceMemo {
+                                            LinearAudioPlayer(file: voiceMemo)
+                                            Button(action: {
+                                                scheduleVM.voiceMemo = nil
+                                                scheduleVM.recordingTime = 0.0
+                                            }) {
+                                                Image(systemName: "trash")
+                                                    .frame(width: 25)
+                                                    .foregroundStyle(Color.gray)
+                                            }
                                         }
                                     }
                                     .foregroundStyle(scheduleVM.voiceMemo == nil ? Color.gray : Color.primary)
