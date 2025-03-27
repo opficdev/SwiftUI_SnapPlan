@@ -391,9 +391,12 @@ struct ScheduleView: View {
                                         scheduleVM.schedule = nil
                                     }
                                     startTask = false
-                                    try await supabaseVM.deletePhotos(id: scheduleVM.id!)
-                                    try await supabaseVM.deleteSchedule(schedule: scheduleVM.schedule!)
-                                    try await supabaseVM.fetchSchedule(date: scheduleVM.startDate)
+                                    if let id = scheduleVM.id, let schedule = scheduleVM.schedule {
+                                        try await supabaseVM.deletePhotos(id: id)
+                                        try await supabaseVM.deleteVoiceMemo(id: id)
+                                        try await supabaseVM.deleteSchedule(schedule: schedule)
+                                        try await supabaseVM.fetchSchedule(date: scheduleVM.startDate)
+                                    }
                                 }
                             }
                         }) {
