@@ -83,7 +83,10 @@ struct ScheduleView: View {
                                             try await supabaseVM.fetchSchedule(date: copy.startDate)
                                         }
                                         Task {
-                                            try await supabaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)             
+                                            try await supabaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)
+                                            if let voiceMemo = scheduleVM.voiceMemo {
+                                                try await supabaseVM.upsertVoiceMemo(id: copy.id, memo: voiceMemo)
+                                            }
                                         }
                                     }) {
                                         Label("복제", systemImage: "doc.on.doc")
@@ -117,9 +120,12 @@ struct ScheduleView: View {
                                         }
                                         do {
                                             try await supabaseVM.upsertPhotos(id: id, photos: photos)
+                                            if let voiceMemo = scheduleVM.voiceMemo {
+                                                try await supabaseVM.upsertVoiceMemo(id: id, memo: voiceMemo)
+                                            }
                                         }
                                         catch {
-                                            print("사진 추가/수정 실패: \(error.localizedDescription)")
+                                            print("사진, 음성 메모 추가/수정 실패: \(error.localizedDescription)")
                                         }
                                     }
                                     titleFocus = false
@@ -309,9 +315,16 @@ struct ScheduleView: View {
                         Spacer()
                     }
                     .onAppear {
-                        if !scheduleVM.didChangedPhotosFromVM {
+                        //  로직 상 scheduleVM.id가 nil이 된 상태에서 appear 될 일은 없지만 혹시나 해서
+                        if let id = scheduleVM.id {
+                            //  NavigationLink을 통한 다른 View에서 사진 정보를 변경하므로 조건문 설정
+                            if !scheduleVM.didChangedPhotosFromVM {
+                                Task {
+                                    scheduleVM.photos = try await supabaseVM.fetchPhotos(schedule: id)
+                                }
+                            }
                             Task {
-                                scheduleVM.photos = try await supabaseVM.fetchPhotos(schedule: scheduleVM.id!)
+                                scheduleVM.voiceMemo = try await supabaseVM.fetchVoiceMemo(schedule: id)
                             }
                         }
                     }

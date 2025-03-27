@@ -42,7 +42,6 @@ class ScheduleViewModel: ObservableObject {
                 if newSchedule == nil {
                     self?.id = nil  // schedule이 nil이면 id만 nil로 변경
                     self?.didChangedPhotosFromVM = false
-                    self?.voiceMemo = nil
                 }
                 else if let schedule = newSchedule {
                     self?.id = schedule.id
