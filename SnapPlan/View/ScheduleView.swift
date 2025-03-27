@@ -119,9 +119,17 @@ struct ScheduleView: View {
                                             print("스케줄 추가/수정 실패: \(error.localizedDescription)")
                                         }
                                         do {
-                                            try await supabaseVM.upsertPhotos(id: id, photos: photos)
+                                            if photos.isEmpty {
+                                                try await supabaseVM.deletePhotos(id: id)
+                                            }
+                                            else {
+                                                try await supabaseVM.upsertPhotos(id: id, photos: photos)
+                                            }
                                             if let voiceMemo = scheduleVM.voiceMemo {
                                                 try await supabaseVM.upsertVoiceMemo(id: id, memo: voiceMemo)
+                                            }
+                                            else {
+                                                try await supabaseVM.deleteVoiceMemo(id: id)
                                             }
                                         }
                                         catch {

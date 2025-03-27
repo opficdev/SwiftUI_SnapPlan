@@ -49,8 +49,7 @@ struct VoiceMemoView: View {
                     .frame(width: circleRadius)
                 RoundedRectangle(cornerRadius: circleRadius * (scheduleVM.isRecording ? 0.15 : 1))
                     .fill(Color.timeBar)
-                    .frame(width: circleRadius * (scheduleVM.isRecording ? 0.5 : 0.8), height: circleRadius * (scheduleVM.isRecording ? 0.5 : 0.8)
-                    )
+                    .frame(width: circleRadius * (scheduleVM.isRecording ? 0.5 : 0.8), height: circleRadius * (scheduleVM.isRecording ? 0.5 : 0.8))
             }
             .onTapGesture {
                 withAnimation {
