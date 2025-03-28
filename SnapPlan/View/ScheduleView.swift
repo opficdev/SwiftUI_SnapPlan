@@ -80,7 +80,7 @@ struct ScheduleView: View {
                                         )
                                         Task {
                                             try await supabaseVM.upsertSchedule(schedule: copy)
-                                            try await supabaseVM.fetchSchedule(date: copy.startDate)
+                                            supabaseVM.setSchedule(schedule: copy)
                                         }
                                         Task {
                                             try await supabaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)
@@ -113,7 +113,7 @@ struct ScheduleView: View {
                                             }
                                             startTask = false
                                             try await supabaseVM.upsertSchedule(schedule: scheduleVM.schedule!)
-                                            try await supabaseVM.fetchSchedule(date: scheduleVM.startDate)
+                                            supabaseVM.setSchedule(schedule: scheduleVM.schedule!)
                                         }
                                         catch {
                                             print("스케줄 추가/수정 실패: \(error.localizedDescription)")
@@ -322,20 +322,6 @@ struct ScheduleView: View {
                         .scrollDisabled(!(titleFocus || descriptionFocus)) // 키보드가 내려가면 스크롤 비활성화
                         Spacer()
                     }
-                    .onAppear {
-                        //  로직 상 scheduleVM.id가 nil이 된 상태에서 appear 될 일은 없지만 혹시나 해서
-                        if let id = scheduleVM.id {
-                            //  NavigationLink을 통한 다른 View에서 사진 정보를 변경하므로 조건문 설정
-                            if !scheduleVM.didChangedPhotosFromVM {
-                                Task {
-                                    scheduleVM.photos = try await supabaseVM.fetchPhotos(schedule: id)
-                                }
-                            }
-                            Task {
-                                scheduleVM.voiceMemo = try await supabaseVM.fetchVoiceMemo(schedule: id)
-                            }
-                        }
-                    }
                     .onChange(of: scheduleVM.startDate) { date in
                         didChangedStartDate = true
                         if date >= scheduleVM.endDate {
@@ -403,7 +389,7 @@ struct ScheduleView: View {
                                         try await supabaseVM.deletePhotos(id: id)
                                         try await supabaseVM.deleteVoiceMemo(id: id)
                                         try await supabaseVM.deleteSchedule(schedule: schedule)
-                                        try await supabaseVM.fetchSchedule(date: scheduleVM.startDate)
+                                        supabaseVM.removeSchedule(schedule: schedule)
                                     }
                                 }
                             }

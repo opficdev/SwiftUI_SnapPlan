@@ -297,6 +297,14 @@ extension SupabaseViewModel {
             print("Delete Schedule Error: \(error)")
         }
     }
+    
+    func setSchedule(schedule: ScheduleData) {
+        schedules[schedule.id.uuidString] = schedule
+    }
+    
+    func removeSchedule(schedule: ScheduleData) {
+        schedules.removeValue(forKey: schedule.id.uuidString)
+    }
 }
 
 // MARK: - 일정 이미지 CRUD
