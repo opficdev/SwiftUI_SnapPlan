@@ -381,16 +381,13 @@ struct ScheduleView: View {
                             descriptionFocus = false
                             Task {
                                 do {
-                                    defer { //  firebase에서 오류가 나도 실행
-                                        scheduleVM.schedule = nil
-                                    }
                                     startTask = false
-                                    if let id = scheduleVM.id, let schedule = scheduleVM.schedule {
-                                        try await supabaseVM.deletePhotos(id: id)
-                                        try await supabaseVM.deleteVoiceMemo(id: id)
-                                        try await supabaseVM.deleteSchedule(schedule: schedule)
-                                        supabaseVM.removeSchedule(schedule: schedule)
-                                    }
+                                    let schedule = scheduleVM.schedule!
+                                    scheduleVM.schedule = nil
+                                    supabaseVM.removeSchedule(schedule: schedule)
+                                    try await supabaseVM.deletePhotos(id: schedule.id)
+                                    try await supabaseVM.deleteVoiceMemo(id: schedule.id)
+                                    try await supabaseVM.deleteSchedule(schedule: schedule)
                                 }
                             }
                         }) {
