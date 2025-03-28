@@ -241,7 +241,7 @@ extension SupabaseViewModel {
         
         do {
             // 당일 일정 조회
-            let dailySchedules: [ScheduleData] = try await supabase.from("Schedule")
+            let dailySchedules: [CodableScheduleData] = try await supabase.from("Schedule")
                 .select()
                 .eq("uid", value: uid)
                 .lte("startDate", value: endOfDay)
@@ -250,7 +250,7 @@ extension SupabaseViewModel {
                 .value
             
             // 반복 일정 조회
-            let recurringSchedules: [ScheduleData] = try await supabase.from("Schedule")
+            let recurringSchedules: [CodableScheduleData] = try await supabase.from("Schedule")
                 .select()
                 .eq("uid", value: uid)
                 .neq("cycleOption", value: "none")
@@ -272,13 +272,13 @@ extension SupabaseViewModel {
         }
     }
 
-    
     func upsertSchedule(schedule: ScheduleData) async throws {
         guard let uid = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         do {
-            let schedule = try supabase.from("Schedule").upsert(schedule).eq("uid", value: uid)
+            let codableSchedule = CodableScheduleData(schedule: schedule)
+            let schedule = try supabase.from("Schedule").upsert(codableSchedule).eq("uid", value: uid)
             let _ = try await schedule.execute()
         } catch {
             print("Upsert Schedule Error: \(error)")
