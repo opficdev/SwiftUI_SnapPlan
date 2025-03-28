@@ -240,8 +240,7 @@ extension SupabaseViewModel {
         let endOfDay = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
         
         do {
-            // 당일 일정 조회
-            let dailySchedules: [CodableScheduleData] = try await supabase.from("Schedule")
+            async let dailySchedulesTask: [CodableScheduleData] = supabase.from("Schedule")
                 .select()
                 .eq("uid", value: uid)
                 .lte("startDate", value: endOfDay)
@@ -249,20 +248,42 @@ extension SupabaseViewModel {
                 .execute()
                 .value
             
-            // 반복 일정 조회
-            let recurringSchedules: [CodableScheduleData] = try await supabase.from("Schedule")
+            async let recurringSchedulesTask: [CodableScheduleData] = supabase.from("Schedule")
                 .select()
                 .eq("uid", value: uid)
                 .neq("cycleOption", value: "none")
                 .execute()
                 .value
             
-            // 결과 합치기 및 중복 제거
-            var scheduleDict: [String: ScheduleData] = [:]
-            let allSchedules = dailySchedules + recurringSchedules
+            let (dailySchedules, recurringSchedules) = try await (dailySchedulesTask, recurringSchedulesTask)
             
-            for schedule in allSchedules {
-                scheduleDict[schedule.id.uuidString] = schedule
+            // 결과 합치기 및 중복 제거
+            let allSchedules = dailySchedules + recurringSchedules
+            var scheduleDict: [String: ScheduleData] = [:]
+            
+            await withTaskGroup(of: (String, ScheduleData)?.self) { group in
+                for schedule in allSchedules {
+                    group.addTask {
+                        do {
+                            async let photos = self.fetchPhotos(schedule: schedule.id)
+                            async let voiceMemo = self.fetchVoiceMemo(schedule: schedule.id)
+                            
+                            let fetchedPhotos = try await photos
+                            let fetchedVoiceMemo = try await voiceMemo
+                            
+                            return (schedule.id.uuidString, ScheduleData(schedule: schedule, voiceMemo: fetchedVoiceMemo, photos: fetchedPhotos))
+                        } catch {
+                            print("Error fetching data for schedule \(schedule.id): \(error)")
+                            return nil
+                        }
+                    }
+                }
+                
+                for await result in group {
+                    if let (id, scheduleData) = result {
+                        scheduleDict[id] = scheduleData
+                    }
+                }
             }
             
             self.schedules.merge(scheduleDict) { $1 }
