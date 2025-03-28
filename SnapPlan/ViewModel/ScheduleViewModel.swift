@@ -17,7 +17,7 @@ class ScheduleViewModel: ObservableObject {
     @Published var startDate = Date()
     @Published var endDate = Date()
     @Published var isAllDay = false
-    @Published var cycleOption = ScheduleData.CycleOption.none
+    @Published var cycleOption = CycleOption.none
     @Published var location = ""
     @Published var address = ""
     @Published var description = ""
@@ -50,37 +50,44 @@ class ScheduleViewModel: ObservableObject {
                     self?.endDate = schedule.endDate
                     self?.isAllDay = schedule.isAllDay
                     self?.cycleOption = schedule.cycleOption
+                    self?.color = schedule.color
+                    self?.voiceMemo = schedule.voiceMemo
+                    self?.photos = schedule.photos
                     self?.location = schedule.location
                     self?.address = schedule.address
                     self?.description = schedule.description
-                    self?.color = schedule.color
                 }
             }
             .store(in: &cancellable)
         //  MARK: Combine으로 각 변수들이 변경되면 자동으로 schedule 구조체 변수에 적용
-        Publishers.CombineLatest4(
+        Publishers.CombineLatest3(
             $id,
             $title,
-            $startDate,
-            $endDate
+            $startDate
         )
         .combineLatest(
             Publishers.CombineLatest3(
+                $endDate,
                 $isAllDay,
-                $cycleOption,
-                $location
+                $cycleOption
             ),
             Publishers.CombineLatest3(
+                $color,
+                $voiceMemo,
+                $photos
+            ),
+            Publishers.CombineLatest3(
+                $location,
                 $address,
-                $description,
-                $color
+                $description
             )
         )
-        .map { [weak self] first, second, third -> ScheduleData? in
+        .map { [weak self] first, second, third, fourth -> ScheduleData? in
             
-            let (id, title, startDate, endDate) = first
-            let (isAllDay, cycleOption, location) = second
-            let (address, description, color) = third
+            let (id, title, startDate) = first
+            let (endDate, isAllDay, cycleOption) = second
+            let (color, voiceMemo, photos) = third
+            let (location, address, description) = fourth
             
             // id가 nil이면 기존 schedule 유지, 그렇지 않으면 새로운 ScheduleData 생성
             return id == nil ? self?.schedule : ScheduleData(
@@ -90,10 +97,12 @@ class ScheduleViewModel: ObservableObject {
                 endDate: endDate,
                 isAllDay: isAllDay,
                 cycleOption: cycleOption,
+                color: color,
+                voiceMemo: voiceMemo,
+                photos: photos,
                 location: location,
                 address: address,
-                description: description,
-                color: color
+                description: description
             )
         }
         .assign(to: &$schedule)
@@ -187,13 +196,6 @@ class ScheduleViewModel: ObservableObject {
             try AVAudioSession.sharedInstance().setActive(false)
         } catch {
             print("AudioSession 비활성화 실패: \(error.localizedDescription)")
-        }
-        
-        if FileManager.default.fileExists(atPath: recordedFileURL.path) {
-            print("녹음 파일 존재: \(recordedFileURL.path)")
-        } else {
-            print("녹음 파일이 존재 X")
-            return
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
