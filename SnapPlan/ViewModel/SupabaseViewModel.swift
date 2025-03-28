@@ -231,20 +231,21 @@ extension SupabaseViewModel {
 
 // MARK: - 일정 테이블 CRUD
 extension SupabaseViewModel {
-    func fetchSchedule(date: Date) async throws {
+//    func fetchSchedule(date: Date) async throws {
+    func fetchSchedule(from: Date, to: Date) async throws {
         guard let uid = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         
-        let startOfDay = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: date)!
-        let endOfDay = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
+        let startDay = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: from)!
+        let endDay = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: to)!
         
         do {
             async let dailySchedulesTask: [CodableScheduleData] = supabase.from("Schedule")
                 .select()
                 .eq("uid", value: uid)
-                .lte("startDate", value: endOfDay)
-                .gte("endDate", value: startOfDay)
+                .lte("startDate", value: endDay)
+                .gte("endDate", value: startDay)
                 .execute()
                 .value
             

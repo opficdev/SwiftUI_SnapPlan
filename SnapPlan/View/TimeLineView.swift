@@ -368,9 +368,7 @@ struct TimeLineView: View {
         .onChange(of: calendarData) { month in
             Task {
                 supabaseVM.schedules.removeAll()
-                for date in month {
-                    try await supabaseVM.fetchSchedule(date: date)
-                }
+                try await supabaseVM.fetchSchedule(from: month.first!, to: month.last!)
             }
         }
         .onChange(of: supabaseVM.is12TimeFmt) { value in
