@@ -28,7 +28,6 @@ class ScheduleViewModel: ObservableObject {
     @Published var audioLevels: [CGFloat] = []
     @Published var isRecording = false
     @Published var recordingTime = 0.0
-    @Published var didChangedPhotosFromVM = false
     
     private var cancellable = Set<AnyCancellable>()
     private var audioRecorder: AVAudioRecorder? = nil
@@ -41,7 +40,6 @@ class ScheduleViewModel: ObservableObject {
             .sink { [weak self] newSchedule in
                 if newSchedule == nil {
                     self?.id = nil  // schedule이 nil이면 id만 nil로 변경
-                    self?.didChangedPhotosFromVM = false
                 }
                 else if let schedule = newSchedule {
                     self?.id = schedule.id

@@ -87,7 +87,6 @@ struct ImageView: View {
                 .disabled(disabled)
                 .onChange(of: selectedPhotos) { newValue in
                     Task {
-                        scheduleVM.didChangedPhotosFromVM = true
                         scheduleVM.photos = await handleSelectedPhotos(newValue)
                     }
                 }
