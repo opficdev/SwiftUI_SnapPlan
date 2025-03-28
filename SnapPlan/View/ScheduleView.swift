@@ -74,9 +74,9 @@ struct ScheduleView: View {
                                             title: scheduleVM.title,
                                             startDate: scheduleVM.startDate.addingTimeInterval(3600),
                                             endDate: scheduleVM.endDate.addingTimeInterval(3600),
+                                            color: scheduleVM.color,
                                             location: scheduleVM.location,
-                                            description: scheduleVM.description,
-                                            color: scheduleVM.color
+                                            description: scheduleVM.description
                                         )
                                         Task {
                                             try await supabaseVM.upsertSchedule(schedule: copy)
