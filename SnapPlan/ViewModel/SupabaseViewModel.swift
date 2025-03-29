@@ -331,34 +331,48 @@ extension SupabaseViewModel {
 
 // MARK: - 일정 이미지 CRUD
 extension SupabaseViewModel {
-    func fetchPhotos(schedule: UUID) async throws -> [UIImage] {
+    func fetchPhotos(schedule: UUID) async throws -> [ImageAsset] {
         guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
-        var photos: [UIImage] = []
         
         do {
             let folderPath = "\(user.uuidString)/\(schedule.uuidString)"
             let fileList = try await supabase.storage.from("photos").list(path: folderPath)
             
-            for file in fileList {
-                let filePath = "\(folderPath)/\(file.name)"
+            return try await withThrowingTaskGroup(of: ImageAsset?.self) { group in
+                var imageAssets: [ImageAsset] = []
+                imageAssets.reserveCapacity(fileList.count)
                 
-                let signedURL = try await supabase.storage.from("photos").createSignedURL(path: filePath, expiresIn: 120)
-                
-                let (data, _) = try await URLSession.shared.data(from: signedURL)
-                if let image = UIImage(data: data) {
-                    photos.append(image)
+                for file in fileList {
+                    group.addTask {
+                        let filePath = "\(folderPath)/\(file.name)"
+                        do {
+                            let signedURL = try await self.supabase.storage.from("photos").createSignedURL(path: filePath, expiresIn: 120)
+                            let (data, _) = try await URLSession.shared.data(from: signedURL)
+                            return ImageAsset(id: file.name, image: UIImage(data: data)!)
+                        } catch {
+                            print("Fetch Image Error for \(file.name): \(error.localizedDescription)")
+                            return nil
+                        }
+                    }
                 }
+                
+                for try await asset in group {
+                    if let asset = asset {
+                        imageAssets.append(asset)
+                    }
+                }
+                
+                return imageAssets
             }
         } catch {
             print("Fetch Image Error: \(error.localizedDescription)")
+            return []
         }
-        
-        return photos
     }
-    
-    func upsertPhotos(id schedule: UUID, photos: [UIImage]) async throws {
+
+    func upsertPhotos(id schedule: UUID, photos: [ImageAsset]) async throws {
         guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
@@ -367,9 +381,9 @@ extension SupabaseViewModel {
             for photo in photos {
                 group.addTask {
                     do {
-                        guard let data = photo.jpegData(compressionQuality: 0.8) else { return }
+                        guard let data = photo.image.jpegData(compressionQuality: 0.8) else { return }
                         
-                        let fileName = "\(Date().timeIntervalSince1970).jpg"
+                        let fileName = "\(photo.id).jpg"
                         let filePath = "\(user.uuidString)/\(schedule.uuidString)/\(fileName)"
                         
                         let _ = try await self.supabase.storage.from("photos").upload(

@@ -23,7 +23,7 @@ class ScheduleViewModel: ObservableObject {
     @Published var description = ""
     @Published var color = 0
     
-    @Published var photos: [UIImage] = []
+    @Published var photos: [ImageAsset] = []
     @Published var voiceMemo: AVAudioFile? = nil
     @Published var audioLevels: [CGFloat] = []
     @Published var isRecording = false

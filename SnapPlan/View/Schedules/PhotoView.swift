@@ -30,8 +30,9 @@ struct ImageView: View {
         VStack {
             if !scheduleVM.photos.isEmpty {
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 0), GridItem(.flexible(), spacing: 0)], spacing: 0) {
-                        ForEach(scheduleVM.photos, id: \.self) { image in
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 4), GridItem(.flexible(), spacing: 4)], spacing: 4) {
+                        let photos = scheduleVM.photos.map { $0.image }
+                        ForEach(Array(zip(photos.indices, photos)), id: \.0) { idx, image in
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFill()
@@ -96,8 +97,8 @@ struct ImageView: View {
 
     }
 
-    private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem]) async -> [UIImage] {
-        var photos: [UIImage] = []
+    private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem]) async -> [ImageAsset] {
+        var imageAssets: [ImageAsset] = []
         
         for newPhoto in newPhotos {
             do {

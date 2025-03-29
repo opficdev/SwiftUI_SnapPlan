@@ -18,7 +18,7 @@ struct ScheduleData: Identifiable {
     var cycleOption: CycleOption    // 일정 반복 주기
     var color: Int  // 일정 색상(뷰에서 사용할 Color 배열의 인덱스임)
     var voiceMemo: AVAudioFile?  // 음성 메모
-    var photos: [UIImage]    // 사진
+    var photos: [ImageAsset]    // 사진
     var location: String
     var address: String  // 장소에 대한 주소
     var description: String  // 일정 설명
@@ -33,7 +33,7 @@ struct ScheduleData: Identifiable {
         cycleOption: CycleOption = .none,
         color: Int = 0,
         voiceMemo: AVAudioFile? = nil,
-        photos: [UIImage] = [],
+        photos: [ImageAsset] = [],
         location: String = "",
         address: String = "",
         description: String = ""
@@ -53,7 +53,7 @@ struct ScheduleData: Identifiable {
         self.description = description
     }
     
-    init(schedule: CodableScheduleData, voiceMemo: AVAudioFile? = nil, photos: [UIImage] = []) {
+    init(schedule: CodableScheduleData, voiceMemo: AVAudioFile? = nil, photos: [ImageAsset] = []) {
         self.id = schedule.id
         self.title = schedule.title
         self.startDate = schedule.startDate
