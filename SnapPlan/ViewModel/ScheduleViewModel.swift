@@ -210,7 +210,7 @@ class ScheduleViewModel: ObservableObject {
     
     private func startMonitoring() {
         self.recordingTime = 0
-        self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        self.timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             
             self.audioRecorder?.updateMeters()
@@ -220,7 +220,7 @@ class ScheduleViewModel: ObservableObject {
             let power = max(CGFloat(self.audioRecorder?.averagePower(forChannel: 0) ?? 0), -60) + 60 //  [0, 60] 범위
             self.audioLevels.append(max(0, power / 60)) //  [0, 1] 범위
             
-            self.recordingTime += 0.1
+            self.recordingTime += 0.05
             if 60 * 60 <= self.recordingTime {
                 self.stopRecord()
             }
