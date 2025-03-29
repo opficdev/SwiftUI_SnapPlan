@@ -129,8 +129,8 @@ struct ScheduleView: View {
                                             else {
                                                 try await supabaseVM.upsertPhotos(id: id, photos: photos)
                                             }
-                                            if let voiceMemo = scheduleVM.voiceMemo {
-                                                try await supabaseVM.upsertVoiceMemo(id: id, memo: voiceMemo)
+                                            if let memo = voiceMemo {
+                                                try await supabaseVM.upsertVoiceMemo(id: id, memo: memo)
                                             }
                                             else {
                                                 try await supabaseVM.deleteVoiceMemo(id: id)
