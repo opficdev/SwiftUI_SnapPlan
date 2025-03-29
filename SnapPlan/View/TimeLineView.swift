@@ -368,7 +368,15 @@ struct TimeLineView: View {
         .onChange(of: calendarData) { month in
             Task {
                 supabaseVM.schedules.removeAll()
+                // MARK: 일정 우선
                 try await supabaseVM.fetchSchedule(from: month.first!, to: month.last!)
+                // MARK: 사진, 음성메모 후순위
+                for schedule in supabaseVM.schedules.keys {
+                    if let uuid = UUID(uuidString: schedule) {
+                        supabaseVM.schedules[schedule]!.photos = try await supabaseVM.fetchPhotos(schedule: uuid)
+                        supabaseVM.schedules[schedule]!.voiceMemo = try await supabaseVM.fetchVoiceMemo(schedule: uuid)
+                    }
+                }
             }
         }
         .onChange(of: supabaseVM.is12TimeFmt) { value in
