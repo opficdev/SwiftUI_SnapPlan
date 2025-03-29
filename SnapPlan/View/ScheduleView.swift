@@ -79,8 +79,12 @@ struct ScheduleView: View {
                                             description: scheduleVM.description
                                         )
                                         Task {
-                                            try await supabaseVM.upsertSchedule(schedule: copy)
-                                            supabaseVM.setSchedule(schedule: copy)
+                                            do {
+                                                try await supabaseVM.upsertSchedule(schedule: copy)
+                                                supabaseVM.setSchedule(schedule: copy)
+                                            } catch {
+                                                print("스케줄 복사본 추가/수정 실패: \(error.localizedDescription)")
+                                            }
                                         }
                                         Task {
                                             try await supabaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)
