@@ -231,7 +231,6 @@ extension SupabaseViewModel {
 
 // MARK: - 일정 테이블 CRUD
 extension SupabaseViewModel {
-//    func fetchSchedule(date: Date) async throws {
     func fetchSchedule(from: Date, to: Date) async throws {
         guard let uid = userId else {
             throw URLError(.userAuthenticationRequired)
@@ -260,33 +259,14 @@ extension SupabaseViewModel {
             
             // 결과 합치기 및 중복 제거
             let allSchedules = dailySchedules + recurringSchedules
-            var scheduleDict: [String: ScheduleData] = [:]
             
-            await withTaskGroup(of: (String, ScheduleData)?.self) { group in
-                for schedule in allSchedules {
-                    group.addTask {
-                        do {
-                            async let photos = self.fetchPhotos(schedule: schedule.id)
-                            async let voiceMemo = self.fetchVoiceMemo(schedule: schedule.id)
-                            
-                            let fetchedPhotos = try await photos
-                            let fetchedVoiceMemo = try await voiceMemo
-                            
-                            return (schedule.id.uuidString, ScheduleData(schedule: schedule, voiceMemo: fetchedVoiceMemo, photos: fetchedPhotos))
-                        } catch {
-                            print("Error fetching data for schedule \(schedule.id): \(error)")
-                            return nil
-                        }
-                    }
+            let scheduleDict = Dictionary(
+                uniqueKeysWithValues: allSchedules.map { schedule in
+                    let scheduleData = ScheduleData(schedule: schedule)
+                    return (scheduleData.id.uuidString, scheduleData)
                 }
-                
-                for await result in group {
-                    if let (id, scheduleData) = result {
-                        scheduleDict[id] = scheduleData
-                    }
-                }
-            }
-            
+            )
+                    
             self.schedules.merge(scheduleDict) { $1 }
             
         } catch {
