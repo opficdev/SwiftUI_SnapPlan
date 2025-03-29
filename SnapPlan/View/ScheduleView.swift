@@ -111,13 +111,13 @@ struct ScheduleView: View {
                                     Task {
                                         let id = scheduleVM.id!
                                         let photos = scheduleVM.photos
+                                        let voiceMemo = scheduleVM.voiceMemo
+                                        let schedule = scheduleVM.schedule!
+                                        scheduleVM.schedule = nil
                                         do {
-                                            defer { //  supabase에서 오류가 나도 실행
-                                                scheduleVM.schedule = nil
-                                            }
                                             startTask = false
-                                            try await supabaseVM.upsertSchedule(schedule: scheduleVM.schedule!)
-                                            supabaseVM.setSchedule(schedule: scheduleVM.schedule!)
+                                            try await supabaseVM.upsertSchedule(schedule: schedule)
+                                            supabaseVM.setSchedule(schedule: schedule)
                                         }
                                         catch {
                                             print("스케줄 추가/수정 실패: \(error.localizedDescription)")
