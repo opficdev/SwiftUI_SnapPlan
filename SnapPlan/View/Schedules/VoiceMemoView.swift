@@ -18,8 +18,8 @@ struct VoiceMemoView: View {
                 Text("음성 메모")
                     .foregroundStyle(Color.gray)
                     .bold()
-                Text("(\(DateFormatter.audioTimeFmt(scheduleVM.recordingTime)))")
-                    .foregroundStyle(Color.primary)
+                //
+                Text("\(String(format: "%.1f", scheduleVM.recordingTime)) / 30:00")
                     .bold()
             }
             
