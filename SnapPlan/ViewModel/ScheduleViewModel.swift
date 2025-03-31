@@ -29,6 +29,9 @@ class ScheduleViewModel: ObservableObject {
     @Published var isRecording = false
     @Published var recordingTime = 0.0
     
+    @Published var memoState: StorageState = .initial
+    @Published var photosState: StorageState = .initial
+    
     private var cancellable = Set<AnyCancellable>()
     private var audioRecorder: AVAudioRecorder? = nil
     private var timer: Timer? = nil
@@ -54,6 +57,8 @@ class ScheduleViewModel: ObservableObject {
                     self?.location = schedule.location
                     self?.address = schedule.address
                     self?.description = schedule.description
+                    self?.memoState = schedule.memoState
+                    self?.photosState = schedule.photosState
                 }
             }
             .store(in: &cancellable)
