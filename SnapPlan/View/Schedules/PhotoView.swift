@@ -123,7 +123,7 @@ struct ImageView: View {
             }
         }
         
-        return photos
+        return imageAssets
     }
 
 }
