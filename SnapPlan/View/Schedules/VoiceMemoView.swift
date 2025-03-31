@@ -14,12 +14,11 @@ struct VoiceMemoView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
+            VStack {
                 Text("음성 메모")
                     .foregroundStyle(Color.gray)
                     .bold()
-                //
-                Text("\(String(format: "%.1f", scheduleVM.recordingTime)) / 30:00")
+                Text("\(DateFormatter.audioTimeFmt(scheduleVM.recordingTime)) / 30:00")
                     .bold()
             }
             
