@@ -15,6 +15,7 @@ struct ImageView: View {
     @State private var savedPhotos: [UIImage] = []
     @State private var innerHeight = CGFloat.zero   //  ScrollView 내부 요소의 총 높이
     @State private var outerHeight = CGFloat.zero   //  ScrollView 자체 높이
+    @State private var errMsg = ""
     private let maxSelectedCount: Int
     init(maxSelectedCount: Int = 6) {
         self.maxSelectedCount = maxSelectedCount
@@ -88,6 +89,13 @@ struct ImageView: View {
             }
         }
         .navigationTitle("사진")
+        .alert("알림", isPresented: .constant(!errMsg.isEmpty)) {
+            Button("확인", role: .cancel) {
+                errMsg = ""
+            }
+        } message: {
+            Text(errMsg)
+        }
 
     }
 
