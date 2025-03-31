@@ -22,6 +22,8 @@ struct ScheduleData: Identifiable {
     var location: String
     var address: String  // 장소에 대한 주소
     var description: String  // 일정 설명
+    var memoState: StorageState = .initial   // 음성 메모가 다운로드 되었는지 확인
+    var photosState: StorageState = .initial  // 사진이 다운로드 되었는지 확인
     
     init(
         id: UUID = UUID(),
