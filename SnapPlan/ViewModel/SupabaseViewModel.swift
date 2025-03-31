@@ -366,7 +366,7 @@ extension SupabaseViewModel {
                     do {
                         guard let data = photo.image.jpegData(compressionQuality: 0.8) else { return }
                         
-                        let fileName = "\(photo.id).jpg"
+                        let fileName = "\(photo.id)" + (photo.id.contains(".jpg") ? "" : ".jpg")
                         let filePath = "\(user.uuidString)/\(schedule.uuidString)/\(fileName)"
                         
                         let _ = try await self.supabase.storage.from("photos").upload(
