@@ -16,12 +16,6 @@ struct ImageView: View {
     @State private var innerHeight = CGFloat.zero   //  ScrollView 내부 요소의 총 높이
     @State private var outerHeight = CGFloat.zero   //  ScrollView 자체 높이
     private let maxSelectedCount: Int
-    private var disabled: Bool {
-        scheduleVM.photos.count >= maxSelectedCount
-    }
-    private var availableSelectedCount: Int {
-        maxSelectedCount - scheduleVM.photos.count
-    }
     init(maxSelectedCount: Int = 6) {
         self.maxSelectedCount = maxSelectedCount
     }
@@ -79,7 +73,7 @@ struct ImageView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 PhotosPicker(
                     selection: $selectedPhotos,
-                    maxSelectionCount: availableSelectedCount,
+                    maxSelectionCount: maxSelectedCount,
                     matching: .images,
                     photoLibrary: .shared()
                 ) {
