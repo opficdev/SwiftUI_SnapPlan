@@ -80,7 +80,7 @@ struct ImageView: View {
                 ) {
                     Image(systemName: "plus")
                 }
-                .disabled(disabled)
+                .disabled(scheduleVM.photos.count >= maxSelectedCount)
                 .onChange(of: selectedPhotos) { newValue in
                     Task {
                         scheduleVM.photos = await handleSelectedPhotos(newValue)
