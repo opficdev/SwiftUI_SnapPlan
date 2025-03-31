@@ -123,17 +123,21 @@ struct ScheduleView: View {
                                             print("스케줄 추가/수정 실패: \(error.localizedDescription)")
                                         }
                                         do {
-                                            if photos.isEmpty {
-                                                try await supabaseVM.deletePhotos(id: id)
+                                            if scheduleVM.photosState != .loading {
+                                                if photos.isEmpty {
+                                                    try await supabaseVM.deletePhotos(id: id)
+                                                }
+                                                else {
+                                                    try await supabaseVM.upsertPhotos(id: id, photos: photos)
+                                                }
                                             }
-                                            else {
-                                                try await supabaseVM.upsertPhotos(id: id, photos: photos)
-                                            }
-                                            if let memo = voiceMemo {
-                                                try await supabaseVM.upsertVoiceMemo(id: id, memo: memo)
-                                            }
-                                            else {
-                                                try await supabaseVM.deleteVoiceMemo(id: id)
+                                            if scheduleVM.memoState != .loading {
+                                                if let memo = voiceMemo {
+                                                    try await supabaseVM.upsertVoiceMemo(id: id, memo: memo)
+                                                }
+                                                else {
+                                                    try await supabaseVM.deleteVoiceMemo(id: id)
+                                                }
                                             }
                                         }
                                         catch {
