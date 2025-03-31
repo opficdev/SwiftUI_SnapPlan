@@ -330,7 +330,10 @@ extension SupabaseViewModel {
                         do {
                             let signedURL = try await self.supabase.storage.from("photos").createSignedURL(path: filePath, expiresIn: 120)
                             let (data, _) = try await URLSession.shared.data(from: signedURL)
-                            return ImageAsset(id: file.name, image: UIImage(data: data)!)
+                            if let image = UIImage(data: data) {
+                                return ImageAsset(id: file.name, image: image)
+                            }
+                            return nil
                         } catch {
                             print("Fetch Image Error for \(file.name): \(error.localizedDescription)")
                             return nil
