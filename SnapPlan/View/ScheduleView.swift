@@ -271,6 +271,10 @@ struct ScheduleView: View {
                                                     .foregroundStyle(Color.gray)
                                             }
                                         }
+                                        else if scheduleVM.memoState == .loading {
+                                            ProgressView()
+                                                .progressViewStyle(CircularProgressViewStyle())
+                                        }
                                     }
                                     .foregroundStyle(scheduleVM.voiceMemo == nil ? Color.gray : Color.primary)
                                     HStack {
@@ -280,6 +284,10 @@ struct ScheduleView: View {
                                                     .frame(width: 25)
                                                 Text("사진")
                                                     .underline(!scheduleVM.photos.isEmpty)
+                                                if scheduleVM.photosState == .loading {
+                                                    ProgressView()
+                                                        .progressViewStyle(CircularProgressViewStyle())
+                                                }
                                             }
                                             .foregroundStyle(scheduleVM.photos.isEmpty ? Color.gray : Color.primary)
                                         }
