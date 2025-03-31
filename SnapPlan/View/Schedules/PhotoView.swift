@@ -112,8 +112,8 @@ struct ImageView: View {
                     }
                             
                     if var id = newPhoto.itemIdentifier, let image = UIImage(data: data) {
-                        //  MARK: 이미지 파일명에 "/"가 포함되면 디렉터리 주소로 인식되므로 "_"로 변경
-                        id = id.replacingOccurrences(of: "/", with: "_")
+                        let lastIndex = id.firstIndex(of: "/") ?? id.endIndex
+                        id = String(id[..<lastIndex])
                         let asset = ImageAsset(id: id, image: image)
                         imageAssets.append(asset)
                     }
