@@ -257,8 +257,10 @@ struct ScheduleView: View {
                                                 .underline(scheduleVM.voiceMemo != nil)
                                         }
                                         .onTapGesture {
-                                            tapVoiceMemo = true
-                                            scheduleVM.audioLevels.removeAll()
+                                            if scheduleVM.memoState != .loading {
+                                                tapVoiceMemo = true
+                                                scheduleVM.audioLevels.removeAll()
+                                            }
                                         }
                                         if let voiceMemo = scheduleVM.voiceMemo {
                                             LinearAudioPlayer(file: .constant(voiceMemo))
@@ -291,6 +293,7 @@ struct ScheduleView: View {
                                             }
                                             .foregroundStyle(scheduleVM.photos.isEmpty ? Color.gray : Color.primary)
                                         }
+                                        .disabled(scheduleVM.photosState == StorageState.loading)
                                         Spacer()
                                     }
                                     HStack {
