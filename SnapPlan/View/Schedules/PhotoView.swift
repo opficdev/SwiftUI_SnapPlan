@@ -103,8 +103,17 @@ struct ImageView: View {
         for newPhoto in newPhotos {
             do {
                 if let data = try await newPhoto.loadTransferable(type: Data.self) {
-                    if let newImage = UIImage(data: data) {
-                        photos.append(newImage)
+                    if 20 * 1024 * 1024 <= data.count {
+                        errMsg = "20MB 이하의 사진만 추가해주세요!"
+                        self.selectedPhotos.removeAll(where: { $0 == newPhoto })
+                        continue
+                    }
+                            
+                    if var id = newPhoto.itemIdentifier, let image = UIImage(data: data) {
+                        //  MARK: 이미지 파일명에 "/"가 포함되면 디렉터리 주소로 인식되므로 "_"로 변경
+                        id = id.replacingOccurrences(of: "/", with: "_")
+                        let asset = ImageAsset(id: id, image: image)
+                        imageAssets.append(asset)
                     }
                 }
             } catch {
