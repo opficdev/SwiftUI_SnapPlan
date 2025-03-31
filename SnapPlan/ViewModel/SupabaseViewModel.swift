@@ -424,7 +424,12 @@ extension SupabaseViewModel {
             
             return try AVAudioFile(forReading: url)
         } catch {
-            print("Fetch VoiceMemo Error: \(error.localizedDescription)")
+            if error.localizedDescription == "Object not found" {
+                
+            }
+            else {
+                print("Fetch VoiceMemo Error: \(error.localizedDescription)")
+            }
         }
         
         return nil
