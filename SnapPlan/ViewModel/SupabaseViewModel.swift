@@ -134,10 +134,9 @@ extension SupabaseViewModel {
                 let user = try supabase.from("User").upsert(
                     UserData(
                         uid: uid,
-                        displayName: gidUser.profile?.name ?? "",
+                        name: gidUser.profile?.name ?? "",
                         email: gidUser.profile?.email ?? "",
                         is12TimeFmt: is12TimeFmt,
-                        name: gidUser.profile?.givenName ?? "",
                         screenMode: self.screenMode,
                         signedAt: Date())
                 )

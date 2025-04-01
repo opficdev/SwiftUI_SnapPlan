@@ -10,10 +10,9 @@ import UIKit
 
 struct UserData: Codable {
     let uid: UUID
-    let displayName: String
+    let name: String
     let email: String
     let is12TimeFmt: Bool
-    let name: String
     let screenMode: UIUserInterfaceStyle
     let signedAt: Date
 }
