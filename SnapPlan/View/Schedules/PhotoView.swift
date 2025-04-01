@@ -17,7 +17,8 @@ struct PhotoView: View {
     @State private var outerHeight = CGFloat.zero   //  ScrollView 자체 높이
     @State private var errMsg = ""
     private let maxSelectedCount: Int
-    init(maxSelectedCount: Int = 6) {
+    init(selectedItems: [ImageAsset], maxSelectedCount: Int = 5) {
+        self._selectedPhotos = State(initialValue: selectedItems.map { PhotosPickerItem(itemIdentifier: $0.id) })
         self.maxSelectedCount = maxSelectedCount
     }
     
@@ -32,13 +33,12 @@ struct PhotoView: View {
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: UIScreen.main.bounds.width / 2 - 28)
-                                .padding(.horizontal, 4)
-                                .overlay (
-                                    Rectangle()
-                                        .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 1)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.white, lineWidth: 2)
                                 )
                         }
-                            
                     }
                     .background(
                         GeometryReader { proxy in
@@ -51,6 +51,7 @@ struct PhotoView: View {
                             }
                         }
                     )
+                    .padding(.horizontal, 4)
                 }
                 .padding(.horizontal)
                 .background(
@@ -61,6 +62,7 @@ struct PhotoView: View {
                     }
                 )
                 .scrollDisabled(innerHeight <= outerHeight)
+           
             }
             else {
                 VStack {
@@ -126,8 +128,4 @@ struct PhotoView: View {
         return imageAssets
     }
 
-}
-
-#Preview {
-    ImageView()
 }
