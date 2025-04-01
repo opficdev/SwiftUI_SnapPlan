@@ -327,7 +327,7 @@ extension SupabaseViewModel {
                     group.addTask {
                         let filePath = "\(folderPath)/\(file.name)"
                         do {
-                            let signedURL = try await self.supabase.storage.from("photos").createSignedURL(path: filePath, expiresIn: 120)
+                            let signedURL = try await self.supabase.storage.from("photos").createSignedURL(path: filePath, expiresIn: 600)
                             let (data, _) = try await URLSession.shared.data(from: signedURL)
                             if let image = UIImage(data: data) {
                                 return ImageAsset(id: file.name, image: image)
