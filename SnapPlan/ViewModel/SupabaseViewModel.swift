@@ -373,7 +373,7 @@ extension SupabaseViewModel {
                             data: data,
                             options: FileOptions(
                                 contentType: "image/jpeg",
-                                upsert: true
+                                upsert: false
                             )
                         )
                     } catch {
