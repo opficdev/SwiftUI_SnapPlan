@@ -8,7 +8,7 @@
 import SwiftUI
 import PhotosUI
 
-struct ImageView: View {
+struct PhotoView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var scheduleVM: ScheduleViewModel
     @State private var selectedPhotos: [PhotosPickerItem] = []
@@ -31,8 +31,8 @@ struct ImageView: View {
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: UIScreen.main.bounds.width / 2)
-                                .clipped()
+                                .frame(width: UIScreen.main.bounds.width / 2 - 28)
+                                .padding(.horizontal, 4)
                                 .overlay (
                                     Rectangle()
                                         .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 1)
