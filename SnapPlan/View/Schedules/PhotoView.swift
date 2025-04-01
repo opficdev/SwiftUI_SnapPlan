@@ -38,6 +38,10 @@ struct PhotoView: View {
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.white, lineWidth: 2)
                                 )
+                                .onTapGesture {
+                                    selectedPhotos.remove(at: idx)
+                                    scheduleVM.photos.remove(at: idx)
+                                }
                         }
                     }
                     .background(
@@ -48,7 +52,7 @@ struct PhotoView: View {
                                 }
                                 .onChange(of: scheduleVM.photos) { _ in
                                     innerHeight = proxy.size.height
-                            }
+                                }
                         }
                     )
                     .padding(.horizontal, 4)
