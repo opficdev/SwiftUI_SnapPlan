@@ -134,7 +134,7 @@ struct SettingView: View {
                 }
                 Button(role: .destructive, action: {
                     Task {
-                        await supabaseVM.signOutGoogle()
+                        try await supabaseVM.signOutGoogle()
                     }
                 }) {
                     Text("확인")

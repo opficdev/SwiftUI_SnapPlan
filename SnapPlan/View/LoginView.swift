@@ -45,7 +45,7 @@ struct LoginView: View {
                 .frame(width: screenWidth / 2)
                 .onTapGesture {
                     Task {
-                        await viewModel.signInGoogle()
+                        try await viewModel.signInGoogle()
                     }
                 }
                 

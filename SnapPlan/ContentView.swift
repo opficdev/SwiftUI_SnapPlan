@@ -26,7 +26,7 @@ struct ContentView: View {
                         .onAppear {
                             if isFirstLaunch {
                                 Task {
-                                    await supabaseVM.signOutGoogle()
+                                    try await supabaseVM.signOutGoogle()
                                     isFirstLaunch = false
                                 }
                             }
