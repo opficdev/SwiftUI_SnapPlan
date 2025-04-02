@@ -330,9 +330,9 @@ extension SupabaseViewModel {
             let folderPath = "\(user.uuidString)/\(schedule.uuidString)"
             let fileList = try await supabase.storage.from("photos").list(path: folderPath)
             
-            return try await withThrowingTaskGroup(of: ImageAsset?.self) { group in
+            return try await withThrowingTaskGroup(of: ImageAsset.self) { group in
                 var imageAssets: [ImageAsset] = []
-                imageAssets.reserveCapacity(fileList.count)
+                imageAssets.reserveCapacity(fileList.count) //  대량 데이터 사이즈만큼 미리 메모리 할당
                 
                 for file in fileList {
                     group.addTask {
@@ -342,19 +342,18 @@ extension SupabaseViewModel {
                             let (data, _) = try await URLSession.shared.data(from: signedURL)
                             if let image = UIImage(data: data) {
                                 return ImageAsset(id: file.name, image: image)
+                            } else {
+                                throw URLError(.cannotDecodeRawData)
                             }
-                            return nil
                         } catch {
                             print("Fetch Image Error for \(file.name): \(error.localizedDescription)")
-                            return nil
+                            throw error  // 에러 재전파
                         }
                     }
                 }
                 
                 for try await asset in group {
-                    if let asset = asset {
-                        imageAssets.append(asset)
-                    }
+                    imageAssets.append(asset)
                 }
                 
                 return imageAssets

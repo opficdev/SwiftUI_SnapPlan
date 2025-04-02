@@ -296,6 +296,28 @@ struct ScheduleView: View {
                                                     ProgressView()
                                                         .progressViewStyle(CircularProgressViewStyle())
                                                 }
+                                                else if scheduleVM.photosState == .error {
+                                                    Image(systemName: "arrow.counterclockwise")
+                                                        .onTapGesture {
+                                                            Task {
+                                                                do {
+                                                                    if let id = scheduleVM.id {
+                                                                        supabaseVM.schedules[id.uuidString]?.photosState = .loading
+                                                                        await MainActor.run {
+                                                                            scheduleVM.photosState = .loading
+                                                                        }
+                                                                        scheduleVM.photos = try await supabaseVM.fetchPhotos(schedule: id)
+                                                                        supabaseVM.schedules[id.uuidString]?.photosState = .success
+                                                                        await MainActor.run {
+                                                                            scheduleVM.photosState = .success
+                                                                        }
+                                                                    }
+                                                                } catch {
+                                                                    print("사진 불러오기 실패: \(error.localizedDescription)")
+                                                                }
+                                                            }
+                                                        }
+                                                }
                                             }
                                             .foregroundStyle(scheduleVM.photos.isEmpty ? Color.gray : Color.primary)
                                         }
