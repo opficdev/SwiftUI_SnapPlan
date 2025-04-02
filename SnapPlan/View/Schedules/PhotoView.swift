@@ -94,8 +94,9 @@ struct PhotoView: View {
                 .onChange(of: selectedPhotos) { newValue in
                     Task {
                         if !removedByTap {
-                            scheduleVM.photos = await handleSelectedPhotos(newValue)
+                            scheduleVM.photos = await handleSelectedPhotos(newValue, assets: scheduleVM.photos)
                         }
+                        removedByTap = false
                     }
                 }
             }
@@ -111,7 +112,7 @@ struct PhotoView: View {
 
     }
 
-    private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem]) async -> [ImageAsset] {
+    private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem], assets: [ImageAsset]) async -> [ImageAsset] {
         var imageAssets: [ImageAsset] = []
         
         for newPhoto in newPhotos {
@@ -123,9 +124,16 @@ struct PhotoView: View {
                         continue
                     }
                             
-                    if let id = newPhoto.itemIdentifier, let image = UIImage(data: data) {
+                    else if let id = newPhoto.itemIdentifier, let image = UIImage(data: data) {
                         let asset = ImageAsset(id: id, image: image)
                         imageAssets.append(asset)
+                    }
+                }
+                else {
+                    if let id = newPhoto.itemIdentifier {
+                        if let asset = (assets.first { $0.id.replacingOccurrences(of: "_", with: "/") == id }) {
+                            imageAssets.append(asset)
+                        }
                     }
                 }
             } catch {
