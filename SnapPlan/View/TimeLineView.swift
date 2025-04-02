@@ -367,10 +367,7 @@ struct TimeLineView: View {
         }
         .onChange(of: calendarData) { month in
             Task {
-                await MainActor.run {
-                    supabaseVM.schedules.removeAll()
-                }
-                
+                supabaseVM.schedules.removeAll()
                 // MARK: 일정 우선
                 try await supabaseVM.fetchSchedule(from: month.first!, to: month.last!)
                 
@@ -380,20 +377,35 @@ struct TimeLineView: View {
                         // 두 개의 독립적인 Task 생성
                         let memoTask = Task {
                             do {
+                                supabaseVM.schedules[schedule]!.memoState = .loading
                                 await MainActor.run {
-                                    supabaseVM.schedules[schedule]!.memoState = .loading
+                                    if let _ = scheduleVM.schedule {
+                                        scheduleVM.memoState = .loading
+                                    }
                                 }
                                 let memo = try await supabaseVM.fetchVoiceMemo(schedule: uuid)
                                 await MainActor.run {
-                                    supabaseVM.schedules[schedule]!.voiceMemo = memo
-                                    supabaseVM.schedules[schedule]!.memoState = .success
+                                    if let _ = scheduleVM.schedule {
+                                        scheduleVM.voiceMemo = memo
+                                        scheduleVM.memoState = .success
+                                    }
                                 }
+                                supabaseVM.schedules[schedule]!.voiceMemo = memo
+                                supabaseVM.schedules[schedule]!.memoState = .success
                             } catch {
-                                await MainActor.run {
-                                    if error.localizedDescription == "Object not found" {
-                                        supabaseVM.schedules[schedule]!.memoState = .success
-                                    } else {
-                                        supabaseVM.schedules[schedule]!.memoState = .error
+                                if error.localizedDescription == "Object not found" {
+                                    supabaseVM.schedules[schedule]!.memoState = .success
+                                    await MainActor.run {
+                                        if let _ = scheduleVM.schedule {
+                                            scheduleVM.memoState = .success
+                                        }
+                                    }
+                                } else {
+                                    supabaseVM.schedules[schedule]!.memoState = .error
+                                    await MainActor.run {
+                                        if let _ = scheduleVM.schedule {
+                                            scheduleVM.memoState = .error
+                                        }
                                     }
                                 }
                             }
@@ -401,22 +413,26 @@ struct TimeLineView: View {
 
                         let photosTask = Task {
                             do {
-                                await MainActor.run {
-                                    supabaseVM.schedules[schedule]!.photosState = .loading
+                                supabaseVM.schedules[schedule]!.photosState = .loading
+                                if let _ = scheduleVM.schedule {
+                                    scheduleVM.photosState = .loading
                                 }
                                 let photos = try await supabaseVM.fetchPhotos(schedule: uuid)
-                                
                                 await MainActor.run {
-                                    supabaseVM.schedules[schedule]?.photos = photos
-                                    supabaseVM.schedules[schedule]!.photosState = .success
+                                    if let _ = scheduleVM.schedule {
+                                        scheduleVM.photos = photos
+                                        scheduleVM.photosState = .success
+                                    }
                                 }
+                                supabaseVM.schedules[schedule]!.photos = photos
+                                supabaseVM.schedules[schedule]!.photosState = .success
                             } catch {
+                                supabaseVM.schedules[schedule]!.photosState = .error
                                 await MainActor.run {
-                                    supabaseVM.schedules[schedule]!.photosState = .error
+                                    scheduleVM.photosState = .error
                                 }
                             }
                         }
-
                         await memoTask.value
                         await photosTask.value
                     }
