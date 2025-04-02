@@ -108,16 +108,18 @@ struct ScheduleView: View {
                                 }
                                 
                                 Button(action: {
+                                    let id = scheduleVM.id!
+                                    let photos = scheduleVM.photos
+                                    let voiceMemo = scheduleVM.voiceMemo
+                                    let schedule = scheduleVM.schedule!
+                                    scheduleVM.schedule = nil
+                                    startTask = false
+                                    supabaseVM.setSchedule(schedule: schedule)
                                     Task {
-                                        let id = scheduleVM.id!
-                                        let photos = scheduleVM.photos
-                                        let voiceMemo = scheduleVM.voiceMemo
-                                        let schedule = scheduleVM.schedule!
-                                        scheduleVM.schedule = nil
                                         do {
-                                            startTask = false
+                                            try await supabaseVM.deleteVoiceMemo(id: id)
+                                            try await supabaseVM.deletePhotos(id: id)
                                             try await supabaseVM.upsertSchedule(schedule: schedule)
-                                            supabaseVM.setSchedule(schedule: schedule)
                                         }
                                         catch {
                                             print("스케줄 추가/수정 실패: \(error.localizedDescription)")
