@@ -16,9 +16,12 @@ struct PhotoView: View {
     @State private var innerHeight = CGFloat.zero   //  ScrollView 내부 요소의 총 높이
     @State private var outerHeight = CGFloat.zero   //  ScrollView 자체 높이
     @State private var errMsg = ""
+    @State private var removedByTap = false
     private let maxSelectedCount: Int
     init(selectedItems: [ImageAsset], maxSelectedCount: Int = 5) {
-        self._selectedPhotos = State(initialValue: selectedItems.map { PhotosPickerItem(itemIdentifier: $0.id) })
+        self._selectedPhotos = State(initialValue: selectedItems.map { item in
+            PhotosPickerItem(itemIdentifier: item.id.replacingOccurrences(of: "_", with: "/"))
+        })
         self.maxSelectedCount = maxSelectedCount
     }
     
@@ -41,6 +44,7 @@ struct PhotoView: View {
                                 .onTapGesture {
                                     selectedPhotos.remove(at: idx)
                                     scheduleVM.photos.remove(at: idx)
+                                    removedByTap = true
                                 }
                         }
                     }
@@ -89,7 +93,9 @@ struct PhotoView: View {
                 .disabled(scheduleVM.photos.count >= maxSelectedCount)
                 .onChange(of: selectedPhotos) { newValue in
                     Task {
-                        scheduleVM.photos = await handleSelectedPhotos(newValue)
+                        if !removedByTap {
+                            scheduleVM.photos = await handleSelectedPhotos(newValue)
+                        }
                     }
                 }
             }
@@ -117,9 +123,7 @@ struct PhotoView: View {
                         continue
                     }
                             
-                    if var id = newPhoto.itemIdentifier, let image = UIImage(data: data) {
-                        let lastIndex = id.firstIndex(of: "/") ?? id.endIndex
-                        id = String(id[..<lastIndex])
+                    if let id = newPhoto.itemIdentifier, let image = UIImage(data: data) {
                         let asset = ImageAsset(id: id, image: image)
                         imageAssets.append(asset)
                     }
