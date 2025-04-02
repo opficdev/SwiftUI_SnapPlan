@@ -56,23 +56,25 @@ final class SupabaseViewModel: ObservableObject {
 
 // MARK: - Google Sign In
 extension SupabaseViewModel {
-    func signInGoogle() async {
+    func signInGoogle() async throws {
         do {
             try await signInGoogleHelper()
             signedIn = true
         } catch {
-            print("Google SignIn Error: \(error)")
+            print("Google SignIn Error: \(error.localizedDescription)")
+            throw error
         }
     }
     
-    func signOutGoogle() async {
+    func signOutGoogle() async throws {
         do {
             try await supabase.auth.signOut()
             GIDSignIn.sharedInstance.signOut()
             try await GIDSignIn.sharedInstance.disconnect()
             signedIn = false
         } catch {
-            print("Google SignOut Error: \(error)")
+            print("Google SignOut Error: \(error.localizedDescription)")
+            throw error
         }
     }
     
@@ -143,7 +145,8 @@ extension SupabaseViewModel {
                 
                 let _ = try await user.execute()
             } catch {
-                print("Save User Error: \(error)")
+                print("Save User Error: \(error.localizedDescription)")
+                throw error
             }
         }
     }
@@ -158,7 +161,8 @@ extension SupabaseViewModel {
                 let user = supabase.from("User").delete().eq("uid", value: uid)
                 let _ = try await user.execute()
             } catch {
-                print("Delete User Error: \(error)")
+                print("Delete User Error: \(error.localizedDescription)")
+                throw error
             }
         }
     }
@@ -172,7 +176,8 @@ extension SupabaseViewModel {
             let user = try supabase.from("User").update(["screenMode": mode.rawValue]).eq("uid", value: uid)
             let _ = try await user.execute()
         } catch {
-            print("Save ScreenMode Error: \(error)")
+            print("Save ScreenMode Error: \(error.localizedDescription)")
+            throw error
         }
     }
     
@@ -191,7 +196,8 @@ extension SupabaseViewModel {
             self.screenMode = userdata.first?.screenMode ?? .unspecified
             
         } catch {
-            print("Fetch ScreenMode Error: \(error)")
+            print("Fetch ScreenMode Error: \(error.localizedDescription)")
+            throw error
         }
     }
     
@@ -204,7 +210,8 @@ extension SupabaseViewModel {
             let user = try supabase.from("User").update(["is12TimeFmt": is12TimeFmt]).eq("uid", value: uid)
             let _ = try await user.execute()
         } catch {
-            print("Save TimeFormat Error: \(error)")
+            print("Save TimeFormat Error: \(error.localizedDescription)")
+            throw error
         }
     }
     
@@ -222,7 +229,8 @@ extension SupabaseViewModel {
             
             self.is12TimeFmt = userdata.first?.is12TimeFmt ?? true
         } catch {
-            print("Fetch TimeFormat Error: \(error)")
+            print("Fetch TimeFormat Error: \(error.localizedDescription)")
+            throw error
         }
         
     }
@@ -269,6 +277,7 @@ extension SupabaseViewModel {
             self.schedules.merge(scheduleDict) { $1 }
             
         } catch {
+            print("Fetch Schedule Error: \(error)")
             throw error
         }
     }
@@ -283,6 +292,7 @@ extension SupabaseViewModel {
             let _ = try await schedule.execute()
         } catch {
             print("Upsert Schedule Error: \(error)")
+            throw error
         }
     }
     
@@ -296,6 +306,7 @@ extension SupabaseViewModel {
             schedules.removeValue(forKey: schedule.id.uuidString)
         } catch {
             print("Delete Schedule Error: \(error)")
+            throw error
         }
     }
     
@@ -350,19 +361,19 @@ extension SupabaseViewModel {
             }
         } catch {
             print("Fetch Image Error: \(error.localizedDescription)")
-            return []
+            throw error
         }
     }
-
+    
     func upsertPhotos(id schedule: UUID, photos: [ImageAsset]) async throws {
         guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         
-        await withTaskGroup(of: Void.self) { group in
-            for photo in photos {
-                group.addTask {
-                    do {
+        do {
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                for photo in photos {
+                    group.addTask {
                         guard let data = photo.image.jpegData(compressionQuality: 0.8) else { return }
                         
                         let fileName = "\(photo.id)" + (photo.id.contains(".jpg") ? "" : ".jpg")
@@ -376,21 +387,24 @@ extension SupabaseViewModel {
                                 upsert: false
                             )
                         )
-                    } catch {
-                        print("Upsert Image Error: \(error.localizedDescription)")
                     }
                 }
+                
+                try await group.waitForAll()
             }
+        } catch {
+            print("Upsert Image Error: \(error.localizedDescription)")
+            throw error
         }
     }
-    
+
     func deletePhotos(id schedule: UUID) async throws {
         guard let user = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         
-        await withTaskGroup(of: Void.self) { group in
-            do {
+        do {
+            try await withThrowingTaskGroup(of: Void.self) { group in
                 let fileList = try await supabase.storage.from("photos").list(path: "\(user.uuidString)/\(schedule.uuidString)")
                 
                 for file in fileList {
@@ -398,10 +412,12 @@ extension SupabaseViewModel {
                     
                     try await supabase.storage.from("photos").remove(paths: [filePath])
                 }
-                
-            } catch {
-                print("Delete Image Error: \(error.localizedDescription)")
             }
+
+
+        } catch {
+            print("Delete Image Error: \(error.localizedDescription)")
+            throw error
         }
     }
 }
@@ -428,6 +444,7 @@ extension SupabaseViewModel {
             }
             else {
                 print("Fetch VoiceMemo Error: \(error.localizedDescription)")
+                throw error
             }
         }
         
@@ -453,6 +470,7 @@ extension SupabaseViewModel {
             )
         } catch {
             print("Upsert VoiceMemo Error: \(error.localizedDescription)")
+            throw error
         }
     }
     
@@ -466,6 +484,7 @@ extension SupabaseViewModel {
             try await supabase.storage.from("voicememos").remove(paths: [filePath])
         } catch {
             print("Delete VoiceMemo Error: \(error.localizedDescription)")
+            throw error
         }
     }
 }
