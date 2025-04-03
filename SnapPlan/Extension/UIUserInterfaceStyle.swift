@@ -25,6 +25,15 @@ extension UIUserInterfaceStyle: Codable {
         }
     }
     
+    public init(stringValue: String) {
+        switch stringValue.lowercased() {
+        case "light": self = .light
+        case "dark": self = .dark
+        case "unspecified": self = .unspecified
+        default: self = .unspecified
+        }
+    }
+    
     var rawValue: String {
         switch self {
         case .unspecified: return "unspecified"
