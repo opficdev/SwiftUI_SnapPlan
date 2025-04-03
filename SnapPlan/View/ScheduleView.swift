@@ -50,8 +50,6 @@ struct ScheduleView: View {
                             Spacer()
                             if scheduleVM.title.isEmpty {
                                 Button(action: {
-                                    titleFocus = false
-                                    descriptionFocus = false
                                     scheduleVM.schedule = nil
                                 }) {
                                     Image(systemName: "xmark.circle.fill")
@@ -63,8 +61,6 @@ struct ScheduleView: View {
                             else {
                                 Menu(content: {
                                     Button(action: {
-                                        titleFocus = false
-                                        descriptionFocus = false
                                         scheduleVM.schedule = nil
                                     }) {
                                         Label("취소", systemImage: "xmark")
@@ -144,13 +140,6 @@ struct ScheduleView: View {
                                         catch {
                                             print("사진, 음성 메모 추가/수정 실패: \(error.localizedDescription)")
                                         }
-                                    }
-                                    titleFocus = false
-                                    descriptionFocus = false
-                                    currentDetent = currentDetent.union([.fraction(0.07)])
-                                    selectedDetent = .fraction(0.07)
-                                    DispatchQueue.main.async {
-                                        currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
                                     }
                                 }) {
                                     ZStack {
@@ -398,10 +387,7 @@ struct ScheduleView: View {
                         }
                     }
                     .onTapGesture {
-                        if titleFocus {
-                            titleFocus = false
-                            currentDetent = [.large, .fraction(0.4)]
-                        }
+                        titleFocus = false
                         descriptionFocus = false
                     }
                     .sheet(isPresented: $tapStartTime) {
@@ -441,8 +427,8 @@ struct ScheduleView: View {
                     }
                     .confirmationDialog("스케줄을 삭제하시겠습니까?", isPresented: $tapDeleteSchedule, titleVisibility: .visible) {
                         Button(role: .destructive, action: {
-                            titleFocus = false
-                            descriptionFocus = false
+                            let schedule = scheduleVM.schedule!
+                            scheduleVM.schedule = nil
                             Task {
                                 do {
                                     firebaseVM.removeSchedule(schedule: schedule)
@@ -470,7 +456,6 @@ struct ScheduleView: View {
                         Spacer()
                         Button(action: {
                             titleFocus = true
-                            currentDetent = currentDetent.union([.large])
                             selectedDetent = .large
                             var startDate = Calendar.current.date(
                                 byAdding: .minute,
@@ -505,6 +490,8 @@ struct ScheduleView: View {
                     }
                 }
                 else {
+                    titleFocus = false
+                    descriptionFocus = false
                     currentDetent = currentDetent.union([.fraction(0.07)])
                     selectedDetent = .fraction(0.07)
                     didChangedStartDate = false
