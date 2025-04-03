@@ -283,6 +283,28 @@ struct ScheduleView: View {
                                             ProgressView()
                                                 .progressViewStyle(CircularProgressViewStyle())
                                         }
+                                        else if scheduleVM.memoState == .error {
+                                            Image(systemName: "arrow.counterclockwise")
+                                                .onTapGesture {
+                                                    Task {
+                                                        do {
+                                                            if let id = scheduleVM.id {
+                                                                supabaseVM.schedules[id.uuidString]?.memoState = .loading
+                                                                await MainActor.run {
+                                                                    scheduleVM.memoState = .loading
+                                                                }
+                                                                scheduleVM.voiceMemo = try await supabaseVM.fetchVoiceMemo(schedule: id)
+                                                                supabaseVM.schedules[id.uuidString]?.memoState = .success
+                                                                await MainActor.run {
+                                                                    scheduleVM.memoState = .success
+                                                                }
+                                                            }
+                                                        } catch {
+                                                            print("음성 메모 불러오기 실패: \(error.localizedDescription)")
+                                                        }
+                                                    }
+                                                }
+                                        }
                                     }
                                     .foregroundStyle(scheduleVM.voiceMemo == nil ? Color.gray : Color.primary)
                                     HStack {
