@@ -463,19 +463,3 @@ struct TimeLineView: View {
         .environmentObject(PlannerViewModel())
         .environmentObject(FirebaseViewModel())
 }
-
-class ScrollViewDelegateHandler: NSObject, UIScrollViewDelegate {
-    static let shared = ScrollViewDelegateHandler()
-
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let pageWidth = scrollView.frame.width
-        let currentPage = Int((scrollView.contentOffset.x + (0.5 * pageWidth)) / pageWidth)
-        print("현재 페이지: \(currentPage)")
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let pageWidth = scrollView.frame.width
-        let currentPage = round(scrollView.contentOffset.x / pageWidth)
-        scrollView.setContentOffset(CGPoint(x: currentPage * pageWidth, y: 0), animated: true)
-    }
-}
