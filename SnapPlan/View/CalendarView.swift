@@ -10,7 +10,7 @@ import SwiftUIIntrospect
 
 struct CalendarView: View {
     @EnvironmentObject private var plannerVM: PlannerViewModel
-    @EnvironmentObject private var supabaseVM: SupabaseViewModel
+    @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
     @Binding var showScheduleView: Bool
     @Binding var showSettingView: Bool
@@ -149,7 +149,7 @@ struct CalendarView: View {
         .background(Color.calendar)
         .fullScreenCover(isPresented: $showSettingView) {
             SettingView()
-                .environmentObject(supabaseVM)
+                .environmentObject(firebaseVM)
                 .onDisappear {
                     showScheduleView = true
                 }
@@ -162,5 +162,5 @@ struct CalendarView: View {
         showScheduleView: .constant(true),
         showSettingView: .constant(false)
     )
-        .environmentObject(SupabaseViewModel())
+        .environmentObject(FirebaseViewModel())
 }

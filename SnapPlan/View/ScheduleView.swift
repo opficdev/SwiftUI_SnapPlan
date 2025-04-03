@@ -15,7 +15,7 @@ struct ScheduleView: View {
     ]
     let screenWidth = UIScreen.main.bounds.width
     @EnvironmentObject var plannerVM: PlannerViewModel
-    @EnvironmentObject var supabaseVM: SupabaseViewModel
+    @EnvironmentObject var firebaseVM: FirebaseViewModel
     @EnvironmentObject var scheduleVM: ScheduleViewModel
     @EnvironmentObject var uiVM: UIViewModel
     @StateObject var searchVM = SearchLocationViewModel()
@@ -80,16 +80,16 @@ struct ScheduleView: View {
                                         )
                                         Task {
                                             do {
-                                                try await supabaseVM.upsertSchedule(schedule: copy)
-                                                supabaseVM.setSchedule(schedule: copy)
+                                                try await firebaseVM.upsertSchedule(schedule: copy)
+                                                firebaseVM.setSchedule(schedule: copy)
                                             } catch {
                                                 print("스케줄 복사본 추가/수정 실패: \(error.localizedDescription)")
                                             }
                                         }
                                         Task {
-                                            try await supabaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)
+                                            try await firebaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)
                                             if let voiceMemo = scheduleVM.voiceMemo {
-                                                try await supabaseVM.upsertVoiceMemo(id: copy.id, memo: voiceMemo)
+                                                try await firebaseVM.upsertVoiceMemo(id: copy.id, voiceMemo: voiceMemo)
                                             }
                                         }
                                     }) {
@@ -113,13 +113,12 @@ struct ScheduleView: View {
                                     let voiceMemo = scheduleVM.voiceMemo
                                     let schedule = scheduleVM.schedule!
                                     scheduleVM.schedule = nil
-                                    startTask = false
-                                    supabaseVM.setSchedule(schedule: schedule)
+                                    firebaseVM.setSchedule(schedule: schedule)
                                     Task {
                                         do {
-                                            try await supabaseVM.deleteVoiceMemo(id: id)
-                                            try await supabaseVM.deletePhotos(id: id)
-                                            try await supabaseVM.upsertSchedule(schedule: schedule)
+                                            try await firebaseVM.deleteVoiceMemo(id: id)
+                                            try await firebaseVM.deletePhotos(id: id)
+                                            try await firebaseVM.upsertSchedule(schedule: schedule)
                                         }
                                         catch {
                                             print("스케줄 추가/수정 실패: \(error.localizedDescription)")
@@ -127,18 +126,18 @@ struct ScheduleView: View {
                                         do {
                                             if scheduleVM.photosState != .loading {
                                                 if photos.isEmpty {
-                                                    try await supabaseVM.deletePhotos(id: id)
+                                                    try await firebaseVM.deletePhotos(id: id)
                                                 }
                                                 else {
-                                                    try await supabaseVM.upsertPhotos(id: id, photos: photos)
+                                                    try await firebaseVM.upsertPhotos(id: id, photos: photos)
                                                 }
                                             }
                                             if scheduleVM.memoState != .loading {
                                                 if let memo = voiceMemo {
-                                                    try await supabaseVM.upsertVoiceMemo(id: id, memo: memo)
+                                                    try await firebaseVM.upsertVoiceMemo(id: id, voiceMemo: memo)
                                                 }
                                                 else {
-                                                    try await supabaseVM.deleteVoiceMemo(id: id)
+                                                    try await firebaseVM.deleteVoiceMemo(id: id)
                                                 }
                                             }
                                         }
@@ -289,12 +288,12 @@ struct ScheduleView: View {
                                                     Task {
                                                         do {
                                                             if let id = scheduleVM.id {
-                                                                supabaseVM.schedules[id.uuidString]?.memoState = .loading
+                                                                firebaseVM.schedules[id.uuidString]?.memoState = .loading
                                                                 await MainActor.run {
                                                                     scheduleVM.memoState = .loading
                                                                 }
-                                                                scheduleVM.voiceMemo = try await supabaseVM.fetchVoiceMemo(schedule: id)
-                                                                supabaseVM.schedules[id.uuidString]?.memoState = .success
+                                                                scheduleVM.voiceMemo = try await firebaseVM.fetchVoiceMemo(schedule: id)
+                                                                firebaseVM.schedules[id.uuidString]?.memoState = .success
                                                                 await MainActor.run {
                                                                     scheduleVM.memoState = .success
                                                                 }
@@ -324,12 +323,12 @@ struct ScheduleView: View {
                                                             Task {
                                                                 do {
                                                                     if let id = scheduleVM.id {
-                                                                        supabaseVM.schedules[id.uuidString]?.photosState = .loading
+                                                                        firebaseVM.schedules[id.uuidString]?.photosState = .loading
                                                                         await MainActor.run {
                                                                             scheduleVM.photosState = .loading
                                                                         }
-                                                                        scheduleVM.photos = try await supabaseVM.fetchPhotos(schedule: id)
-                                                                        supabaseVM.schedules[id.uuidString]?.photosState = .success
+                                                                        scheduleVM.photos = try await firebaseVM.fetchPhotos(schedule: id)
+                                                                        firebaseVM.schedules[id.uuidString]?.photosState = .success
                                                                         await MainActor.run {
                                                                             scheduleVM.photosState = .success
                                                                         }
@@ -446,13 +445,10 @@ struct ScheduleView: View {
                             descriptionFocus = false
                             Task {
                                 do {
-                                    startTask = false
-                                    let schedule = scheduleVM.schedule!
-                                    scheduleVM.schedule = nil
-                                    supabaseVM.removeSchedule(schedule: schedule)
-                                    try await supabaseVM.deletePhotos(id: schedule.id)
-                                    try await supabaseVM.deleteVoiceMemo(id: schedule.id)
-                                    try await supabaseVM.deleteSchedule(schedule: schedule)
+                                    firebaseVM.removeSchedule(schedule: schedule)
+                                    try await firebaseVM.deletePhotos(id: schedule.id)
+                                    try await firebaseVM.deleteVoiceMemo(id: schedule.id)
+                                    try await firebaseVM.deleteSchedule(schedule: schedule)
                                 }
                             }
                         }) {

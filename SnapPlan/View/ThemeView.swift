@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ThemeView: View {
-    @EnvironmentObject var supabaseVM: SupabaseViewModel
+    @EnvironmentObject var firebaseVM: FirebaseViewModel
     
     var body: some View {
         VStack {
@@ -16,15 +16,15 @@ struct ThemeView: View {
                 Button(action: {
                     setAppTheme(.unspecified)
                     Task {
-                        try await supabaseVM.updateScreenMode(mode: .unspecified)
-                        supabaseVM.screenMode = .unspecified
+                        try await firebaseVM.updateScreenMode(mode: .unspecified)
+                        firebaseVM.screenMode = .unspecified
                     }
                 }) {
                     HStack {
                         Text("자동")
                             .foregroundStyle(Color.primary)
                         Spacer()
-                        if supabaseVM.screenMode == .unspecified {
+                        if firebaseVM.screenMode == .unspecified {
                             Image(systemName: "checkmark")
                         }
                     }
@@ -33,15 +33,15 @@ struct ThemeView: View {
                 Button(action: {
                     setAppTheme(.light)
                     Task {
-                        try await supabaseVM.updateScreenMode(mode: .light)
-                        supabaseVM.screenMode = .light
+                        try await firebaseVM.updateScreenMode(mode: .light)
+                        firebaseVM.screenMode = .light
                     }
                 }) {
                     HStack {
                         Text("라이트 모드")
                             .foregroundStyle(Color.primary)
                         Spacer()
-                        if supabaseVM.screenMode == .light {
+                        if firebaseVM.screenMode == .light {
                             Image(systemName: "checkmark")
                         }
                     }
@@ -50,15 +50,15 @@ struct ThemeView: View {
                 Button(action: {
                     setAppTheme(.dark) // 다크 모드
                     Task {
-                        try await supabaseVM.updateScreenMode(mode: .dark)
-                        supabaseVM.screenMode = .dark
+                        try await firebaseVM.updateScreenMode(mode: .dark)
+                        firebaseVM.screenMode = .dark
                     }
                 }) {
                     HStack {
                         Text("다크 모드")
                             .foregroundStyle(Color.primary)
                         Spacer()
-                        if supabaseVM.screenMode == .dark {
+                        if firebaseVM.screenMode == .dark {
                             Image(systemName: "checkmark")
                         }
                     }
@@ -91,5 +91,5 @@ struct ThemeView: View {
 }
 #Preview {
     ThemeView()
-        .environmentObject(SupabaseViewModel())
+        .environmentObject(FirebaseViewModel())
 }

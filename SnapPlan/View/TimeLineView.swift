@@ -12,7 +12,7 @@ struct TimeLineView: View {
     @StateObject var uiVM = UIViewModel()
     @StateObject private var scheduleVM = ScheduleViewModel()
     @EnvironmentObject private var plannerVM: PlannerViewModel
-    @EnvironmentObject private var supabaseVM: SupabaseViewModel
+    @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
     @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
@@ -27,11 +27,11 @@ struct TimeLineView: View {
             Color.timeLine.ignoresSafeArea()
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 0) {
-                    Text(supabaseVM.is12TimeFmt ? "12시간제" : "24시간제")
+                    Text(firebaseVM.is12TimeFmt ? "12시간제" : "24시간제")
                         .frame(width: screenWidth / 7)
                         .font(.caption)
                         .onTapGesture {
-                            supabaseVM.is12TimeFmt.toggle()
+                            firebaseVM.is12TimeFmt.toggle()
                         }
                     
                     HStack {
@@ -67,7 +67,7 @@ struct TimeLineView: View {
                                     VStack {
                                         ZStack(alignment: .topTrailing) {
                                             VStack(alignment: .trailing, spacing: gap) {
-                                                let hours = plannerVM.getHours(is12hoursFmt: supabaseVM.is12TimeFmt)
+                                                let hours = plannerVM.getHours(is12hoursFmt: firebaseVM.is12TimeFmt)
                                                 ForEach(Array(zip(hours.indices, hours)), id: \.1.id) { index, hour in
                                                     Text("\(hour.timePeriod) \(hour.time)")
                                                         .font(.caption)
@@ -94,7 +94,7 @@ struct TimeLineView: View {
                                                 plannerVM.getDateString(
                                                     for: plannerVM.today,
                                                     components: [.hour, .minute],
-                                                    is12hoursFmt: supabaseVM.is12TimeFmt
+                                                    is12hoursFmt: firebaseVM.is12TimeFmt
                                                 )
                                             )
                                             .font(.caption)
@@ -152,7 +152,7 @@ struct TimeLineView: View {
                                                                 }
                                                                 
                                                                 //  MARK: 반복 일정
-                                                                let cyecleSchedules = supabaseVM.schedules.values.filter { $0.cycleOption != .none }
+                                                                let cyecleSchedules = firebaseVM.schedules.values.filter { $0.cycleOption != .none }
                                                                 ForEach(Array(zip(cyecleSchedules.indices, cyecleSchedules)), id: \.1.id) { idx, scheduleData in
                                                                     if (scheduleVM.id != scheduleData.id && !scheduleData.isAllDay) && scheduleVM.isCycleConfirm(date: date, schedule: scheduleData) {
                                                                         ScheduleBox(
@@ -168,7 +168,7 @@ struct TimeLineView: View {
                                                                 }
                                                                 
                                                                 //  MARK: 반복, 종일 설정이 없는 일정
-                                                                let schedules = uiVM.findSchedules(containing: date, in: supabaseVM.schedules)
+                                                                let schedules = uiVM.findSchedules(containing: date, in: firebaseVM.schedules)
                                                                 ForEach(Array(zip(schedules.indices, schedules)), id: \.1.id) { idx, scheduleData in
                                                                     if scheduleVM.id != scheduleData.id && !scheduleData.isAllDay && scheduleData.cycleOption == .none {
                                                                         ScheduleBox(
@@ -262,15 +262,6 @@ struct TimeLineView: View {
                                                         selection = 7
                                                     }
                                                 }
-
-                                                if plannerVM.changedDateFromCalendarView {
-                                                    //  MARK: CalendarView의 withAnimation과 겹치는 부분이 있음
-                                                    //  MARK: 스크롤만 animation을 넣는 받법을 찾아야함
-//                                                    withAnimation {
-                                                        scrollProxy.scrollTo(value)
-//                                                    }
-                                                    plannerVM.changedDateFromCalendarView = false
-                                                }
                                             }
                                         }
                                         .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
@@ -302,7 +293,7 @@ struct TimeLineView: View {
                         
                         VStack(spacing: 3) {
                             //  MARK: 종일 일정 부분
-                            let todaySchedules = uiVM.findSchedules(containing: plannerVM.selectDate, in: supabaseVM.schedules).sorted(by: { $0.title < $1.title })
+                            let todaySchedules = uiVM.findSchedules(containing: plannerVM.selectDate, in: firebaseVM.schedules).sorted(by: { $0.title < $1.title })
                             ForEach(Array(zip(todaySchedules.indices, todaySchedules)), id: \.1.id) { idx, scheduleData in
                                 if scheduleData.isAllDay {
                                     if scheduleVM.id == scheduleData.id {
@@ -333,7 +324,7 @@ struct TimeLineView: View {
                     }
                     .background(Color.timeLine)
                     .border(Color.gray.opacity(0.3))
-                    .onChange(of: supabaseVM.schedules) { schedules in
+                    .onChange(of: firebaseVM.schedules) { schedules in
                         uiVM.setAllDayPadding(date: plannerVM.selectDate, height: timeZoneSize.height, schedules: schedules)
                     }
                     Rectangle()
@@ -363,45 +354,45 @@ struct TimeLineView: View {
                 calendarData = plannerVM.calendarData[1]
             }
             selection = calendarData.firstIndex(where: {plannerVM.isSameDate(date1: $0, date2: date, components: [.year, .month, .day]) })!
-            uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: supabaseVM.schedules)
+            uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
         }
         .onChange(of: calendarData) { month in
             Task {
-                supabaseVM.schedules.removeAll()
+                firebaseVM.schedules.removeAll()
                 // MARK: 일정 우선
-                try await supabaseVM.fetchSchedule(from: month.first!, to: month.last!)
+                try await firebaseVM.fetchSchedule(from: month.first!, to: month.last!)
                 
                 // MARK: 사진, 음성메모 후순위
-                for schedule in supabaseVM.schedules.keys {
+                for schedule in firebaseVM.schedules.keys {
                     if let uuid = UUID(uuidString: schedule) {
                         // 두 개의 독립적인 Task 생성
                         let memoTask = Task {
                             do {
-                                supabaseVM.schedules[schedule]!.memoState = .loading
+                                firebaseVM.schedules[schedule]?.memoState = .loading
                                 await MainActor.run {
                                     if let _ = scheduleVM.schedule {
                                         scheduleVM.memoState = .loading
                                     }
                                 }
-                                let memo = try await supabaseVM.fetchVoiceMemo(schedule: uuid)
+                                let memo = try await firebaseVM.fetchVoiceMemo(schedule: uuid)
                                 await MainActor.run {
                                     if let _ = scheduleVM.schedule {
                                         scheduleVM.voiceMemo = memo
                                         scheduleVM.memoState = .success
                                     }
                                 }
-                                supabaseVM.schedules[schedule]!.voiceMemo = memo
-                                supabaseVM.schedules[schedule]!.memoState = .success
+                                firebaseVM.schedules[schedule]?.voiceMemo = memo
+                                firebaseVM.schedules[schedule]?.memoState = .success
                             } catch {
                                 if error.localizedDescription == "Object not found" {
-                                    supabaseVM.schedules[schedule]!.memoState = .success
+                                    firebaseVM.schedules[schedule]?.memoState = .success
                                     await MainActor.run {
                                         if let _ = scheduleVM.schedule {
                                             scheduleVM.memoState = .success
                                         }
                                     }
                                 } else {
-                                    supabaseVM.schedules[schedule]!.memoState = .error
+                                    firebaseVM.schedules[schedule]?.memoState = .error
                                     await MainActor.run {
                                         if let _ = scheduleVM.schedule {
                                             scheduleVM.memoState = .error
@@ -413,21 +404,21 @@ struct TimeLineView: View {
 
                         let photosTask = Task {
                             do {
-                                supabaseVM.schedules[schedule]!.photosState = .loading
+                                firebaseVM.schedules[schedule]?.photosState = .loading
                                 if let _ = scheduleVM.schedule {
                                     scheduleVM.photosState = .loading
                                 }
-                                let photos = try await supabaseVM.fetchPhotos(schedule: uuid)
+                                let photos = try await firebaseVM.fetchPhotos(schedule: uuid)
                                 await MainActor.run {
                                     if let _ = scheduleVM.schedule {
                                         scheduleVM.photos = photos
                                         scheduleVM.photosState = .success
                                     }
                                 }
-                                supabaseVM.schedules[schedule]!.photos = photos
-                                supabaseVM.schedules[schedule]!.photosState = .success
+                                firebaseVM.schedules[schedule]?.photos = photos
+                                firebaseVM.schedules[schedule]?.photosState = .success
                             } catch {
-                                supabaseVM.schedules[schedule]!.photosState = .error
+                                firebaseVM.schedules[schedule]?.photosState = .error
                                 await MainActor.run {
                                     scheduleVM.photosState = .error
                                 }
@@ -439,10 +430,10 @@ struct TimeLineView: View {
                 }
             }
         }
-        .onChange(of: supabaseVM.is12TimeFmt) { value in
+        .onChange(of: firebaseVM.is12TimeFmt) { value in
             Task {
                 do {
-                    try await supabaseVM.updateTimeFormat(is12TimeFmt: value)
+                    try await firebaseVM.updateTimeFormat(is12TimeFmt: value)
                 } catch {
                     print("12시간제 변경 에러", error.localizedDescription)
                 }
@@ -451,7 +442,7 @@ struct TimeLineView: View {
         .sheet(isPresented: $showScheduleView) {
             ScheduleView()
                 .environmentObject(plannerVM)
-                .environmentObject(supabaseVM)
+                .environmentObject(firebaseVM)
                 .environmentObject(uiVM)
                 .environmentObject(scheduleVM)
                 .presentationDragIndicator(.visible)
@@ -470,7 +461,7 @@ struct TimeLineView: View {
 #Preview {
     TimeLineView(showScheduleView: .constant(true))
         .environmentObject(PlannerViewModel())
-        .environmentObject(SupabaseViewModel())
+        .environmentObject(FirebaseViewModel())
 }
 
 class ScrollViewDelegateHandler: NSObject, UIScrollViewDelegate {
