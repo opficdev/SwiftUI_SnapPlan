@@ -118,8 +118,8 @@ struct PhotoView: View {
         for newPhoto in newPhotos {
             do {
                 if let data = try await newPhoto.loadTransferable(type: Data.self) {
-                    if 20 * 1024 * 1024 <= data.count {
-                        errMsg = "20MB 이하의 사진만 추가해주세요!"
+                    if 5 * 1024 * 1024 <= data.count {
+                        errMsg = "5MB 이하의 사진만 추가해주세요!"
                         self.selectedPhotos.removeAll(where: { $0 == newPhoto })
                         continue
                     }
