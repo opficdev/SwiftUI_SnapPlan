@@ -493,8 +493,6 @@ struct ScheduleView: View {
             .presentationDetents(currentDetent, selection: $selectedDetent)
             .onChange(of: scheduleVM.schedule) { schedule in
                 startTask = schedule != nil
-                //  MARK: defer 내에서 scheduleVM.schedule이 nil이 될 때 startTask가 false가 되지만
-                //  MARK: 이미 starTask는 false임
             }
             .onChange(of: startTask) { value in
                 if value {
