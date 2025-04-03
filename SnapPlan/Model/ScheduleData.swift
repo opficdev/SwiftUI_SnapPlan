@@ -60,7 +60,7 @@ struct ScheduleData: Identifiable {
         self.title = schedule.title
         self.startDate = schedule.startDate
         self.endDate = schedule.endDate
-        self.isChanging = schedule.isChanging
+        self.isChanging = false
         self.isAllDay = schedule.isAllDay
         self.cycleOption = schedule.cycleOption
         self.color = schedule.color
@@ -70,6 +70,4 @@ struct ScheduleData: Identifiable {
         self.address = schedule.address
         self.description = schedule.description
     }
-    
-
 }
