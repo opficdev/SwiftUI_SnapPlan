@@ -369,14 +369,14 @@ struct TimeLineView: View {
                         let memoTask = Task {
                             do {
                                 firebaseVM.schedules[schedule]?.memoState = .loading
-                                await MainActor.run {
-                                    if let _ = scheduleVM.schedule {
+                                if let id = scheduleVM.id, id == uuid {
+                                    await MainActor.run {
                                         scheduleVM.memoState = .loading
                                     }
                                 }
                                 let memo = try await firebaseVM.fetchVoiceMemo(schedule: uuid)
                                 await MainActor.run {
-                                    if let _ = scheduleVM.schedule {
+                                    if let id = scheduleVM.id, id == uuid {
                                         scheduleVM.voiceMemo = memo
                                         scheduleVM.memoState = .success
                                     }
@@ -386,15 +386,15 @@ struct TimeLineView: View {
                             } catch {
                                 if error.localizedDescription == "Object not found" {
                                     firebaseVM.schedules[schedule]?.memoState = .success
-                                    await MainActor.run {
-                                        if let _ = scheduleVM.schedule {
+                                    if let id = scheduleVM.id, id == uuid {
+                                        await MainActor.run {
                                             scheduleVM.memoState = .success
                                         }
                                     }
                                 } else {
                                     firebaseVM.schedules[schedule]?.memoState = .error
-                                    await MainActor.run {
-                                        if let _ = scheduleVM.schedule {
+                                    if let id = scheduleVM.id, id == uuid {
+                                        await MainActor.run {
                                             scheduleVM.memoState = .error
                                         }
                                     }
@@ -405,12 +405,14 @@ struct TimeLineView: View {
                         let photosTask = Task {
                             do {
                                 firebaseVM.schedules[schedule]?.photosState = .loading
-                                if let _ = scheduleVM.schedule {
-                                    scheduleVM.photosState = .loading
+                                if let id = scheduleVM.id, id == uuid {
+                                    await MainActor.run {
+                                        scheduleVM.photosState = .loading
+                                    }
                                 }
                                 let photos = try await firebaseVM.fetchPhotos(schedule: uuid)
                                 await MainActor.run {
-                                    if let _ = scheduleVM.schedule {
+                                    if let id = scheduleVM.id, id == uuid {
                                         scheduleVM.photos = photos
                                         scheduleVM.photosState = .success
                                     }
@@ -419,8 +421,10 @@ struct TimeLineView: View {
                                 firebaseVM.schedules[schedule]?.photosState = .success
                             } catch {
                                 firebaseVM.schedules[schedule]?.photosState = .error
-                                await MainActor.run {
-                                    scheduleVM.photosState = .error
+                                if let id = scheduleVM.id, id == uuid {
+                                    await MainActor.run {
+                                        scheduleVM.photosState = .error
+                                    }
                                 }
                             }
                         }
