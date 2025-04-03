@@ -472,7 +472,13 @@ extension FirebaseViewModel {
             let filePath = "voiceMemos/\(userId)/\(schedule.uuidString)"
             let fileRef = storage.reference().child(filePath).child("voiceMemo.m4a")
             
+            let _ = try await fileRef.getMetadata()
+            
             try await fileRef.delete()
+        } catch let error as StorageError {
+            if error.errorCode == StorageErrorCode.objectNotFound.rawValue {
+                return
+            }
         } catch {
             print("Delete Voice Memo Error: \(error.localizedDescription)")
             throw error
