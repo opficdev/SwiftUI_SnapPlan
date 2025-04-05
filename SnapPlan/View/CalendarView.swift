@@ -104,7 +104,7 @@ struct CalendarView: View {
                     TabView(selection: $selection) {
                         let calendarData = plannerVM.calendarData
                         ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, month in
-                            CalendarGrid(monthData: month, wasPast: $plannerVM.wasPast)
+                            CalendarGrid(monthData: month)
                                 .environmentObject(plannerVM)
                                 .tag(idx)
                                 .onDisappear {

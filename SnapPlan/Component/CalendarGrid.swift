@@ -8,14 +8,12 @@
 import SwiftUI
 
 struct CalendarGrid: View {
-    @EnvironmentObject var viewModel: PlannerViewModel
-    @Binding var wasPast: Bool  //  이전 날짜인지 확인
+    @EnvironmentObject var plannerVM: PlannerViewModel
     @State private var monthData: [Date]
     let screenWidth = UIScreen.main.bounds.width
     
-    init(monthData: [Date], wasPast: Binding<Bool>) {
+    init(monthData: [Date]) {
         self._monthData = State(initialValue: monthData)
-        self._wasPast = wasPast
     }
         
     var body: some View {
@@ -24,8 +22,8 @@ struct CalendarGrid: View {
                 HStack {
                     ForEach(0..<7) { row in
                         Spacer()
-                        CalendarCell(date: monthData[col * 7 + row], wasPast: $wasPast)
-                            .environmentObject(viewModel)
+                        CalendarCell(date: monthData[col * 7 + row])
+                            .environmentObject(plannerVM)
                         Spacer()
                     }
                 }
@@ -35,9 +33,6 @@ struct CalendarGrid: View {
 }
 
 #Preview {
-    CalendarGrid(
-        monthData: PlannerViewModel().calendarData[1],
-        wasPast: .constant(false)
-    )
+    CalendarGrid(monthData: PlannerViewModel().calendarData[1])
     .environmentObject(PlannerViewModel())
 }

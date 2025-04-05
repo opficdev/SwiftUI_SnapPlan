@@ -10,13 +10,11 @@ import SwiftUI
 struct CalendarCell: View {
     @EnvironmentObject var plannerVM: PlannerViewModel
     @Environment(\.colorScheme) var colorScheme
-    @Binding var wasPast: Bool //  이전 날짜인지 확인
     @State private var date: Date //  셀의 날짜
     let screenWidth = UIScreen.main.bounds.width
     
-    init(date: Date, wasPast: Binding<Bool>) {
+    init(date: Date) {
         self._date = State(initialValue: date)
-        self._wasPast = wasPast
     }
     
     var body: some View {
@@ -28,7 +26,7 @@ struct CalendarCell: View {
                     )
                     .frame(width: screenWidth / 10, height: screenWidth / 10)
                     .transition(.asymmetric(
-                        insertion: .move(edge: wasPast ? .leading : .trailing).combined(with: .opacity),
+                        insertion: .move(edge: plannerVM.wasPast ? .leading : .trailing).combined(with: .opacity),
                         removal: .identity
                     ))
             }
@@ -45,18 +43,13 @@ struct CalendarCell: View {
                 .frame(width: screenWidth / 10, height: screenWidth / 10)
         }
         .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                wasPast = plannerVM.selectDate < date
-                plannerVM.selectDate = date
-            }
+            plannerVM.userTapped = true
+            plannerVM.selectDate = date
         }
     }
 }
 
 #Preview {
-    CalendarCell(
-        date: Date(),
-        wasPast: .constant(false)
-    )
+    CalendarCell(date: Date())
     .environmentObject(PlannerViewModel())
 }
