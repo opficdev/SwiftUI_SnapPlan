@@ -226,8 +226,11 @@ struct TimeLineView: View {
                                                             //  오직 감시용으로만 사용할 것
                                                             //  단, 감시를 해도 코드 내부 모든 오토 스크롤 이벤트 종료 후 관찰을 지속할 것
                                                             Color.clear.onChange(of: geometryProxy.frame(in: .global)) { frame in
-                                                                if timeZoneSize.width <= frame.midX && frame.midX <= screenWidth && plannerVM.selection != idx {
+                                                                if plannerVM.scrollTaskEnd && timeZoneSize.width <= frame.midX && frame.midX <= screenWidth && plannerVM.selection != idx {
                                                                     plannerVM.selection = idx
+                                                                    DispatchQueue.main.async {
+                                                                        plannerVM.scrollTaskEnd = false
+                                                                    }
                                                                 }
                                                             }
                                                         }
