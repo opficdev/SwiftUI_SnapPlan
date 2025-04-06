@@ -16,9 +16,7 @@ final class PlannerViewModel: ObservableObject {
     @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     @Published var selection = -1   //  선택된 날짜의 index
     @Published var userTapped = false //  사용자가 스크롤 중인지 여부
-    @Published var shouldScrollTo = false //  강제로 스크롤 해야하는지 여부
-    
-    @Published var didSetSelection = false //  selection이 최초 수정되었는지 여부
+    @Published var scrollTaskEnd = false //  코드에서 스크롤이 끝났는지 여부
     
     init() {
         startTimer()
@@ -31,8 +29,9 @@ final class PlannerViewModel: ObservableObject {
                 if !self.userTapped {
                     if 1 < self.calendarData.count, newValue < self.calendarData[1].count {
                         if newValue == -1 { //  초기화
-                            self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) })!
-                            print("뷰모델에서 초기 상태 설정: \(self.selection)")
+                            self.selection = self.calendarData[1].firstIndex(
+                                where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) }
+                            )!
                         }
                         else {
                             withAnimation(.easeInOut(duration: 0.2)) {
