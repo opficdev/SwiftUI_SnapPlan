@@ -16,7 +16,6 @@ struct TimeLineView: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
-    @State private var selection = -1   //  초기값을 -1로 지정하면 무조건 onChange(of:) 에서 반응할 것임
     @State private var calendarData = [Date]()
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
@@ -224,43 +223,23 @@ struct TimeLineView: View {
                                                     .id(idx)
                                                     .background(
                                                         GeometryReader { geometryProxy in
-                                                            Color.clear.onChange(of: geometryProxy.frame(in: .global).midX) { x in
-                                                                if timeZoneSize.width <= x && x <= screenWidth {
-                                                                    selection = idx
-                                                                    plannerVM.changedDateFromCalendarView = false
+                                                            //  오직 감시용으로만 사용할 것
+                                                            //  단, 감시를 해도 코드 내부 모든 오토 스크롤 이벤트 종료 후 관찰을 지속할 것
+                                                            Color.clear.onChange(of: geometryProxy.frame(in: .global)) { frame in
+                                                                if timeZoneSize.width <= frame.midX && frame.midX <= screenWidth && plannerVM.selection != idx {
+                                                                    plannerVM.selection = idx
                                                                 }
                                                             }
                                                         }
-                                                        
                                                     )
                                                 }
                                                 .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
                                             }
                                             .onAppear {
                                                 calendarData = plannerVM.calendarData[1]
-                                                selection = calendarData.firstIndex(where: {
-                                                    plannerVM.isSameDate(
-                                                        date1: $0,
-                                                        date2: plannerVM.selectDate,
-                                                        components: [.year, .month, .day]) }
-                                                )!
                                                 DispatchQueue.main.async {
-                                                    scrollProxy.scrollTo(selection, anchor: .top)
-                                                }
-                                            }
-                                            .onChange(of: selection) { value in
-                                                plannerVM.wasPast = plannerVM.selectDate < calendarData[value]
-                                                withAnimation {
-                                                    plannerVM.selectDate = calendarData[value]
-                                                    plannerVM.currentDate = plannerVM.selectDate
-                                                }
-                                                
-                                                if value == 0 && plannerVM.isSameDate(date1: plannerVM.selectDate, date2: plannerVM.currentDate, components: [.year, .month, .day]) {
-                                                    calendarData = Array(plannerVM.calendarData[0][28..<35]) + calendarData
-                                                    DispatchQueue.main.async {
-                                                        scrollProxy.scrollTo(7)
-                                                        selection = 7
-                                                    }
+                                                    scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                    uiVM.allDayPadding = timeZoneSize.height * 2
                                                 }
                                             }
                                         }
@@ -335,25 +314,10 @@ struct TimeLineView: View {
                
             }
         }
-        .onChange(of: plannerVM.calendarData) { data in
-            if plannerVM.selectDate == plannerVM.currentDate {  //  CalendarView에서 달이 바뀌었지만 전달 or 다음달의 날짜를 탭 해서 바뀐 경우
-                calendarData = data[1]
-                selection = calendarData.firstIndex(where: {
-                    plannerVM.isSameDate(
-                        date1: $0,
-                        date2: plannerVM.selectDate,
-                        components: [.year, .month, .day]) }
-                )!
-            }
-        }
         .onChange(of: plannerVM.selectDate) { date in
             if !calendarData.contains(where: {plannerVM.isSameDate(date1: $0, date2: date, components: [.year, .month, .day]) }) {
-//                withAnimation {
-//                    plannerVM.setCalendarData(date: date)
-//                }
                 calendarData = plannerVM.calendarData[1]
             }
-            selection = calendarData.firstIndex(where: {plannerVM.isSameDate(date1: $0, date2: date, components: [.year, .month, .day]) })!
             uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
         }
         .onChange(of: calendarData) { month in

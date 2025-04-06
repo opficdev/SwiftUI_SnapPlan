@@ -14,14 +14,62 @@ final class PlannerViewModel: ObservableObject {
     @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
     @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 형태
     @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
-    @Published var changedDateFromCalendarView = false   //  selectDate가 CalendarView에서 탭으로 변경되었는지 여부
+    @Published var selection = -1   //  선택된 날짜의 index
+    @Published var userTapped = false //  사용자가 스크롤 중인지 여부
+    @Published var shouldScrollTo = false //  강제로 스크롤 해야하는지 여부
+    
+    @Published var didSetSelection = false //  selection이 최초 수정되었는지 여부
     
     init() {
         startTimer()
         setCalendarData(date: today)
+        
+        $selection
+            .removeDuplicates()
+            .sink { [weak self] newValue in
+                guard let self = self else { return }
+                if !self.userTapped {
+                    if 1 < self.calendarData.count, newValue < self.calendarData[1].count {
+                        if newValue == -1 { //  초기화
+                            self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) })!
+                            print("뷰모델에서 초기 상태 설정: \(self.selection)")
+                        }
+                        else {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                self.wasPast = self.selectDate < self.calendarData[1][newValue]
+                                self.selectDate = self.calendarData[1][newValue]
+                            }
+                            self.currentDate = self.selectDate
+                        }
+                    }
+                }
+            }
+            .store(in: &cancellables)
+        
+        $selectDate
+            .removeDuplicates()
+            .sink { [weak self] newValue in
+                guard let self = self else { return }
+                if self.userTapped {
+                    self.currentDate = newValue
+                    if self.calendarData.isEmpty || !self.calendarData[1].contains(newValue) {
+                        self.setCalendarData(date: newValue)
+                    }
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
+                        self.wasPast = self.selectDate < self.calendarData[1][self.selection]
+                        
+                        if self.selection == 0 {
+                            self.setCalendarData(date: newValue)
+                            self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
+                        }
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
     
-    private var timerCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
     private var calendar: Calendar {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "ko_KR")
@@ -32,11 +80,12 @@ final class PlannerViewModel: ObservableObject {
     }
 
     private func startTimer() {
-        timerCancellable = Timer.publish(every: 0.1, on: .main, in: .common)
+        Timer.publish(every: 0.1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 self?.today = Date()
             }
+            .store(in: &cancellables)
     }
     
     func getDateFromIndex(index: Int) -> Date {
@@ -226,6 +275,6 @@ final class PlannerViewModel: ObservableObject {
     }
     
     deinit {
-        timerCancellable?.cancel()
+        cancellables.forEach { $0.cancel() }
     }
 }

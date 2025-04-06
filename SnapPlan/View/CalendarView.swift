@@ -79,9 +79,8 @@ struct CalendarView: View {
                     )
                     .onTapGesture{
                         if !plannerVM.isSameDate(date1: plannerVM.today, date2: plannerVM.selectDate, components: [.year, .month, .day]) {
-                            plannerVM.wasPast = plannerVM.selectDate < plannerVM.today
+                            plannerVM.userTapped = true
                             plannerVM.selectDate = plannerVM.today
-                            plannerVM.changedDateFromCalendarView = true
                             selection = 1
                         }
                     }
@@ -108,6 +107,7 @@ struct CalendarView: View {
                                 .environmentObject(plannerVM)
                                 .tag(idx)
                                 .onDisappear {
+                                    // MARK: TabView의 애니메이션을 위해 insert, removeLast를 사용
                                     // 전 달로 이동
                                     if selection == 0 {
                                         let lastDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
@@ -126,14 +126,6 @@ struct CalendarView: View {
                                     }
                                     selection = 1
                                 }
-                        }
-                        .onChange(of: plannerVM.selectDate) { newDate in
-                            plannerVM.currentDate = newDate
-                            if !plannerVM.isSameDate(date1: newDate, date2: plannerVM.calendarData[1][15], components: [.year, .month]) {
-                                plannerVM.setCalendarData(date: newDate)
-                            }
-                            selection = 1
-                            plannerVM.changedDateFromCalendarView = true
                         }
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
