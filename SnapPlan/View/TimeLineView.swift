@@ -245,7 +245,7 @@ struct TimeLineView: View {
                                             }
                                             .onChange(of: plannerVM.userTapped) { value in
                                                 if value {
-                                                    DispatchQueue.main.async {
+                                                    withAnimation(.easeInOut(duration: 0.1)) {
                                                         scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
                                                         plannerVM.userTapped = false
                                                     }
