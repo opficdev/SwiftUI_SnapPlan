@@ -33,7 +33,7 @@ final class PlannerViewModel: ObservableObject {
                                 where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) }
                             )!
                             Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 1_000_000) // 0.001초 대기
+                                try? await Task.sleep(nanoseconds: 10_000_000) // 0.01초 대기
                                 self.scrollTaskEnd = true
                             }
                         }
@@ -67,7 +67,7 @@ final class PlannerViewModel: ObservableObject {
                             self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
                         }
                         Task { @MainActor in
-                            try? await Task.sleep(nanoseconds: 1_000_000) // 0.001초 대기
+                            try? await Task.sleep(nanoseconds: 10_000_000) // 0.01초 대기
                             self.scrollTaskEnd = true
                         }
                     }
