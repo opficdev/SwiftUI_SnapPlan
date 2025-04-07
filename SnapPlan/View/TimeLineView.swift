@@ -243,6 +243,14 @@ struct TimeLineView: View {
                                                     uiVM.allDayPadding = timeZoneSize.height * 2
                                                 }
                                             }
+                                            .onChange(of: plannerVM.userTapped) { value in
+                                                if value {
+                                                    DispatchQueue.main.async {
+                                                        scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                        plannerVM.userTapped = false
+                                                    }
+                                                }
+                                            }
                                         }
                                         .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
                                         .scrollDisabled(scheduleVM.schedule != nil)
