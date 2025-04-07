@@ -245,10 +245,8 @@ struct TimeLineView: View {
                                             }
                                             .onChange(of: plannerVM.userTapped) { value in
                                                 if value {
-                                                    withAnimation(.easeInOut(duration: 0.1)) {
-                                                        scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
-                                                        plannerVM.userTapped = false
-                                                    }
+                                                    scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                    plannerVM.userTapped = false
                                                 }
                                             }
                                         }
