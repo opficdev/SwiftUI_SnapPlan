@@ -51,8 +51,8 @@ final class PlannerViewModel: ObservableObject {
                                 self.selection = self.calendarData[1].firstIndex(
                                     where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }
                                 )!
+                                self.monthChange = true
                             }
-                            
                             self.currentDate = self.selectDate
                         }
                     }

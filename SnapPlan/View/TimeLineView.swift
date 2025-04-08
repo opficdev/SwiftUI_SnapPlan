@@ -230,6 +230,12 @@ struct TimeLineView: View {
                                                                     timeZoneSize.width <= frame.midX && frame.midX <= screenWidth {
                                                                     plannerVM.selection = idx
                                                                 }
+                                                                if plannerVM.monthChange && Int(screenWidth) == Int(frame.maxX) {
+                                                                    plannerVM.monthChange = false
+                                                                    DispatchQueue.main.async {
+                                                                        scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     )
