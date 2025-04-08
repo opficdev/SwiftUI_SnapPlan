@@ -65,21 +65,17 @@ final class PlannerViewModel: ObservableObject {
             .sink { [weak self] newValue in
                 guard let self = self else { return }
                 if self.userTapped {
-                    self.currentDate = newValue
-                    if self.calendarData.isEmpty || !self.calendarData[1].contains(newValue) {
+                    if self.calendarData.isEmpty || !self.isSameDate(date1: self.currentDate, date2: newValue, components: [.year, .month]) {
                         self.setCalendarData(date: newValue)
                     }
                     
                     self.scrollTaskEnd = false
-                    self.wasPast = self.calendarData[1][self.selection] < newValue
+                    self.wasPast = self.currentDate < newValue
                     self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
+                    self.currentDate = newValue
                     
-                    if self.selection == 0 {
-                        self.setCalendarData(date: newValue)
-                        self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
-                    }
                     Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: 300_000_000) // 0.3초 대기
+                        try? await Task.sleep(for: .seconds(0.1)) // 0.1초 대기
                         self.scrollTaskEnd = true
                     }
                 }
