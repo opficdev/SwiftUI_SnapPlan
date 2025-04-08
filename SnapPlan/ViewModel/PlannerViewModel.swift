@@ -17,6 +17,7 @@ final class PlannerViewModel: ObservableObject {
     @Published var selection = -1   //  선택된 날짜의 index
     @Published var userTapped = false //  사용자가 스크롤 중인지 여부
     @Published var scrollTaskEnd = false //  코드에서 스크롤이 끝났는지 여부
+    @Published var monthChange = false //  월 변경 여부
     
     init() {
         startTimer()
@@ -38,10 +39,23 @@ final class PlannerViewModel: ObservableObject {
                             }
                         }
                         else {
+                            self.wasPast = self.selectDate < self.calendarData[1][newValue]
                             withAnimation(.easeInOut(duration: 0.2)) {
-                                self.wasPast = self.selectDate < self.calendarData[1][newValue]
                                 self.selectDate = self.calendarData[1][newValue]
                             }
+                            
+                            if !isSameDate(date1: self.selectDate, date2: self.currentDate, components: [.year, .month]) {
+                                self.setCalendarData(date: self.selectDate) //  애니메이션이 필요해서 내부 로직 변경해야할 수도 있음
+                                self.selection = self.calendarData[1].firstIndex(
+                                    where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }
+                                )!
+                                
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 10_000_000) // 0.01초 대기
+                                    self.scrollTaskEnd = true
+                                }
+                            }
+                            
                             self.currentDate = self.selectDate
                         }
                     }
@@ -58,18 +72,18 @@ final class PlannerViewModel: ObservableObject {
                     if self.calendarData.isEmpty || !self.calendarData[1].contains(newValue) {
                         self.setCalendarData(date: newValue)
                     }
-                    withAnimation(.easeInOut(duration: 0.2)) {
+                    
+                    self.scrollTaskEnd = false
+                    self.wasPast = self.calendarData[1][self.selection] < newValue
+                    self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
+                    
+                    if self.selection == 0 {
+                        self.setCalendarData(date: newValue)
                         self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
-                        self.wasPast = self.selectDate < self.calendarData[1][self.selection]
-                        
-                        if self.selection == 0 {
-                            self.setCalendarData(date: newValue)
-                            self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
-                        }
-                        Task { @MainActor in
-                            try? await Task.sleep(nanoseconds: 10_000_000) // 0.01초 대기
-                            self.scrollTaskEnd = true
-                        }
+                    }
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 300_000_000) // 0.3초 대기
+                        self.scrollTaskEnd = true
                     }
                 }
             }

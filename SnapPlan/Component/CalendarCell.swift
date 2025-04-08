@@ -43,8 +43,10 @@ struct CalendarCell: View {
                 .frame(width: screenWidth / 10, height: screenWidth / 10)
         }
         .onTapGesture {
-            plannerVM.userTapped = true
-            plannerVM.selectDate = date
+            withAnimation(.easeInOut(duration: 0.1)) {
+                plannerVM.userTapped = true
+                plannerVM.selectDate = date
+            }
         }
     }
 }
