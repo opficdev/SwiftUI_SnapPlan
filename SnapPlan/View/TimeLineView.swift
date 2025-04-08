@@ -324,7 +324,7 @@ struct TimeLineView: View {
             }
         }
         .onChange(of: plannerVM.selectDate) { date in
-            if !calendarData.contains(where: {plannerVM.isSameDate(date1: $0, date2: date, components: [.year, .month, .day]) }) {
+            if calendarData != plannerVM.calendarData[1] {
                 calendarData = plannerVM.calendarData[1]
             }
             uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
