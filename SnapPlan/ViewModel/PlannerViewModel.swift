@@ -40,20 +40,17 @@ final class PlannerViewModel: ObservableObject {
                         }
                         else {
                             self.wasPast = self.selectDate < self.calendarData[1][newValue]
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(.easeInOut(duration: 0.1)) {
                                 self.selectDate = self.calendarData[1][newValue]
                             }
                             
                             if !isSameDate(date1: self.selectDate, date2: self.currentDate, components: [.year, .month]) {
+                                self.scrollTaskEnd = true
                                 self.setCalendarData(date: self.selectDate) //  애니메이션이 필요해서 내부 로직 변경해야할 수도 있음
+
                                 self.selection = self.calendarData[1].firstIndex(
                                     where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }
                                 )!
-                                
-                                Task { @MainActor in
-                                    try? await Task.sleep(nanoseconds: 10_000_000) // 0.01초 대기
-                                    self.scrollTaskEnd = true
-                                }
                             }
                             
                             self.currentDate = self.selectDate
