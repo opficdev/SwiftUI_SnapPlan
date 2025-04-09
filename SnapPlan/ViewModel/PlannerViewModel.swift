@@ -34,10 +34,6 @@ final class PlannerViewModel: ObservableObject {
                             self.timeLineSelection = self.calendarData[1].firstIndex(
                                 where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) }
                             )!
-                            Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 10_000_000) // 0.01초 대기
-                                self.scrollTaskEnd = true
-                            }
                         }
                         else {
                             self.wasPast = self.selectDate < self.calendarData[1][newValue]
@@ -70,16 +66,9 @@ final class PlannerViewModel: ObservableObject {
                     if self.calendarData.isEmpty || !self.isSameDate(date1: self.currentDate, date2: newValue, components: [.year, .month]) {
                         self.setCalendarData(date: newValue)
                     }
-                    
-                    self.scrollTaskEnd = false
                     self.wasPast = self.currentDate < newValue
                     self.timeLineSelection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
                     self.currentDate = newValue
-                    
-                    Task { @MainActor in
-                        try? await Task.sleep(for: .seconds(0.1)) // 0.1초 대기
-                        self.scrollTaskEnd = true
-                    }
                 }
             }
             .store(in: &cancellables)
