@@ -15,7 +15,6 @@ struct CalendarView: View {
     @Binding var showScheduleView: Bool
     @Binding var showSettingView: Bool
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
-    @State private var selection = 1  //  선택된 달력의 tag
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -82,7 +81,7 @@ struct CalendarView: View {
                             withAnimation(.easeInOut(duration: 0.1)) {
                                 plannerVM.userTapped = true
                                 plannerVM.selectDate = plannerVM.today
-                                selection = 1
+                                plannerVM.calendarSelection = 1
                             }
                         }
                     }
@@ -102,7 +101,7 @@ struct CalendarView: View {
                     }
                     .padding(.vertical, 8)
                     
-                    TabView(selection: $selection) {
+                    TabView(selection: $plannerVM.calendarSelection) {
                         let calendarData = plannerVM.calendarData
                         ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, month in
                             CalendarGrid(monthData: month)
@@ -111,7 +110,7 @@ struct CalendarView: View {
                                 .onDisappear {
                                     // MARK: TabView의 애니메이션을 위해 insert, removeLast를 사용
                                     // 전 달로 이동
-                                    if selection == 0 {
+                                    if plannerVM.calendarSelection == 0 {
                                         let lastDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
                                         let lastMonth = plannerVM.calendarDates(date: lastDate)
                                         plannerVM.calendarData.insert(lastMonth, at: 0)
@@ -119,14 +118,14 @@ struct CalendarView: View {
                                         plannerVM.currentDate = plannerVM.date(byAdding: .month, value: -1, to: plannerVM.currentDate)!
                                     }
                                     // 다음 달로 이동
-                                    else if selection == 2 {
+                                    else if plannerVM.calendarSelection == 2 {
                                         let nextDate = plannerVM.date(byAdding: .month, value: 2, to: plannerVM.currentDate)!
                                         let nextMonth = plannerVM.calendarDates(date: nextDate)
                                         plannerVM.calendarData.append(nextMonth)
                                         plannerVM.calendarData.removeFirst()
                                         plannerVM.currentDate = plannerVM.date(byAdding: .month, value: 1, to: plannerVM.currentDate)!
                                     }
-                                    selection = 1
+                                    plannerVM.calendarSelection = 1
                                 }
                         }
                     }
@@ -134,7 +133,7 @@ struct CalendarView: View {
                     .frame(height: screenWidth * 0.6)
                     .onAppear {
                         DispatchQueue.main.async {
-                            selection = 1
+                            plannerVM.calendarSelection = 1
                         }
                     }
                 }
