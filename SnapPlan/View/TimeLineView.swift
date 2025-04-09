@@ -248,14 +248,14 @@ struct TimeLineView: View {
                                             .onAppear {
                                                 calendarData = plannerVM.calendarData[1]
                                                 DispatchQueue.main.async {
-                                                    scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                    scrollProxy.scrollTo(plannerVM.timeLineSelection, anchor: .top)
                                                     uiVM.allDayPadding = timeZoneSize.height * 2
                                                 }
                                             }
                                             .onChange(of: plannerVM.userTapped) { value in
                                                 if value {
                                                     withAnimation(.easeInOut(duration: 0.2)) {
-                                                        scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                        scrollProxy.scrollTo(plannerVM.timeLineSelection, anchor: .top)
                                                     }
                                                     plannerVM.userTapped = false
                                                 }
