@@ -19,6 +19,7 @@ final class PlannerViewModel: ObservableObject {
     @Published var userTapped = false //  사용자가 스크롤 중인지 여부
     @Published var dragByUser = false //  코드에서 스크롤이 끝났는지 여부
     @Published var monthChange = false //  월 변경 여부
+    private var disableRecursion = false //  재귀 호출 방지
     
     init() {
         startTimer()
@@ -35,7 +36,7 @@ final class PlannerViewModel: ObservableObject {
                                 where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) }
                             )!
                         }
-                        else {
+                        else if !disableRecursion {
                             self.wasPast = self.selectDate < self.calendarData[1][newValue]
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 self.selectDate = self.calendarData[1][newValue]
@@ -51,7 +52,11 @@ final class PlannerViewModel: ObservableObject {
                                 )!
                                 self.monthChange = true
                             }
+                            
                             self.currentDate = self.selectDate
+                        }
+                        else {
+                            disableRecursion = false
                         }
                     }
                 }
