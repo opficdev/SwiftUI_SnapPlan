@@ -226,14 +226,17 @@ struct TimeLineView: View {
                                                             //  오직 감시용으로만 사용할 것
                                                             //  단, 감시를 해도 코드 내부 모든 오토 스크롤 이벤트 종료 후 관찰을 지속할 것
                                                             Color.clear.onChange(of: geometryProxy.frame(in: .global)) { frame in
-                                                                if plannerVM.scrollTaskEnd && plannerVM.selection != idx &&
+                                                                if plannerVM.dragByUser && plannerVM.timeLineSelection != idx &&
                                                                     timeZoneSize.width <= frame.midX && frame.midX <= screenWidth {
-                                                                    plannerVM.selection = idx
+                                                                    plannerVM.timeLineSelection = idx
                                                                 }
-                                                                if plannerVM.monthChange && Int(screenWidth) == Int(frame.maxX) {
-                                                                    plannerVM.monthChange = false
-                                                                    DispatchQueue.main.async {
-                                                                        scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                                if Int(screenWidth) == Int(frame.maxX) {
+                                                                    plannerVM.dragByUser = false
+                                                                    if plannerVM.monthChange {
+                                                                        plannerVM.monthChange = false
+                                                                        DispatchQueue.main.async {
+                                                                            scrollProxy.scrollTo(plannerVM.timeLineSelection, anchor: .top)
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -265,7 +268,7 @@ struct TimeLineView: View {
                                             view.isPagingEnabled = true
                                         }
                                     }
-//                                    .simultaneousGesture(
+                                    .simultaneousGesture(
 //                                        MagnificationGesture()    //  줌 효과 -> 수정 필요
 //                                            .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
 //                                                gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
@@ -273,7 +276,11 @@ struct TimeLineView: View {
 //                                            .onEnded { _ in
 //                                                lastGap = max(gap, screenWidth / 24)
 //                                            }
-//                                    )
+                                        DragGesture()
+                                            .onChanged { _ in
+                                                plannerVM.dragByUser = true
+                                            }
+                                    )
                                 }
                             }
                         }
