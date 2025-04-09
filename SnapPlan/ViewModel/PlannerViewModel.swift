@@ -24,14 +24,14 @@ final class PlannerViewModel: ObservableObject {
         startTimer()
         setCalendarData(date: today)
         
-        $selection
+        $timeLineSelection
             .removeDuplicates()
             .sink { [weak self] newValue in
                 guard let self = self else { return }
                 if !self.userTapped {
                     if 1 < self.calendarData.count, newValue < self.calendarData[1].count {
                         if newValue == -1 { //  초기화
-                            self.selection = self.calendarData[1].firstIndex(
+                            self.timeLineSelection = self.calendarData[1].firstIndex(
                                 where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) }
                             )!
                             Task { @MainActor in
@@ -49,7 +49,8 @@ final class PlannerViewModel: ObservableObject {
                                 self.scrollTaskEnd = true
                                 self.setCalendarData(date: self.selectDate) //  애니메이션이 필요해서 내부 로직 변경해야할 수도 있음
 
-                                self.selection = self.calendarData[1].firstIndex(
+                                disableRecursion = true    //  MARK: 아래의 self.timeLineSelection의 변경하는 코드에 의해 해당 코드가 재귀적으로 호출되는 것을 방지
+                                self.timeLineSelection = self.calendarData[1].firstIndex(
                                     where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }
                                 )!
                                 self.monthChange = true
@@ -72,7 +73,7 @@ final class PlannerViewModel: ObservableObject {
                     
                     self.scrollTaskEnd = false
                     self.wasPast = self.currentDate < newValue
-                    self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
+                    self.timeLineSelection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
                     self.currentDate = newValue
                     
                     Task { @MainActor in
