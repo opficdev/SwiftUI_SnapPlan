@@ -111,9 +111,9 @@ struct CalendarView: View {
                                     // MARK: TabView의 애니메이션을 위해 insert, removeLast를 사용
                                     // 전 달로 이동
                                     if plannerVM.calendarSelection == 0 {
-                                        let lastDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
-                                        let lastMonth = plannerVM.calendarDates(date: lastDate)
-                                        plannerVM.calendarData.insert(lastMonth, at: 0)
+                                        let prevDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
+                                        let prevMonth = plannerVM.calendarDates(date: prevDate)
+                                        plannerVM.calendarData.insert(prevMonth, at: 0)
                                         plannerVM.calendarData.removeLast()
                                         plannerVM.currentDate = plannerVM.date(byAdding: .month, value: -1, to: plannerVM.currentDate)!
                                     }
