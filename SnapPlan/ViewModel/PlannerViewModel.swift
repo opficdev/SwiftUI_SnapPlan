@@ -38,7 +38,7 @@ final class PlannerViewModel: ObservableObject {
                         }
                         else if !disableRecursion {
                             self.wasPast = self.selectDate < self.calendarData[1][newValue]
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(.easeInOut(duration: 0.2)) {  //  CalendarBox의 transition을 위한 withAnimation
                                 self.selectDate = self.calendarData[1][newValue]
                             }
                             
