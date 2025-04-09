@@ -40,7 +40,7 @@ final class PlannerViewModel: ObservableObject {
                         }
                         else {
                             self.wasPast = self.selectDate < self.calendarData[1][newValue]
-                            withAnimation(.easeInOut(duration: 0.1)) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
                                 self.selectDate = self.calendarData[1][newValue]
                             }
                             
