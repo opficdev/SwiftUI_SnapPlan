@@ -263,10 +263,7 @@ struct TimeLineView: View {
                                         }
                                         .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
                                         .scrollDisabled(scheduleVM.schedule != nil)
-                                        .introspect(.scrollView, on: .iOS(.v16, .v17, .v18)) { view in
-                                            //  MARK: 페이징은 ScrollView와 내부 뷰 너비가 정수형일 때 오류없이 작동함
-                                            view.isPagingEnabled = true
-                                        }
+                                        .pagingEnabled()
                                     }
                                     .simultaneousGesture(
 //                                        MagnificationGesture()    //  줌 효과 -> 수정 필요
