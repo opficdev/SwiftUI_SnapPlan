@@ -15,6 +15,7 @@ struct CalendarView: View {
     @Binding var showScheduleView: Bool
     @Binding var showSettingView: Bool
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
+    @State private var dragByUser = false
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -101,41 +102,56 @@ struct CalendarView: View {
                     }
                     .padding(.vertical, 8)
                     
-                    TabView(selection: $plannerVM.calendarSelection) {
-                        let calendarData = plannerVM.calendarData
-                        ForEach(Array(zip(calendarData.indices, calendarData)), id: \.1) { idx, month in
-                            CalendarGrid(monthData: month)
-                                .environmentObject(plannerVM)
-                                .tag(idx)
-                                .onDisappear {
-                                    // MARK: TabView의 애니메이션을 위해 insert, removeLast를 사용
-                                    // 전 달로 이동
-                                    if plannerVM.calendarSelection == 0 {
-                                        let prevDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
-                                        let prevMonth = plannerVM.calendarDates(date: prevDate)
-                                        plannerVM.calendarData.insert(prevMonth, at: 0)
-                                        plannerVM.calendarData.removeLast()
-                                        plannerVM.currentDate = plannerVM.date(byAdding: .month, value: -1, to: plannerVM.currentDate)!
-                                    }
-                                    // 다음 달로 이동
-                                    else if plannerVM.calendarSelection == 2 {
-                                        let nextDate = plannerVM.date(byAdding: .month, value: 2, to: plannerVM.currentDate)!
-                                        let nextMonth = plannerVM.calendarDates(date: nextDate)
-                                        plannerVM.calendarData.append(nextMonth)
-                                        plannerVM.calendarData.removeFirst()
-                                        plannerVM.currentDate = plannerVM.date(byAdding: .month, value: 1, to: plannerVM.currentDate)!
-                                    }
-                                    plannerVM.calendarSelection = 1
+                    ScrollViewReader { scrollProxy in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 0) {
+                                ForEach(Array(zip(plannerVM.calendarData.indices, plannerVM.calendarData)), id: \.1) { idx, month in
+                                    CalendarGrid(monthData: month)
+                                        .environmentObject(plannerVM)
+                                        .id(idx)
+                                        .background(
+                                            GeometryReader { proxy in
+                                                Color.clear.onChange(of: proxy.frame(in: .global)) { frame in
+                                                    if dragByUser && Int(frame.minX) == 0 {
+                                                        dragByUser = false
+                                                        if idx == 0 {
+                                                            let prevDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
+                                                            let prevMonth = plannerVM.calendarDates(date: prevDate)
+                                                            plannerVM.calendarData.insert(prevMonth, at: 0)
+                                                            plannerVM.calendarData.removeLast()
+                                                            plannerVM.currentDate = plannerVM.date(byAdding: .month, value: -1, to: plannerVM.currentDate)!
+                                                        }
+                                                        else if idx == 2 {
+                                                            let nextDate = plannerVM.date(byAdding: .month, value: 2, to: plannerVM.currentDate)!
+                                                            let nextMonth = plannerVM.calendarDates(date: nextDate)
+                                                            plannerVM.calendarData.append(nextMonth)
+                                                            plannerVM.calendarData.removeFirst()
+                                                            plannerVM.currentDate = plannerVM.date(byAdding: .month, value: 1, to: plannerVM.currentDate)!
+                                                        }
+                                                        scrollProxy.scrollTo(1, anchor: .center)
+                                                    }
+                                                }
+                                            }
+                                        )
                                 }
+                                .frame(width: CGFloat(Int(screenWidth)), height: screenWidth * 0.6)
+                                .onAppear {
+                                    DispatchQueue.main.async {
+                                        plannerVM.calendarSelection = 1
+                                        scrollProxy.scrollTo(1, anchor: .center)
+                                    }
+                                }
+                            }
                         }
+                        .frame(width: CGFloat(Int(screenWidth)), height: screenWidth * 0.6)
+                        .pagingEnabled()
                     }
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                    .frame(height: screenWidth * 0.6)
-                    .onAppear {
-                        DispatchQueue.main.async {
-                            plannerVM.calendarSelection = 1
-                        }
-                    }
+                    .simultaneousGesture(
+                        DragGesture()
+                            .onChanged { _ in
+                                dragByUser = true
+                            }
+                    )
                 }
             }
         }
