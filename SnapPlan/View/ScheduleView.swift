@@ -245,7 +245,7 @@ struct ScheduleView: View {
                                 VStack(alignment:. leading, spacing: 20) {
                                     HStack {
                                         Group {
-                                            Image(systemName: "microphone.fill")
+                                            Image(systemName: "mic.fill")
                                                 .frame(width: 25)
                                             Text("음성 메모")
                                                 .underline(scheduleVM.voiceMemo != nil)
