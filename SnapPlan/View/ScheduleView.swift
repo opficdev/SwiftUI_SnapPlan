@@ -21,8 +21,6 @@ struct ScheduleView: View {
     @StateObject var searchVM = SearchLocationViewModel()
     
     @State private var startTask = false     //  스케줄 CRUD 작업 시작여부
-    @State private var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]
-    @State private var selectedDetent: PresentationDetent = .fraction(0.07)
     @State private var tapStartTime = false //  시작 시간 탭 여부
     @State private var tapStartDate = false //  시작 날짜 탭 여부
     @State private var tapEndTime = false   //  종료 시간 탭 여부
@@ -456,7 +454,7 @@ struct ScheduleView: View {
                         Spacer()
                         Button(action: {
                             titleFocus = true
-                            selectedDetent = .large
+                            uiVM.selectedDetent = .large
                             var startDate = Calendar.current.date(
                                 byAdding: .minute,
                                 value: 5 - Calendar.current.component(.minute, from: Date()) % 5,
@@ -475,35 +473,34 @@ struct ScheduleView: View {
                 }
             }
             .padding()
-            .presentationDetents(currentDetent, selection: $selectedDetent)
             .onChange(of: scheduleVM.schedule) { schedule in
                 startTask = schedule != nil
             }
             .onChange(of: startTask) { value in
                 if value {
-                    currentDetent = currentDetent.union([.large, .fraction(0.4)])
-                    if selectedDetent == .fraction(0.07) {
-                        selectedDetent = .fraction(0.4)
+                    uiVM.currentDetent = uiVM.currentDetent.union([.large, .fraction(0.4)])
+                    if uiVM.selectedDetent == .fraction(0.07) {
+                        uiVM.selectedDetent = .fraction(0.4)
                     }
                     DispatchQueue.main.async {
-                        currentDetent = currentDetent.subtracting([.fraction(0.07)])
+                        uiVM.currentDetent = uiVM.currentDetent.subtracting([.fraction(0.07)])
                     }
                 }
                 else {
                     titleFocus = false
                     descriptionFocus = false
-                    currentDetent = currentDetent.union([.fraction(0.07)])
-                    selectedDetent = .fraction(0.07)
+                    uiVM.currentDetent = uiVM.currentDetent.union([.fraction(0.07)])
+                    uiVM.selectedDetent = .fraction(0.07)
                     didChangedStartDate = false
                     DispatchQueue.main.async {
-                        currentDetent = currentDetent.subtracting([.large, .fraction(0.4)])
+                        uiVM.currentDetent = uiVM.currentDetent.subtracting([.large, .fraction(0.4)])
                     }
                 }
             }
             .background(
                 GeometryReader { proxy in
                     Color.clear.onChange(of: proxy.size.height) { height in
-                        if selectedDetent != .large {
+                        if uiVM.selectedDetent != .large {
                             DispatchQueue.main.async {
                                 uiVM.sheetPadding = height
                             }
@@ -529,14 +526,14 @@ struct ScheduleView: View {
             }
         }
         .onAppear {
-            currentDetent = currentDetent.union([.large])
-            selectedDetent = .large
+            uiVM.currentDetent = uiVM.currentDetent.union([.large])
+            uiVM.selectedDetent = .large
             DispatchQueue.main.async {
-                currentDetent = currentDetent.subtracting([.fraction(0.4)])
+                uiVM.currentDetent = uiVM.currentDetent.subtracting([.fraction(0.4)])
             }
         }
         .onDisappear {
-            currentDetent = currentDetent.union([.fraction(0.4)])
+            uiVM.currentDetent = uiVM.currentDetent.union([.fraction(0.4)])
         }
     }
 }

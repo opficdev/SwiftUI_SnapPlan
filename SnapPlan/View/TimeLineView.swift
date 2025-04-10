@@ -435,6 +435,7 @@ struct TimeLineView: View {
                 .environmentObject(firebaseVM)
                 .environmentObject(uiVM)
                 .environmentObject(scheduleVM)
+                .presentationDetents(uiVM.currentDetent, selection: $uiVM.selectedDetent)
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled(true)   //  사용자가 임의로 sheet를 완전히 내리는 것을 방지
                 .introspect(.sheet, on: .iOS(.v16, .v17, .v18)) { controller in //  sheet가 올라와있어도 하위 뷰에 터치가 가능하도록 해줌
