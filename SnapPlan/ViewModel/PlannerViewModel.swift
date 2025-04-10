@@ -43,19 +43,8 @@ final class PlannerViewModel: ObservableObject {
                             }
                             
                             if !self.isSameDate(date1: self.selectDate, date2: self.currentDate, components: [.year, .month]) {
-                                self.setCalendarData(date: self.selectDate)
-                                
-                                if self.selectDate < self.currentDate {
-                                    //  저번달로 이동
-                                    self.calendarSelection = 2
-                                }
-                                else {
-                                    //  다음달로 이동
-                                    self.calendarSelection = 0
-                                }
-                               
                                 withAnimation {
-                                    self.calendarSelection = 1
+                                    self.setCalendarData(date: self.selectDate)
                                 }
 
                                 disableRecursion = true    //  MARK: 아래의 self.timeLineSelection의 변경하는 코드에 의해 해당 코드가 재귀적으로 호출되는 것을 방지
