@@ -82,7 +82,6 @@ struct CalendarView: View {
                             withAnimation(.easeInOut(duration: 0.1)) {
                                 plannerVM.userTapped = true
                                 plannerVM.selectDate = plannerVM.today
-                                plannerVM.calendarSelection = 1
                             }
                         }
                     }
@@ -133,7 +132,6 @@ struct CalendarView: View {
                                 .frame(width: CGFloat(Int(screenWidth)), height: screenWidth * 0.6)
                                 .onAppear {
                                     DispatchQueue.main.async {
-                                        plannerVM.calendarSelection = 1
                                         scrollProxy.scrollTo(1, anchor: .center)
                                     }
                                 }
