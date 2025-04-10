@@ -115,18 +115,14 @@ struct CalendarView: View {
                                                     if dragByUser && Int(frame.minX) == 0 {
                                                         dragByUser = false
                                                         if idx == 0 {
-                                                            let prevDate = plannerVM.date(byAdding: .month, value: -2, to: plannerVM.currentDate)!
-                                                            let prevMonth = plannerVM.calendarDates(date: prevDate)
-                                                            plannerVM.calendarData.insert(prevMonth, at: 0)
-                                                            plannerVM.calendarData.removeLast()
-                                                            plannerVM.currentDate = plannerVM.date(byAdding: .month, value: -1, to: plannerVM.currentDate)!
+                                                            let prevDate = plannerVM.date(byAdding: .month, value: -1, to: plannerVM.currentDate)!
+                                                            plannerVM.setCalendarData(date: prevDate)
+                                                            plannerVM.currentDate = prevDate
                                                         }
                                                         else if idx == 2 {
-                                                            let nextDate = plannerVM.date(byAdding: .month, value: 2, to: plannerVM.currentDate)!
-                                                            let nextMonth = plannerVM.calendarDates(date: nextDate)
-                                                            plannerVM.calendarData.append(nextMonth)
-                                                            plannerVM.calendarData.removeFirst()
-                                                            plannerVM.currentDate = plannerVM.date(byAdding: .month, value: 1, to: plannerVM.currentDate)!
+                                                            let nextDate = plannerVM.date(byAdding: .month, value: 1, to: plannerVM.currentDate)!
+                                                            plannerVM.setCalendarData(date: nextDate)
+                                                            plannerVM.currentDate = nextDate
                                                         }
                                                         scrollProxy.scrollTo(1, anchor: .center)
                                                     }
