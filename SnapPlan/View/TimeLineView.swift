@@ -17,6 +17,7 @@ struct TimeLineView: View {
     @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
     @State private var calendarData = [Date]()
+    @State private var dragByUser = false
     @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
     @State private var lastGap = UIScreen.main.bounds.width / 24
     let screenWidth = UIScreen.main.bounds.width
@@ -226,12 +227,12 @@ struct TimeLineView: View {
                                                             //  오직 감시용으로만 사용할 것
                                                             //  단, 감시를 해도 코드 내부 모든 오토 스크롤 이벤트 종료 후 관찰을 지속할 것
                                                             Color.clear.onChange(of: geometryProxy.frame(in: .global)) { frame in
-                                                                if plannerVM.dragByUser && plannerVM.selection != idx &&
+                                                                if dragByUser && plannerVM.selection != idx &&
                                                                     timeZoneSize.width <= frame.midX && frame.midX <= screenWidth {
                                                                     plannerVM.selection = idx
                                                                 }
                                                                 if Int(screenWidth) == Int(frame.maxX) {
-                                                                    plannerVM.dragByUser = false
+                                                                    dragByUser = false
                                                                     if plannerVM.monthChange {
                                                                         plannerVM.monthChange = false
                                                                         DispatchQueue.main.async {
@@ -275,7 +276,7 @@ struct TimeLineView: View {
 //                                            }
                                         DragGesture()
                                             .onChanged { _ in
-                                                plannerVM.dragByUser = true
+                                                dragByUser = true
                                             }
                                     )
                                 }

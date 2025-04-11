@@ -16,7 +16,6 @@ final class PlannerViewModel: ObservableObject {
     @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     @Published var selection = -1   //  TimeLineView의 selection
     @Published var userTapped = false //  사용자가 스크롤 중인지 여부
-    @Published var dragByUser = false //  코드에서 스크롤이 끝났는지 여부
     @Published var monthChange = false //  월 변경 여부
     private var disableRecursion = false //  재귀 호출 방지
     
