@@ -46,7 +46,7 @@ final class PlannerViewModel: ObservableObject {
                                     self.setCalendarData(date: self.selectDate)
                                 }
                     
-                                self.disableRecursion = true    //  MARK: 아래의 self.selection의 변경하는 코드에 의해 해당 코드가 재귀적으로 호출되는 것을 방지
+                                disableRecursion = true    //  MARK: 아래의 self.selection의 변경하는 코드에 의해 해당 코드가 재귀적으로 호출되는 것을 방지
                                 self.selection = self.calendarData[1].firstIndex(
                                     where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }
                                 )!
