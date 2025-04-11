@@ -15,9 +15,9 @@ final class PlannerViewModel: ObservableObject {
     @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 형태
     @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
     @Published var selection = -1   //  TimeLineView의 selection
+    @Published var newSelection = -1    //  CalendarData가 변경되었을 때의 TimeLineView에서 스크롤해줄 index
     @Published var userTapped = false //  사용자가 스크롤 중인지 여부
     @Published var monthChange = false //  월 변경 여부
-    private var disableRecursion = false //  재귀 호출 방지
     
     init() {
         startTimer()
@@ -34,9 +34,9 @@ final class PlannerViewModel: ObservableObject {
                                 where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) }
                             )!
                         }
-                        else if !disableRecursion {
+                        else {
                             self.wasPast = self.selectDate < self.calendarData[1][newValue]
-                            withAnimation(.easeInOut(duration: 0.2)) {  //  CalendarBox의 transition을 위한 withAnimation
+                            withAnimation {  //  CalendarBox의 transition을 위한 withAnimation
                                 self.selectDate = self.calendarData[1][newValue]
                             }
                             
@@ -44,18 +44,14 @@ final class PlannerViewModel: ObservableObject {
                                 withAnimation {
                                     self.setCalendarData(date: self.selectDate)
                                 }
-                    
-                                disableRecursion = true    //  MARK: 아래의 self.selection의 변경하는 코드에 의해 해당 코드가 재귀적으로 호출되는 것을 방지
-                                self.selection = self.calendarData[1].firstIndex(
+
+                                self.newSelection = self.calendarData[1].firstIndex(
                                     where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }
                                 )!
                                 self.monthChange = true
                             }
                             
                             self.currentDate = self.selectDate
-                        }
-                        else {
-                            disableRecursion = false
                         }
                     }
                 }

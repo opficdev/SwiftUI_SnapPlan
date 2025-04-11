@@ -236,7 +236,7 @@ struct TimeLineView: View {
                                                                     if plannerVM.monthChange {
                                                                         plannerVM.monthChange = false
                                                                         DispatchQueue.main.async {
-                                                                            scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                                            scrollProxy.scrollTo(plannerVM.newSelection, anchor: .top)
                                                                         }
                                                                     }
                                                                 }
