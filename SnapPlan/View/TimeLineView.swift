@@ -226,16 +226,16 @@ struct TimeLineView: View {
                                                             //  오직 감시용으로만 사용할 것
                                                             //  단, 감시를 해도 코드 내부 모든 오토 스크롤 이벤트 종료 후 관찰을 지속할 것
                                                             Color.clear.onChange(of: geometryProxy.frame(in: .global)) { frame in
-                                                                if plannerVM.dragByUser && plannerVM.timeLineSelection != idx &&
+                                                                if plannerVM.dragByUser && plannerVM.selection != idx &&
                                                                     timeZoneSize.width <= frame.midX && frame.midX <= screenWidth {
-                                                                    plannerVM.timeLineSelection = idx
+                                                                    plannerVM.selection = idx
                                                                 }
                                                                 if Int(screenWidth) == Int(frame.maxX) {
                                                                     plannerVM.dragByUser = false
                                                                     if plannerVM.monthChange {
                                                                         plannerVM.monthChange = false
                                                                         DispatchQueue.main.async {
-                                                                            scrollProxy.scrollTo(plannerVM.timeLineSelection, anchor: .top)
+                                                                            scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
                                                                         }
                                                                     }
                                                                 }
@@ -248,14 +248,14 @@ struct TimeLineView: View {
                                             .onAppear {
                                                 calendarData = plannerVM.calendarData[1]
                                                 DispatchQueue.main.async {
-                                                    scrollProxy.scrollTo(plannerVM.timeLineSelection, anchor: .top)
+                                                    scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
                                                     uiVM.allDayPadding = timeZoneSize.height * 2
                                                 }
                                             }
                                             .onChange(of: plannerVM.userTapped) { value in
                                                 if value {
                                                     withAnimation(.easeInOut(duration: 0.2)) {
-                                                        scrollProxy.scrollTo(plannerVM.timeLineSelection, anchor: .top)
+                                                        scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
                                                     }
                                                     plannerVM.userTapped = false
                                                 }

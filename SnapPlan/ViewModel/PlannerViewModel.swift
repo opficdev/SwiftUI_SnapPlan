@@ -14,7 +14,7 @@ final class PlannerViewModel: ObservableObject {
     @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
     @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 형태
     @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
-    @Published var timeLineSelection = -1   //  TimeLineView의 selection
+    @Published var selection = -1   //  TimeLineView의 selection
     @Published var userTapped = false //  사용자가 스크롤 중인지 여부
     @Published var dragByUser = false //  코드에서 스크롤이 끝났는지 여부
     @Published var monthChange = false //  월 변경 여부
@@ -24,14 +24,14 @@ final class PlannerViewModel: ObservableObject {
         startTimer()
         setCalendarData(date: today)
         
-        $timeLineSelection
+        $selection
             .removeDuplicates()
             .sink { [weak self] newValue in
                 guard let self = self else { return }
                 if !self.userTapped {
                     if 1 < self.calendarData.count, newValue < self.calendarData[1].count {
                         if newValue == -1 { //  초기화
-                            self.timeLineSelection = self.calendarData[1].firstIndex(
+                            self.selection = self.calendarData[1].firstIndex(
                                 where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) }
                             )!
                         }
@@ -45,9 +45,9 @@ final class PlannerViewModel: ObservableObject {
                                 withAnimation {
                                     self.setCalendarData(date: self.selectDate)
                                 }
-
-                                disableRecursion = true    //  MARK: 아래의 self.timeLineSelection의 변경하는 코드에 의해 해당 코드가 재귀적으로 호출되는 것을 방지
-                                self.timeLineSelection = self.calendarData[1].firstIndex(
+                    
+                                self.disableRecursion = true    //  MARK: 아래의 self.selection의 변경하는 코드에 의해 해당 코드가 재귀적으로 호출되는 것을 방지
+                                self.selection = self.calendarData[1].firstIndex(
                                     where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }
                                 )!
                                 self.monthChange = true
@@ -72,7 +72,7 @@ final class PlannerViewModel: ObservableObject {
                         self.setCalendarData(date: newValue)
                     }
                     self.wasPast = self.currentDate < newValue
-                    self.timeLineSelection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
+                    self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
                     self.currentDate = newValue
                 }
             }
