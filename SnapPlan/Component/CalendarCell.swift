@@ -26,7 +26,7 @@ struct CalendarCell: View {
                     )
                     .frame(width: screenWidth / 10, height: screenWidth / 10)
                     .transition(.asymmetric(
-                        insertion: .move(edge: plannerVM.wasPast ? .leading : .trailing).combined(with: .opacity),
+                        insertion: .move(edge: plannerVM.wasPast ? .leading : .trailing),
                         removal: .identity
                     ))
             }
