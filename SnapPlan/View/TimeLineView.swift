@@ -338,7 +338,6 @@ struct TimeLineView: View {
         }
         .onChange(of: calendarData) { month in
             Task {
-                firebaseVM.schedules.removeAll()
                 // MARK: 일정 우선
                 try await firebaseVM.fetchSchedule(from: month.first!, to: month.last!)
                 
