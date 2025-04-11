@@ -18,6 +18,15 @@ final class PlannerViewModel: ObservableObject {
     @Published var newSelection = -1    //  CalendarData가 변경되었을 때의 TimeLineView에서 스크롤해줄 index
     @Published var userTapped = false //  사용자가 스크롤 중인지 여부
     @Published var monthChange = false //  월 변경 여부
+    private var cancellables = Set<AnyCancellable>()
+    private var calendar: Calendar {
+        var calendar = Calendar.current
+        calendar.locale = Locale(identifier: "ko_KR")
+        return calendar
+    }
+    var daysOfWeek: [String] {
+        return calendar.shortWeekdaySymbols
+    }
     
     init() {
         startTimer()
@@ -72,16 +81,6 @@ final class PlannerViewModel: ObservableObject {
                 }
             }
             .store(in: &cancellables)
-    }
-    
-    private var cancellables = Set<AnyCancellable>()
-    private var calendar: Calendar {
-        var calendar = Calendar.current
-        calendar.locale = Locale(identifier: "ko_KR")
-        return calendar
-    }
-    var daysOfWeek: [String] {
-        return calendar.shortWeekdaySymbols
     }
 
     private func startTimer() {
