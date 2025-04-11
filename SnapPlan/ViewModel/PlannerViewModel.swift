@@ -44,6 +44,10 @@ final class PlannerViewModel: ObservableObject {
                             )!
                         }
                         else {
+                            if !self.calendarData[1].contains(
+                                where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }) {
+                                self.setCalendarData(date: self.selectDate)
+                            }
                             self.wasPast = self.selectDate < self.calendarData[1][newValue]
                             withAnimation(.easeInOut(duration: 0.15)) {  //  CalendarBox의 transition을 위한 withAnimation
                                 self.selectDate = self.calendarData[1][newValue]
