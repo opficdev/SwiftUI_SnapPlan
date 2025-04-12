@@ -10,12 +10,11 @@ import Combine
 
 final class PlannerViewModel: ObservableObject {
     @Published var today = Date()
-    @Published var selectDate = Date() //  캘린더에서 선택된 날짜
-    @Published var currentDate = Date() // 캘린더에서 보여주는 년도와 월
+    @Published var selectDate: Date //  캘린더에서 선택된 날짜
+    @Published var currentDate: Date // 캘린더에서 보여주는 년도와 월
     @Published var calendarData = [[Date]]() // 캘린더에 표시할 날짜들 [[저번달], [이번달], [다음달]] 형태
     @Published var wasPast = false  //  새로운 selectDate가 기존 selectDate 이전인지 여부
-    @Published var selection = -1   //  TimeLineView의 selection
-    @Published var newSelection = -1    //  CalendarData가 변경되었을 때의 TimeLineView에서 스크롤해줄 index
+    @Published var newSelectDate = Date()  //  CalendarData가 변경되었을 때의 TimeLineView에서 스크롤해줄 날짜
     @Published var userTapped = false //  사용자가 스크롤 중인지 여부
     @Published var monthChange = false //  월 변경 여부
     private var cancellables = Set<AnyCancellable>()
@@ -29,60 +28,20 @@ final class PlannerViewModel: ObservableObject {
     }
     
     init() {
+        self.selectDate = Calendar.current.startOfDay(for: Date())
+        self.currentDate = Calendar.current.startOfDay(for: Date())
         startTimer()
         setCalendarData(date: today)
-        
-        $selection
-            .removeDuplicates()
-            .sink { [weak self] newValue in
-                guard let self = self else { return }
-                if !self.userTapped {
-                    if 1 < self.calendarData.count, newValue < self.calendarData[1].count {
-                        if newValue == -1 { //  초기화
-                            self.selection = self.calendarData[1].firstIndex(
-                                where: { self.isSameDate(date1: $0, date2: self.today, components: [.year, .month, .day]) }
-                            )!
-                        }
-                        else {
-                            if !self.calendarData[1].contains(
-                                where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }) {
-                                self.setCalendarData(date: self.selectDate)
-                            }
-                            self.wasPast = self.selectDate < self.calendarData[1][newValue]
-                            withAnimation(.easeInOut(duration: 0.15)) {  //  CalendarBox의 transition을 위한 withAnimation
-                                self.selectDate = self.calendarData[1][newValue]
-                            }
-                            
-                            if !self.isSameDate(date1: self.selectDate, date2: self.currentDate, components: [.year, .month]) {
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    self.setCalendarData(date: self.selectDate)
-                                }
-
-                                self.newSelection = self.calendarData[1].firstIndex(
-                                    where: { self.isSameDate(date1: $0, date2: self.selectDate, components: [.year, .month, .day]) }
-                                )!
-                                self.monthChange = true
-                            }
-                            
-                            self.currentDate = self.selectDate
-                        }
-                    }
-                }
-            }
-            .store(in: &cancellables)
         
         $selectDate
             .removeDuplicates()
             .sink { [weak self] newValue in
                 guard let self = self else { return }
-                if self.userTapped {
-                    if self.calendarData.isEmpty || !self.isSameDate(date1: self.currentDate, date2: newValue, components: [.year, .month]) {
-                        self.setCalendarData(date: newValue)
-                    }
-                    self.wasPast = self.currentDate < newValue
-                    self.selection = self.calendarData[1].firstIndex(where: { self.isSameDate(date1: $0, date2: newValue, components: [.year, .month, .day]) })!
-                    self.currentDate = newValue
+                if self.calendarData.isEmpty || !self.isSameDate(date1: self.currentDate, date2: newValue, components: [.year, .month]) {
+                    self.setCalendarData(date: newValue)
                 }
+                self.wasPast = self.currentDate < newValue
+                self.currentDate = newValue
             }
             .store(in: &cancellables)
     }

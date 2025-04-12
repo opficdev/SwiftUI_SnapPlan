@@ -221,22 +221,21 @@ struct TimeLineView: View {
                                                                 .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)), height: uiVM.sheetPadding)
                                                         }
                                                     }
-                                                    .id(idx)
                                                     .background(
                                                         GeometryReader { geometryProxy in
                                                             //  오직 감시용으로만 사용할 것
                                                             //  단, 감시를 해도 코드 내부 모든 오토 스크롤 이벤트 종료 후 관찰을 지속할 것
                                                             Color.clear.onChange(of: geometryProxy.frame(in: .global)) { frame in
-                                                                if dragByUser && plannerVM.selection != idx &&
+                                                                if dragByUser && plannerVM.selectDate != date &&
                                                                     timeZoneSize.width <= frame.midX && frame.midX <= screenWidth {
-                                                                    plannerVM.selection = idx
+                                                                    plannerVM.selectDate = date
                                                                 }
                                                                 if Int(screenWidth) == Int(frame.maxX) {
                                                                     dragByUser = false
                                                                     if plannerVM.monthChange {
                                                                         plannerVM.monthChange = false
                                                                         DispatchQueue.main.async {
-                                                                            scrollProxy.scrollTo(plannerVM.newSelection, anchor: .top)
+                                                                            scrollProxy.scrollTo(plannerVM.newSelectDate, anchor: .top)
                                                                         }
                                                                     }
                                                                 }
@@ -249,14 +248,14 @@ struct TimeLineView: View {
                                             .onAppear {
                                                 calendarData = plannerVM.calendarData[1]
                                                 DispatchQueue.main.async {
-                                                    scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                    scrollProxy.scrollTo(plannerVM.selectDate, anchor: .top)
                                                     uiVM.allDayPadding = timeZoneSize.height * 2
                                                 }
                                             }
                                             .onChange(of: plannerVM.userTapped) { value in
                                                 if value {
                                                     withAnimation(.easeInOut(duration: 0.2)) {
-                                                        scrollProxy.scrollTo(plannerVM.selection, anchor: .top)
+                                                        scrollProxy.scrollTo(plannerVM.selectDate, anchor: .top)
                                                     }
                                                     plannerVM.userTapped = false
                                                 }
