@@ -337,6 +337,9 @@ struct TimeLineView: View {
         .onChange(of: plannerVM.selectDate) { date in
             uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
         }
+        .onChange(of: plannerVM.calendarData) { month in
+            calendarData = month[1]
+        }
         .onChange(of: calendarData) { month in
             Task {
                 // MARK: 일정 우선
