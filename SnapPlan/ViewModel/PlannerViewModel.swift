@@ -62,7 +62,8 @@ final class PlannerViewModel: ObservableObject {
         Timer.publish(every: 0.1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                self?.today = Date()
+                guard let self = self else { return }
+                self.today = Date()
             }
             .store(in: &cancellables)
     }
