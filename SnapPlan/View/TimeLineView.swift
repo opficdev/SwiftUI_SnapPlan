@@ -228,8 +228,10 @@ struct TimeLineView: View {
                                                             Color.clear.onChange(of: geometryProxy.frame(in: .global)) { frame in
                                                                 if dragByUser && plannerVM.selectDate != date &&
                                                                     timeZoneSize.width <= frame.midX && frame.midX <= screenWidth {
-                                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                                        plannerVM.selectDate = date
+                                                                    if plannerVM.allowSetDate(date: date) {
+                                                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                                                            plannerVM.selectDate = date
+                                                                        }
                                                                     }
                                                                 }
                                                                 if Int(screenWidth) == Int(frame.maxX) {

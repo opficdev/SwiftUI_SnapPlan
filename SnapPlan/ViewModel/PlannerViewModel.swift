@@ -38,15 +38,18 @@ final class PlannerViewModel: ObservableObject {
             .sink { [weak self] newValue in
                 guard let self = self else { return }
                 
-                
                 if !self.isSameDate(date1: self.currentDate, date2: newValue, components: [.year, .month]) {
                     if self.userTapped {
                         withAnimation(.easeInOut(duration: 0.15)) {
                             self.setCalendarData(date: newValue)
                         }
                     }
-                    else {
-                        
+                    else if !self.monthChange {
+                        self.newSelectDate = newValue
+                        self.monthChange = true
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            self.setCalendarData(date: newValue)
+                        }
                     }
                 }
                 self.wasPast = self.currentDate < newValue
@@ -62,6 +65,17 @@ final class PlannerViewModel: ObservableObject {
                 self?.today = Date()
             }
             .store(in: &cancellables)
+    }
+    
+    func allowSetDate(date: Date) -> Bool {
+        let prevDate = calendar.date(byAdding: .day, value: -1, to: self.selectDate)!
+        let nextDate = calendar.date(byAdding: .day, value: 1, to: self.selectDate)!
+        
+        if self.isSameDate(date1: date, date2: prevDate, components: [.year, .month, .day]) ||
+            self.isSameDate(date1: date, date2: nextDate, components: [.year, .month, .day]) {
+            return true
+        }
+        return false
     }
     
     func getDateFromIndex(index: Int) -> Date {
