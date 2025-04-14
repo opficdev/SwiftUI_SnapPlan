@@ -64,7 +64,7 @@
 
 
 ## Firebase 구조
-'''
+```
 📁 Firestore  
 ├── 📂 Users Collection  
 │   ├── 📄 {userId}/info  
@@ -96,4 +96,4 @@
 ├── 📂 Voice Memos  
 │   ├── 📂 /voiceMemos/{userId}/{scheduleId}/  
 │   │   └── 📄 voiceMemo.m4a
-'''
+```
