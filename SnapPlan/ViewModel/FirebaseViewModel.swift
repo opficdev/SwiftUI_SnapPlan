@@ -146,10 +146,7 @@ extension FirebaseViewModel {
         try await signOutGoogle()
         try await user.delete()
     }
-}
-
-// MARK: - 12/24시간제 포맷
-extension FirebaseViewModel {
+    
     func fetch12TimeFmt() async throws {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
@@ -179,10 +176,7 @@ extension FirebaseViewModel {
             throw error
         }
     }
-}
-
-// MARK: - 테마
-extension FirebaseViewModel {
+    
     func fetchScreenMode() async throws {
         guard let userId = userId else {
             throw URLError(.userAuthenticationRequired)
