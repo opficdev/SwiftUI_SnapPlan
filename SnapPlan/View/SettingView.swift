@@ -22,47 +22,45 @@ struct SettingView: View {
                         Text(firebaseVM.email)
                     }
                     .listRowBackground(Color.timeLine)
-                    Section(header: Text("스타일")) {
-                        Button(action: {
-                            firebaseVM.calendarPagingStyle = 1
-                        }) {
-                            HStack {
-                                Text("1일")
-                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 1 ? Color.primary : Color.gray)
-                                Spacer()
-                                if firebaseVM.calendarPagingStyle == 1 {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
-                        }
-                        Button(action: {
-                            firebaseVM.calendarPagingStyle = 2
-                        }) {
-                            HStack {
-                                Text("2일")
-                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 2 ? Color.primary : Color.gray)
-                                Spacer()
-                                if firebaseVM.calendarPagingStyle == 2 {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
-                        }
-//                        .disabled(true)
-                        Button(action: {
-                            firebaseVM.calendarPagingStyle = 3
-                        }) {
-                            HStack {
-                                Text("3일")
-                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 3 ? Color.primary : Color.gray)
-                                Spacer()
-                                if firebaseVM.calendarPagingStyle == 3 {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
-                        }
-//                        .disabled(true)
-                    }
-                    .listRowBackground(Color.timeLine)
+//                    Section(header: Text("스타일")) {
+//                        Button(action: {
+//                            firebaseVM.calendarPagingStyle = 1
+//                        }) {
+//                            HStack {
+//                                Text("1일")
+//                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 1 ? Color.primary : Color.gray)
+//                                Spacer()
+//                                if firebaseVM.calendarPagingStyle == 1 {
+//                                    Image(systemName: "checkmark")
+//                                }
+//                            }
+//                        }
+//                        Button(action: {
+//                            firebaseVM.calendarPagingStyle = 2
+//                        }) {
+//                            HStack {
+//                                Text("2일")
+//                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 2 ? Color.primary : Color.gray)
+//                                Spacer()
+//                                if firebaseVM.calendarPagingStyle == 2 {
+//                                    Image(systemName: "checkmark")
+//                                }
+//                            }
+//                        }
+//                        Button(action: {
+//                            firebaseVM.calendarPagingStyle = 3
+//                        }) {
+//                            HStack {
+//                                Text("3일")
+//                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 3 ? Color.primary : Color.gray)
+//                                Spacer()
+//                                if firebaseVM.calendarPagingStyle == 3 {
+//                                    Image(systemName: "checkmark")
+//                                }
+//                            }
+//                        }
+//                    }
+//                    .listRowBackground(Color.timeLine)
                     //  MARK: NavigationLink를 통해 표시되는 ThemeView는 부모 뷰(SettingView)의 환경 객체를 상속받기 때문에 별도로 환경 객체를 주입하지 않아도 오류 발생 X
                     Section(header: Text("테마")) {
                         NavigationLink(destination: ThemeView()) {
