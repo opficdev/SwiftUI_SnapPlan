@@ -81,7 +81,7 @@ struct CalendarView: View {
                         if !plannerVM.isSameDate(date1: plannerVM.today, date2: plannerVM.selectDate, components: [.year, .month, .day]) {
                             withAnimation(.easeInOut(duration: 0.1)) {
                                 plannerVM.userTapped = true
-                                plannerVM.selectDate = plannerVM.today
+                                plannerVM.selectDate = Calendar.current.startOfDay(for: plannerVM.today)
                             }
                         }
                     }
