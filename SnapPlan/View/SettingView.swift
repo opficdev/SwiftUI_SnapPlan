@@ -126,6 +126,11 @@ struct SettingView: View {
                 .scrollContentBackground(.hidden)
             }
             .background(Color.calendar)
+            .onChange(of: firebaseVM.calendarPagingStyle) { newValue in
+                Task {
+                    try await firebaseVM.updateCalendarPagingStyle(pagingStyle: newValue)
+                }
+            }
             .alert("로그아웃", isPresented: $logoutAlert) {
                 Button(role: .cancel, action: {
                     logoutAlert = false
