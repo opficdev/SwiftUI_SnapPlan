@@ -66,7 +66,7 @@ struct SettingView: View {
                         .foregroundStyle(.gray)
                     }
                     .listRowBackground(Color.timeLine)
-                    
+                    //  MARK: NavigationLink를 통해 표시되는 ThemeView는 부모 뷰(SettingView)의 환경 객체를 상속받기 때문에 별도로 환경 객체를 주입하지 않아도 오류 발생 X
                     Section(header: Text("테마")) {
                         NavigationLink(destination: ThemeView()) {
                             Text("테마")
