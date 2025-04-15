@@ -38,7 +38,9 @@ final class FirebaseViewModel: ObservableObject {
 
             if let _ = user {
                 Task {
-                    
+                    try await self.fetch12TimeFmt()
+                    try await self.fetchScreenMode()
+                    try await self.fetchCalendarPagingStyle()
                     self.signedIn = true
                 }
             }
