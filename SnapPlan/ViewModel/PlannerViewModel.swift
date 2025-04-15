@@ -38,18 +38,12 @@ final class PlannerViewModel: ObservableObject {
             .sink { [weak self] newValue in
                 guard let self = self else { return }
                 
-                if !self.isSameDate(date1: self.currentDate, date2: newValue, components: [.year, .month]) {
-                    if self.userTapped {
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            self.setCalendarData(date: newValue)
-                        }
-                    }
-                    else if !self.monthChange {
-                        self.newSelectDate = newValue
-                        self.monthChange = true
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            self.setCalendarData(date: newValue)
-                        }
+                if !self.isSameDate(date1: self.currentDate, date2: self.selectDate, components: [.year, .month]) ||
+                    !self.isSameDate(date1: self.currentDate, date2: newValue, components: [.year, .month]) {
+                    self.monthChange = true
+                    self.newSelectDate = newValue
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        self.setCalendarData(date: newValue)
                     }
                 }
                 self.wasPast = self.currentDate < newValue
