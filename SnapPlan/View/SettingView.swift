@@ -12,7 +12,6 @@ struct SettingView: View {
     @Environment(\.dismiss) var dismiss
     @State private var logoutAlert = false
     @State private var deleteAlert = false
-    @State private var days = "1"
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     
     var body: some View {
@@ -23,47 +22,45 @@ struct SettingView: View {
                         Text(firebaseVM.email)
                     }
                     .listRowBackground(Color.timeLine)
-                    Section(header: Text("일정")) {
+                    Section(header: Text("스타일")) {
                         Button(action: {
-                            days = "1"
+                            firebaseVM.calendarPagingStyle = 1
                         }) {
                             HStack {
                                 Text("1일")
-                                    .foregroundStyle(Color.primary)
+                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 1 ? Color.primary : Color.gray)
                                 Spacer()
-                                if days == "1" {
+                                if firebaseVM.calendarPagingStyle == 1 {
                                     Image(systemName: "checkmark")
                                 }
                             }
                         }
                         Button(action: {
-                            days = "2"
+                            firebaseVM.calendarPagingStyle = 2
                         }) {
                             HStack {
                                 Text("2일")
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 2 ? Color.primary : Color.gray)
                                 Spacer()
-                                if days == "2" {
+                                if firebaseVM.calendarPagingStyle == 2 {
                                     Image(systemName: "checkmark")
                                 }
                             }
                         }
-                        .disabled(true)
-                        .foregroundStyle(.gray)
+//                        .disabled(true)
                         Button(action: {
-                            days = "3"
+                            firebaseVM.calendarPagingStyle = 3
                         }) {
                             HStack {
                                 Text("3일")
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(firebaseVM.calendarPagingStyle == 3 ? Color.primary : Color.gray)
                                 Spacer()
-                                if days == "3" {
+                                if firebaseVM.calendarPagingStyle == 3 {
                                     Image(systemName: "checkmark")
                                 }
                             }
                         }
-                        .disabled(true)
-                        .foregroundStyle(.gray)
+//                        .disabled(true)
                     }
                     .listRowBackground(Color.timeLine)
                     //  MARK: NavigationLink를 통해 표시되는 ThemeView는 부모 뷰(SettingView)의 환경 객체를 상속받기 때문에 별도로 환경 객체를 주입하지 않아도 오류 발생 X
