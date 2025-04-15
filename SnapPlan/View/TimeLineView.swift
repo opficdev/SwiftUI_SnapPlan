@@ -338,8 +338,10 @@ struct TimeLineView: View {
             }
         }
         .onChange(of: plannerVM.selectDate) { date in
-            if calendarData != Array(Set(plannerVM.calendarData[0] + plannerVM.calendarData[1])).sorted(by: { $0 < $1 }) {
-                calendarData = Array(Set(plannerVM.calendarData[0] + plannerVM.calendarData[1])).sorted(by: { $0 < $1 })
+            if let localFirst = calendarData.first, let plannerFirst = plannerVM.calendarData.first?.first {
+                if localFirst != plannerFirst {
+                    calendarData = Array(Set(plannerVM.calendarData[0] + plannerVM.calendarData[1])).sorted(by: { $0 < $1 })
+                }
             }
             uiVM.setAllDayPadding(date: date, height: timeZoneSize.height, schedules: firebaseVM.schedules)
         }
