@@ -34,7 +34,16 @@ struct ContentView: View {
                 }
             }
             else {  //  로그인을 시도하는 중(최초 로그인을 한 이후인 경우)
-                
+                Color.clear.onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                        if firebaseVM.signedIn == nil {
+                            Task {
+                                try await firebaseVM.signOutGoogle()
+                                isFirstLaunch = true
+                            }
+                        }
+                    }
+                }
             }
         }
     }
