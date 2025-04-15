@@ -24,6 +24,7 @@ final class FirebaseViewModel: ObservableObject {
     @Published var signedIn: Bool? = nil
     @Published var is12TimeFmt: Bool = true
     @Published var screenMode: UIUserInterfaceStyle = .unspecified
+    @Published var calendarPagingStyle: Int = 1
     @Published var schedules: [String:ScheduleData] = [:]
     
     init() {
@@ -125,7 +126,8 @@ extension FirebaseViewModel {
             "email": user.email ?? "",  //  이메일
             "is12TimeFmt": true,    //  12시간제 포맷 여부
             "screenMode": "unspecified",    //  화면 모드
-            "signedAt": FieldValue.serverTimestamp() //  가입 시간
+            "signedAt": FieldValue.serverTimestamp(), //  가입 시간
+            "calendarPagingStyle": 1    //  캘린더 페이지 스타일
         ]
         
         userRef.setData(userInfo, merge: true) { error in
@@ -202,6 +204,36 @@ extension FirebaseViewModel {
         
         do {
             try await docRef.setData(["screenMode": mode.rawValue], merge: true)
+        } catch {
+            throw error
+        }
+    }
+    
+    func fetchCalendarPagingStyle() async throws {
+        guard let userId = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let docRef = db.collection(userId).document("info")
+        
+        do {
+            let document = try await docRef.getDocument()
+            let pagingStyle = document.data()?["calendarPagingStyle"] as? Int
+            self.calendarPagingStyle = pagingStyle ?? 1
+        } catch {
+            throw error
+        }
+    }
+
+    func updateCalendarPagingStyle(pagingStyle: Int) async throws {
+        guard let userId = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let docRef = db.collection(userId).document("info")
+        
+        do {
+            try await docRef.setData(["calendarPagingStyle": pagingStyle], merge: true)
         } catch {
             throw error
         }
