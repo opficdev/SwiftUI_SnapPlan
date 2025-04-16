@@ -122,7 +122,6 @@ extension FirebaseViewModel {
         let userRef = db.collection(user.uid).document("info")
         let userInfo: [String: Any] = [
             "uid": user.uid,    //  uid
-            "displayName": user.displayName ?? "",  //  닉네임
             "email": user.email ?? "",  //  이메일
             "is12TimeFmt": true,    //  12시간제 포맷 여부
             "screenMode": "unspecified",    //  화면 모드
