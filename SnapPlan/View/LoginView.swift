@@ -31,21 +31,42 @@ struct LoginView: View {
                 .scaledToFit()
                 .frame(width: screenWidth / 5)
                 Spacer()
-                Group {
-                    if colorScheme == .light {
-                        Image("ios_light_sq_SI@4x")
-                            .resizable()
+                VStack(spacing: 20) {
+                    
+                    Group {
+                        if colorScheme == .light {
+                            Image("ios_light_sq_SI@4x")
+                                .resizable()
+                        }
+                        else {
+                            Image("ios_dark_sq_SI@4x")
+                                .resizable()
+                        }
                     }
-                    else {
-                        Image("ios_dark_sq_SI@4x")
-                            .resizable()
+                    .scaledToFit()
+                    .frame(width: screenWidth / 2)
+                    .onTapGesture {
+                        Task {
+                            try await viewModel.signInGoogle()
+                        }
                     }
-                }
-                .scaledToFit()
-                .frame(width: screenWidth / 2)
-                .onTapGesture {
-                    Task {
-                        try await viewModel.signInGoogle()
+                    
+                    Group {
+                        if colorScheme == .light {
+                            Image("appleid_light_button@4x")
+                                .resizable()
+                        }
+                        else {
+                            Image("appleid_dark_button@4x")
+                                .resizable()
+                        }
+                    }
+                    .scaledToFit()
+                    .frame(width: screenWidth / 2)
+                    .onTapGesture {
+                        Task {
+                            try await viewModel.signInApple()
+                        }
                     }
                 }
                 
