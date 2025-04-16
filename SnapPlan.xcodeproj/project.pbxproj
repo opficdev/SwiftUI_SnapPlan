@@ -12,6 +12,7 @@
 		DF39A4F72D9E8B9D007A6DC8 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF39A4F62D9E8B9D007A6DC8 /* FirebaseCore */; };
 		DF39A4F92D9E8B9D007A6DC8 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = DF39A4F82D9E8B9D007A6DC8 /* FirebaseFirestore */; };
 		DF39A4FB2D9E8B9D007A6DC8 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = DF39A4FA2D9E8B9D007A6DC8 /* FirebaseStorage */; };
+		DF635DFE2DAF87D900849144 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = DF635DFD2DAF87D900849144 /* FirebaseFunctions */; };
 		DF6B55012D2399A3006BB54A /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = DF6B55002D2399A3006BB54A /* GoogleSignIn */; };
 		DF6B55032D2399A3006BB54A /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = DF6B55022D2399A3006BB54A /* GoogleSignInSwift */; };
 		DF9A76A62D2ED2BC00D1CAF4 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DF9A76A52D2ED2BC00D1CAF4 /* README.md */; };
@@ -57,6 +58,7 @@
 				DF6B55032D2399A3006BB54A /* GoogleSignInSwift in Frameworks */,
 				DF39A4F92D9E8B9D007A6DC8 /* FirebaseFirestore in Frameworks */,
 				DF6B55012D2399A3006BB54A /* GoogleSignIn in Frameworks */,
+				DF635DFE2DAF87D900849144 /* FirebaseFunctions in Frameworks */,
 				DF379BC12D44891800E10867 /* SwiftUIIntrospect in Frameworks */,
 				DF39A4FB2D9E8B9D007A6DC8 /* FirebaseStorage in Frameworks */,
 				DF39A4F72D9E8B9D007A6DC8 /* FirebaseCore in Frameworks */,
@@ -73,6 +75,7 @@
 				DF9A76D32D2ED37F00D1CAF4 /* Preview */,
 				DF9A76A52D2ED2BC00D1CAF4 /* README.md */,
 				DF4F8AF72D228F2700ACA504 /* SnapPlan */,
+				DF635DFC2DAF87D900849144 /* Frameworks */,
 				DF4F8AF62D228F2700ACA504 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -83,6 +86,13 @@
 				DF4F8AF52D228F2700ACA504 /* SnapPlan.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DF635DFC2DAF87D900849144 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -113,6 +123,7 @@
 				DF39A4F62D9E8B9D007A6DC8 /* FirebaseCore */,
 				DF39A4F82D9E8B9D007A6DC8 /* FirebaseFirestore */,
 				DF39A4FA2D9E8B9D007A6DC8 /* FirebaseStorage */,
+				DF635DFD2DAF87D900849144 /* FirebaseFunctions */,
 			);
 			productName = SwiftUI_SnapPlan;
 			productReference = DF4F8AF52D228F2700ACA504 /* SnapPlan.app */;
@@ -459,6 +470,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DF39A4F32D9E8B9D007A6DC8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		DF635DFD2DAF87D900849144 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF39A4F32D9E8B9D007A6DC8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
 		};
 		DF6B55002D2399A3006BB54A /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
