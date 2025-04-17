@@ -262,7 +262,16 @@ extension FirebaseViewModel {
     }
     
     func deleteUser() async throws {
-        guard let user = Auth.auth().currentUser else { return }
+        guard let user = Auth.auth().currentUser, let userId = userId else { return }
+        self.signedIn = false
+        
+        do {
+            try await deleteStorageDirectory(path: "photos/\(userId)")
+            try await deleteStorageDirectory(path: "voiceMemos/\(userId)")
+        } catch {
+            print("Error deleting Storage: \(error.localizedDescription)")
+        }
+        
         let batch = db.batch()
         let docs = try await db.collection(user.uid).getDocuments()
         for doc in docs.documents {
