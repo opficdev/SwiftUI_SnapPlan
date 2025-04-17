@@ -120,6 +120,124 @@ extension FirebaseViewModel {
     }
 }
 
+// MARK: - Apple Sign In/Out
+extension FirebaseViewModel {
+    func signInApple() async throws {
+        do {
+            try await signInAppleHelper()
+            signedIn = true
+        } catch {
+            print("Apple SignIn Error: \(error)")
+            throw error
+        }
+    }
+    
+    func signOutApple() async throws {
+        do {
+            try Auth.auth().signOut()
+            signedIn = false
+        } catch {
+            print("Apple SignOut Error: \(error)")
+            throw error
+        }
+    }
+    
+    private func signInAppleHelper() async throws {
+        let nonce = UUID().uuidString
+        let hashedNonce = SHA256.hash(data: Data(nonce.utf8)).map { String(format: "%02x", $0) }.joined()
+        
+        let provider = ASAuthorizationAppleIDProvider()
+        let request = provider.createRequest()
+        request.requestedScopes = [.email]
+        request.nonce = hashedNonce
+        
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        
+        let authorization = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<ASAuthorization, Error>) in
+            self.appleSignInDelegate = AppleSignInDelegate(continuation: continuation)
+            controller.delegate = self.appleSignInDelegate
+            controller.presentationContextProvider = self.appleSignInDelegate
+            controller.performRequests()
+        }
+        
+        guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+              let appleIDToken = credential.identityToken,
+              let authorizationCode = credential.authorizationCode,
+              let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+            throw URLError(.badServerResponse)
+        }
+        
+        let firebaseCredential = OAuthProvider.credential(
+            providerID: AuthProviderID.apple,
+            idToken: idTokenString,
+            rawNonce: nonce
+        )
+        
+        let result = try await Auth.auth().signIn(with: firebaseCredential)
+        
+        saveUser(user: result.user)
+        try await getAppleRefreshToken(authorizationCode: authorizationCode)
+    }
+    
+    private func getAppleRefreshToken(authorizationCode: Data) async throws {
+        guard let userId = userId, let authorizationCode = String(data: authorizationCode, encoding: .utf8) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let getFuction = functions.httpsCallable("getAppleRefreshToken")
+        
+        let params: [String: Any] = [
+            "authorizationCode": authorizationCode,
+            "userId": userId
+        ]
+            
+        do {
+            let _ = try await getFuction.call(params)
+        } catch {
+            print("Error get Apple Refresh Token: \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+    // 애플 액세스 토큰 재발급 메서드
+    func refreshAppleAccessToken() async throws -> String {
+        guard let _ = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let refreshFunction = functions.httpsCallable("refreshAppleAccessToken")
+        
+        do {
+            let result = try await refreshFunction.call()
+            
+            if let data = result.data as? [String: Any], let accessToken = data["token"] as? String {
+                return accessToken
+            }
+            return ""
+        } catch {
+            print("Error refresh Apple Token: \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+    // 애플 액세스 토큰 취소 메서드
+    func revokeAppleAccessToken(token: String) async throws -> Bool {
+        guard let _ = userId else {
+            throw URLError(.userAuthenticationRequired)
+        }
+       
+        let revokeFunction = functions.httpsCallable("revokeAppleAccessToken")
+        
+        do {
+            let _ = try await revokeFunction.call(["token": token])
+            return true
+        } catch {
+            print("Error revoke Apple Token: \(error.localizedDescription)")
+            throw error
+        }
+    }
+}
+
 // MARK: - User 데이터
 extension FirebaseViewModel {
     private func saveUser(user: User) {
