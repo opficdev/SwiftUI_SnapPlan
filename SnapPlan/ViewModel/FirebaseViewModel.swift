@@ -12,6 +12,7 @@ import Combine
 import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
+import FirebaseFunctions
 import GoogleSignIn
 import GoogleSignInSwift
 
