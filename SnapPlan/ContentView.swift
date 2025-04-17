@@ -27,6 +27,7 @@ struct ContentView: View {
                             if isFirstLaunch {
                                 Task {
                                     try await firebaseVM.signOutGoogle()
+                                    try await firebaseVM.signOutApple()
                                     isFirstLaunch = false
                                 }
                             }
@@ -39,6 +40,7 @@ struct ContentView: View {
                         if firebaseVM.signedIn == nil {
                             Task {
                                 try await firebaseVM.signOutGoogle()
+                                try await firebaseVM.signOutApple()
                                 isFirstLaunch = true
                             }
                         }
