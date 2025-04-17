@@ -21,6 +21,7 @@ import CryptoKit
 @MainActor
 final class FirebaseViewModel: ObservableObject {
     private var userId: String? { Auth.auth().currentUser?.uid }
+    private var appleSignInDelegate: AppleSignInDelegate?
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     var email: String { Auth.auth().currentUser?.email ?? "" }  //  뷰에서 변경하지 않아서 published로 하지 않음
