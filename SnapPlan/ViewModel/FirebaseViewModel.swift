@@ -15,6 +15,8 @@ import FirebaseStorage
 import FirebaseFunctions
 import GoogleSignIn
 import GoogleSignInSwift
+import AuthenticationServices
+import CryptoKit
 
 @MainActor
 final class FirebaseViewModel: ObservableObject {
