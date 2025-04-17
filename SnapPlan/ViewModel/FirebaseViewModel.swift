@@ -282,8 +282,37 @@ extension FirebaseViewModel {
         for doc in scheduleDocs.documents {
             batch.deleteDocument(doc.reference)
         }
-        try await batch.commit()
-        try await signOutGoogle()
+        
+        // 공급자 확인
+        let hasAppleProvider = user.providerData.contains { $0.providerID == "apple.com" }
+        let hasGoogleProvider = user.providerData.contains { $0.providerID == "google.com" }
+
+        // 두 공급자가 모두 있는 경우
+        if hasAppleProvider && hasGoogleProvider {
+            // Apple 토큰 처리 후 마지막 로그아웃 전에 batch.commit()
+            let appleToken = try await refreshAppleAccessToken()
+            if try await revokeAppleAccessToken(token: appleToken) {
+                try await batch.commit()
+                try await signOutApple()
+            }
+            
+            // Google은 나중에 로그아웃
+            try await signOutGoogle()
+        }
+        // Apple 공급자만 있는 경우
+        else if hasAppleProvider {
+            let appleToken = try await refreshAppleAccessToken()
+            if try await revokeAppleAccessToken(token: appleToken) {
+                try await batch.commit()
+                try await signOutApple()
+            }
+        }
+        // Google 공급자만 있는 경우
+        else if hasGoogleProvider {
+            try await batch.commit()
+            try await signOutGoogle()
+        }
+       
         try await user.delete()
     }
     
