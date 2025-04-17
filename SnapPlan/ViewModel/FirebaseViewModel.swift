@@ -273,8 +273,13 @@ extension FirebaseViewModel {
         }
         
         let batch = db.batch()
-        let docs = try await db.collection(user.uid).getDocuments()
-        for doc in docs.documents {
+        // 1. info 문서만 삭제
+        let infoDocRef = db.collection(userId).document("info")
+        batch.deleteDocument(infoDocRef)
+        
+        // 2. schedules/data 컬렉션의 문서들 삭제
+        let scheduleDocs = try await db.collection(userId).document("schedules").collection("data").getDocuments()
+        for doc in scheduleDocs.documents {
             batch.deleteDocument(doc.reference)
         }
         try await batch.commit()
