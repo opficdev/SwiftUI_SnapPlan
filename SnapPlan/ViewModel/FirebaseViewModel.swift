@@ -28,22 +28,26 @@ final class FirebaseViewModel: ObservableObject {
     @Published var schedules: [String:ScheduleData] = [:]
     
     init() {
-        GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-            if let error = error as NSError?, error.code == -4 {    // -4: 로그인 세션이 만료된 경우
-                self.signedIn = false
-            }
-            else if let error = error {
-                print("Last Login Restore Error: \(error.localizedDescription)")
-                return
-            }
-
-            if let _ = user {
-                Task {
+        Task {
+            if let _ = try? await GIDSignIn.sharedInstance.restorePreviousSignIn() {
+                if let _ = Auth.auth().currentUser {
                     try await self.fetch12TimeFmt()
                     try await self.fetchScreenMode()
                     try await self.fetchCalendarPagingStyle()
                     self.signedIn = true
                 }
+                else {
+                    try await signOutGoogle()
+                }
+            }
+            else if let currentUser = Auth.auth().currentUser, currentUser.providerData.contains(where: { $0.providerID == "apple.com" }) {
+                try await self.fetch12TimeFmt()
+                try await self.fetchScreenMode()
+                try await self.fetchCalendarPagingStyle()
+                self.signedIn = true
+            }
+            else {
+                try await self.signOutApple()
             }
         }
     }
