@@ -115,7 +115,7 @@ struct SettingView: View {
                             Text("탈퇴")
                         }
                     } message: {
-                        Text("이 작업은 되돌릴 수 없습니다.")
+                        Text("회원 탈퇴가 진행되면 모든 데이터가 지워지고 복구할 수 없습니다.")
                     }
                 }
                 .scrollContentBackground(.hidden)
