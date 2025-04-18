@@ -57,6 +57,7 @@ class ScheduleViewModel: ObservableObject {
                     self?.location = schedule.location
                     self?.address = schedule.address
                     self?.description = schedule.description
+                    self?.recordingTime = 0
                     self?.memoState = schedule.memoState
                     self?.photosState = schedule.photosState
                 }
