@@ -267,12 +267,8 @@ extension FirebaseViewModel {
         guard let user = Auth.auth().currentUser, let userId = userId else { return }
         self.signedIn = false
         
-        do {
-            try await deleteStorageDirectory(path: "photos/\(userId)")
-            try await deleteStorageDirectory(path: "voiceMemos/\(userId)")
-        } catch {
-            print("Error deleting Storage: \(error.localizedDescription)")
-        }
+        let deleteFunction = functions.httpsCallable("deleteUserStorage")
+        let _ = try await deleteFunction.call()
         
         let batch = db.batch()
         // 1. info 문서만 삭제
@@ -682,35 +678,3 @@ extension FirebaseViewModel {
         }
     }
 }
-
-extension FirebaseViewModel {
-    private func deleteStorageDirectory(path: String) async throws {
-        let storageRef = storage.reference().child(path)
-        
-        do {
-            // 해당 경로의 모든 항목 조회
-            let result = try await storageRef.listAll()
-            
-            // 파일 삭제
-            for item in result.items {
-                try await item.delete()
-            }
-            
-            // 재귀적으로 하위 디렉토리 삭제
-            for prefix in result.prefixes {
-                try await deleteStorageDirectory(path: prefix.fullPath)
-            }
-        } catch let error as StorageError {
-            if error.errorCode == StorageErrorCode.objectNotFound.rawValue {
-                // 경로가 존재하지 않는 경우 무시
-                return
-            } else {
-                print("Error deleting Storage \(path): \(error.localizedDescription)")
-                throw error
-            }
-        }
-    }
-}
-
-
-
