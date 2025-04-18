@@ -13,6 +13,7 @@
 - FirebaseAuth를 통한 사용자 인증
 - Firestore를 통한 사용자, 일정 데이터 저장
 - Firebase Storage를 통한 사진, 음성 메모 저장
+- Firebase Cloud Functions를 통한 사진, 음성 메모 삭제 및 Apple 토큰 제어
 - Combine을 사용해 현재 시각을 0.1초 단위로 최신화
 - frame 측정에 대한 GeometryReader 사용 최소화
 - 라이트 / 다크 모드 지원
