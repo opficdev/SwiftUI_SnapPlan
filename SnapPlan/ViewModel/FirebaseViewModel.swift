@@ -267,19 +267,15 @@ extension FirebaseViewModel {
         guard let user = Auth.auth().currentUser, let userId = userId else { return }
         self.signedIn = false
         
-        let deleteFunction = functions.httpsCallable("deleteUserStorage")
-        let _ = try await deleteFunction.call()
+        let deleteScheduleFunction = functions.httpsCallable("deleteUserSchedule")
+        let _ = try await deleteScheduleFunction.call()
+        
+        let deleteStorageFunction = functions.httpsCallable("deleteUserStorage")
+        let _ = try await deleteStorageFunction.call()
         
         let batch = db.batch()
-        // 1. info 문서만 삭제
         let infoDocRef = db.collection(userId).document("info")
         batch.deleteDocument(infoDocRef)
-        
-        // 2. schedules/data 컬렉션의 문서들 삭제
-        let scheduleDocs = try await db.collection(userId).document("schedules").collection("data").getDocuments()
-        for doc in scheduleDocs.documents {
-            batch.deleteDocument(doc.reference)
-        }
         
         // 공급자 확인
         let hasAppleProvider = user.providerData.contains { $0.providerID == "apple.com" }
