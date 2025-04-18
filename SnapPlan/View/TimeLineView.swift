@@ -372,19 +372,10 @@ struct TimeLineView: View {
                                 firebaseVM.schedules[schedule]?.voiceMemo = memo
                                 firebaseVM.schedules[schedule]?.memoState = .success
                             } catch {
-                                if error.localizedDescription == "Object not found" {
-                                    firebaseVM.schedules[schedule]?.memoState = .success
-                                    if let id = scheduleVM.id, id == uuid {
-                                        await MainActor.run {
-                                            scheduleVM.memoState = .success
-                                        }
-                                    }
-                                } else {
-                                    firebaseVM.schedules[schedule]?.memoState = .error
-                                    if let id = scheduleVM.id, id == uuid {
-                                        await MainActor.run {
-                                            scheduleVM.memoState = .error
-                                        }
+                                firebaseVM.schedules[schedule]?.memoState = .error
+                                if let id = scheduleVM.id, id == uuid {
+                                    await MainActor.run {
+                                        scheduleVM.memoState = .error
                                     }
                                 }
                             }
