@@ -19,6 +19,7 @@ struct ScheduleView: View {
     @EnvironmentObject var scheduleVM: ScheduleViewModel
     @EnvironmentObject var uiVM: UIViewModel
     @StateObject var searchVM = SearchLocationViewModel()
+    @StateObject var permissionVM = PermissionViewModel()
     
     @State private var startTask = false     //  스케줄 CRUD 작업 시작여부
     @State private var tapStartTime = false //  시작 시간 탭 여부
@@ -249,7 +250,7 @@ struct ScheduleView: View {
                                                 .underline(scheduleVM.voiceMemo != nil)
                                         }
                                         .onTapGesture {
-                                            if scheduleVM.memoState != .loading {
+                                            if scheduleVM.memoState != .loading && permissionVM.checkMicPermission() {
                                                 tapVoiceMemo = true
                                                 scheduleVM.audioLevels.removeAll()
                                             }
@@ -443,6 +444,18 @@ struct ScheduleView: View {
                         }) {
                             Text("취소")
                         }
+                    }
+                    .confirmationDialog(
+                        permissionVM.permissionTitle,
+                        isPresented: $permissionVM.showPermissionAlert,
+                        titleVisibility: .visible
+                    ) {
+                        Button("설정으로 이동") {
+                            permissionVM.openSettings()
+                        }
+                        Button("취소", role: .cancel) {}
+                    } message: {
+                        Text(permissionVM.permissionMsg)
                     }
                 }
                 else {
