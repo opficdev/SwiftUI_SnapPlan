@@ -478,12 +478,14 @@ extension FirebaseViewModel {
     }
     
     func deleteSchedule(schedule: ScheduleData) async throws {
-        guard let userId = userId else {
+        guard let _ = userId else {
             throw URLError(.userAuthenticationRequired)
         }
         do {
-            try await db.collection(userId).document("schedules").collection("data").document(schedule.id.uuidString).delete()
             schedules.removeValue(forKey: schedule.id.uuidString)
+            let deleteUserSchedule = functions.httpsCallable("deleteUserSchedule")
+            let _ = try await deleteUserSchedule.call(["scheduleId": schedule.id.uuidString])
+            
         } catch {
             print("Schedule Delete Error: \(error.localizedDescription)")
             throw error
