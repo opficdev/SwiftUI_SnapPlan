@@ -267,10 +267,10 @@ extension FirebaseViewModel {
         guard let user = Auth.auth().currentUser, let userId = userId else { return }
         self.signedIn = false
         
-        let deleteScheduleFunction = functions.httpsCallable("deleteUserSchedule")
+        let deleteScheduleFunction = functions.httpsCallable("deleteUserAllSchedules")
         let _ = try await deleteScheduleFunction.call()
         
-        let deleteStorageFunction = functions.httpsCallable("deleteUserStorage")
+        let deleteStorageFunction = functions.httpsCallable("deleteUserAllStorage")
         let _ = try await deleteStorageFunction.call()
         
         let batch = db.batch()
