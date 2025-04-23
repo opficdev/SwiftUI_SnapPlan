@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import GoogleSignInSwift
 
 struct LoginView: View {
     @EnvironmentObject private var viewModel: FirebaseViewModel
     @Environment(\.colorScheme) var colorScheme
+    @State private var loginBtnHeight: CGFloat = 0
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -32,42 +34,28 @@ struct LoginView: View {
                 .frame(width: screenWidth / 5)
                 Spacer()
                 VStack(spacing: 20) {
-                    
-                    Group {
-                        if colorScheme == .light {
-                            Image("ios_light_sq_SI@4x")
-                                .resizable()
-                        }
-                        else {
-                            Image("ios_dark_sq_SI@4x")
-                                .resizable()
-                        }
-                    }
-                    .scaledToFit()
-                    .frame(width: screenWidth / 2)
-                    .onTapGesture {
+                    GoogleSignInButton(scheme: colorScheme == .light ? .dark : .light, style: .wide, state: .pressed) {
                         Task {
                             try await viewModel.signInGoogle()
                         }
                     }
-                    
-                    Group {
-                        if colorScheme == .light {
-                            Image("appleid_light_button@4x")
-                                .resizable()
-                        }
-                        else {
-                            Image("appleid_dark_button@4x")
-                                .resizable()
-                        }
-                    }
-                    .scaledToFit()
                     .frame(width: screenWidth / 2)
-                    .onTapGesture {
+                    .removeShadow()
+                    .background(
+                        GeometryReader { geometry in
+                            Color.clear.onAppear {
+                                loginBtnHeight = geometry.size.height
+                            }
+                        }
+                    )
+                    
+                    AppleSignInButton(cornerRadius: 2, action: {    //  GoogleSignInButtonStyling.swift에 정의된 cornerRadius
                         Task {
                             try await viewModel.signInApple()
                         }
-                    }
+                    })
+                    .frame(width:screenWidth / 2, height: loginBtnHeight)
+                    .id(colorScheme == .light ? "light-btn": "dark-btn")    //  래퍼 내에서는 변경되지만 SwiftUI에서 변경되지 않아서 id 업데이트로 강제 테마 변경
                 }
                 
                 Spacer()
