@@ -9,10 +9,11 @@ import SwiftUI
 import SwiftUIIntrospect
 
 struct TimeLineView: View {
-    @StateObject var uiVM = UIViewModel()
+    @StateObject private var uiVM = UIViewModel()
     @StateObject private var scheduleVM = ScheduleViewModel()
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
+    @EnvironmentObject private var networkVM: NetworkViewModel
     @Environment(\.colorScheme) var colorScheme
     @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
@@ -428,6 +429,7 @@ struct TimeLineView: View {
                 .environmentObject(firebaseVM)
                 .environmentObject(uiVM)
                 .environmentObject(scheduleVM)
+                .environmentObject(networkVM)
                 .presentationDetents(uiVM.currentDetent, selection: $uiVM.selectedDetent)
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled(true)   //  사용자가 임의로 sheet를 완전히 내리는 것을 방지
