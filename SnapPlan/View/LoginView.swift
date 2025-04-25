@@ -9,9 +9,9 @@ import SwiftUI
 import GoogleSignInSwift
 
 struct LoginView: View {
-    @EnvironmentObject private var viewModel: FirebaseViewModel
+    @EnvironmentObject private var firebaseVM: FirebaseViewModel
+    @EnvironmentObject private var networkVM: NetworkViewModel
     @Environment(\.colorScheme) var colorScheme
-    @State private var loginBtnHeight: CGFloat = 0
     
     let screenWidth = UIScreen.main.bounds.width
     
@@ -33,29 +33,34 @@ struct LoginView: View {
                 .scaledToFit()
                 .frame(width: screenWidth / 5)
                 Spacer()
+                Text("스냅플랜에 오신 것을 환영합니다")
+                    .font(.title2)
+                    .bold()
+                Spacer()
                 VStack(spacing: 20) {
-                    GoogleSignInButton(scheme: colorScheme == .light ? .dark : .light, style: .wide, state: .pressed) {
-                        Task {
-                            try await viewModel.signInGoogle()
-                        }
-                    }
-                    .frame(width: screenWidth / 2)
-                    .removeShadow()
-                    .background(
-                        GeometryReader { geometry in
-                            Color.clear.onAppear {
-                                loginBtnHeight = geometry.size.height
+                    LoginButton(text: "구글 계정으로 로그인") {
+                        if networkVM.isConnected {
+                            Task {
+                                try await firebaseVM.signInGoogle()
                             }
                         }
-                    )
-                    
-                    AppleSignInButton(cornerRadius: 2, action: {    //  GoogleSignInButtonStyling.swift에 정의된 cornerRadius
-                        Task {
-                            try await viewModel.signInApple()
+                        else {
+                            networkVM.showNetworkAlert = true
                         }
-                    })
-                    .frame(width:screenWidth / 2, height: loginBtnHeight)
-                    .id(colorScheme == .light ? "light-btn": "dark-btn")    //  래퍼 내에서는 변경되지만 SwiftUI에서 변경되지 않아서 id 업데이트로 강제 테마 변경
+                    }
+                    .frame(width: screenWidth * 3 / 4, height: screenWidth / 13)
+                        
+                    LoginButton(text: "애플 계정으로 로그인") {
+                        if networkVM.isConnected {
+                            Task {
+                                try await firebaseVM.signInGoogle()
+                            }
+                        }
+                        else {
+                            networkVM.showNetworkAlert = true
+                        }
+                    }
+                    .frame(width: screenWidth * 3 / 4, height: screenWidth / 13)
                 }
                 
                 Spacer()
@@ -67,9 +72,4 @@ struct LoginView: View {
             }
         }
     }
-}
-
-#Preview {
-    LoginView()
-        .environmentObject(FirebaseViewModel())
 }
