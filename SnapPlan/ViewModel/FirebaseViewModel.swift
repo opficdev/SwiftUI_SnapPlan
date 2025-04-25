@@ -4,7 +4,6 @@
 //
 //  Created by opfic on 12/30/24.
 //
-//  Supabase 사용 예정으로 더이상 사용하지 않을 예정
 
 import SwiftUI
 import AVFoundation
