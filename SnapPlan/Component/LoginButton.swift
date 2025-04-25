@@ -42,7 +42,7 @@ struct LoginButton: View {
         .overlay(
             GeometryReader { proxy in
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.gray, lineWidth: 2)
+                    .stroke(Color.gray, lineWidth: 1)
                     .onAppear {
                         height = proxy.size.height
                     }
