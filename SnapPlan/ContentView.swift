@@ -20,10 +20,12 @@ struct ContentView: View {
                 if signedIn && !isFirstLaunch {
                     PlannerView()
                         .environmentObject(firebaseVM)
+                        .environmentObject(networkVM)
                 }
                 else {
                     LoginView()
                         .environmentObject(firebaseVM)
+                        .environmentObject(networkVM)
                         .onAppear {
                             if isFirstLaunch {
                                 Task {
@@ -49,12 +51,12 @@ struct ContentView: View {
                 }
             }
         }
-        .alert(isPresented: $networkVM.showCellularAlert) {
+        .alert(isPresented: $networkVM.showNetworkAlert) {
             Alert(
                 title: Text("네트워크 문제"),
                 message: Text("네트워크 연결을 확인해주세요"),
                 dismissButton: .default(Text("확인")) {
-                    networkVM.showCellularAlert = false
+                    networkVM.showNetworkAlert = false
                 }
             )
         }
