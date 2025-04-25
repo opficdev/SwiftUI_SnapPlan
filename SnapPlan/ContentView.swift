@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var firebaseVM = FirebaseViewModel()
+    @StateObject private var networkVM = NetworkViewModel()
     // 앱이 설치되고 첫번째 로딩인지 저장하는 AppStorage
     @AppStorage("isFirstLaunch") var isFirstLaunch: Bool = true
     
@@ -47,6 +48,15 @@ struct ContentView: View {
                     }
                 }
             }
+        }
+        .alert(isPresented: $networkVM.showCellularAlert) {
+            Alert(
+                title: Text("네트워크 문제"),
+                message: Text("네트워크 연결을 확인해주세요"),
+                dismissButton: .default(Text("확인")) {
+                    networkVM.showCellularAlert = false
+                }
+            )
         }
     }
 }
