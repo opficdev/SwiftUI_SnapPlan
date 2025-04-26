@@ -22,7 +22,7 @@ struct CalendarView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                Image(systemName: "gearshape")
+                Image(systemName: "line.3.horizontal")
                     .resizable()
                     .scaledToFit()
                     .frame(width: screenWidth / 18)
