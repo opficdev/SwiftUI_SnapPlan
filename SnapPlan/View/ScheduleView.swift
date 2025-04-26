@@ -18,6 +18,8 @@ struct ScheduleView: View {
     @EnvironmentObject var firebaseVM: FirebaseViewModel
     @EnvironmentObject var scheduleVM: ScheduleViewModel
     @EnvironmentObject var uiVM: UIViewModel
+    @EnvironmentObject var networkVM: NetworkViewModel
+    @Environment(\.colorScheme) var colorScheme
     @StateObject var searchVM = SearchLocationViewModel()
     @StateObject var permissionVM = PermissionViewModel()
     
@@ -64,36 +66,38 @@ struct ScheduleView: View {
                                     }) {
                                         Label("취소", systemImage: "xmark")
                                     }
-                                    Button(action: {
-                                        let copy = ScheduleData(
-                                            title: scheduleVM.title,
-                                            startDate: scheduleVM.startDate.addingTimeInterval(3600),
-                                            endDate: scheduleVM.endDate.addingTimeInterval(3600),
-                                            color: scheduleVM.color,
-                                            location: scheduleVM.location,
-                                            description: scheduleVM.description
-                                        )
-                                        Task {
-                                            do {
-                                                try await firebaseVM.upsertSchedule(schedule: copy)
-                                                firebaseVM.setSchedule(schedule: copy)
-                                            } catch {
-                                                print("스케줄 복사본 추가/수정 실패: \(error.localizedDescription)")
+                                    if networkVM.isConnected {
+                                        Button(action: {
+                                            let copy = ScheduleData(
+                                                title: scheduleVM.title,
+                                                startDate: scheduleVM.startDate.addingTimeInterval(3600),
+                                                endDate: scheduleVM.endDate.addingTimeInterval(3600),
+                                                color: scheduleVM.color,
+                                                location: scheduleVM.location,
+                                                description: scheduleVM.description
+                                            )
+                                            Task {
+                                                do {
+                                                    try await firebaseVM.upsertSchedule(schedule: copy)
+                                                    firebaseVM.setSchedule(schedule: copy)
+                                                } catch {
+                                                    print("스케줄 복사본 추가/수정 실패: \(error.localizedDescription)")
+                                                }
                                             }
-                                        }
-                                        Task {
-                                            try await firebaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)
-                                            if let voiceMemo = scheduleVM.voiceMemo {
-                                                try await firebaseVM.upsertVoiceMemo(id: copy.id, voiceMemo: voiceMemo)
+                                            Task {
+                                                try await firebaseVM.upsertPhotos(id: copy.id, photos: scheduleVM.photos)
+                                                if let voiceMemo = scheduleVM.voiceMemo {
+                                                    try await firebaseVM.upsertVoiceMemo(id: copy.id, voiceMemo: voiceMemo)
+                                                }
                                             }
+                                        }) {
+                                            Label("복제", systemImage: "doc.on.doc")
                                         }
-                                    }) {
-                                        Label("복제", systemImage: "doc.on.doc")
-                                    }
-                                    Button(role: .destructive, action: {
-                                        tapDeleteSchedule = true
-                                    }) {
-                                        Label("삭제", systemImage: "trash")
+                                        Button(role: .destructive, action: {
+                                            tapDeleteSchedule = true
+                                        }) {
+                                            Label("삭제", systemImage: "trash")
+                                        }
                                     }
                                 }) {
                                     Image(systemName: "ellipsis")
@@ -108,45 +112,55 @@ struct ScheduleView: View {
                                     let voiceMemo = scheduleVM.voiceMemo
                                     let schedule = scheduleVM.schedule!
                                     scheduleVM.schedule = nil
-                                    firebaseVM.setSchedule(schedule: schedule)
-                                    Task {
-                                        do {
-                                            try await firebaseVM.deleteVoiceMemo(id: id)
-                                            try await firebaseVM.deletePhotos(id: id)
-                                            try await firebaseVM.upsertSchedule(schedule: schedule)
-                                        }
-                                        catch {
-                                            print("스케줄 추가/수정 실패: \(error.localizedDescription)")
-                                        }
-                                        do {
-                                            if scheduleVM.photosState != .loading {
-                                                if photos.isEmpty {
-                                                    try await firebaseVM.deletePhotos(id: id)
+                                    if networkVM.isConnected {
+                                        firebaseVM.setSchedule(schedule: schedule)
+                                        Task {
+                                            do {
+                                                try await firebaseVM.deleteVoiceMemo(id: id)
+                                                try await firebaseVM.deletePhotos(id: id)
+                                                try await firebaseVM.upsertSchedule(schedule: schedule)
+                                            }
+                                            catch {
+                                                print("스케줄 추가/수정 실패: \(error.localizedDescription)")
+                                            }
+                                            do {
+                                                if scheduleVM.photosState != .loading {
+                                                    if photos.isEmpty {
+                                                        try await firebaseVM.deletePhotos(id: id)
+                                                    }
+                                                    else {
+                                                        try await firebaseVM.upsertPhotos(id: id, photos: photos)
+                                                    }
                                                 }
-                                                else {
-                                                    try await firebaseVM.upsertPhotos(id: id, photos: photos)
+                                                if scheduleVM.memoState != .loading {
+                                                    if let memo = voiceMemo {
+                                                        try await firebaseVM.upsertVoiceMemo(id: id, voiceMemo: memo)
+                                                    }
+                                                    else {
+                                                        try await firebaseVM.deleteVoiceMemo(id: id)
+                                                    }
                                                 }
                                             }
-                                            if scheduleVM.memoState != .loading {
-                                                if let memo = voiceMemo {
-                                                    try await firebaseVM.upsertVoiceMemo(id: id, voiceMemo: memo)
-                                                }
-                                                else {
-                                                    try await firebaseVM.deleteVoiceMemo(id: id)
-                                                }
+                                            catch {
+                                                print("사진, 음성 메모 추가/수정 실패: \(error.localizedDescription)")
                                             }
-                                        }
-                                        catch {
-                                            print("사진, 음성 메모 추가/수정 실패: \(error.localizedDescription)")
                                         }
                                     }
                                 }) {
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 5)
-                                            .fill(Color.gray.opacity(0.2))
-                                            .frame(width: 40, height: 30)
-                                        Text("완료")
-                                            .foregroundStyle(Color.white)
+                                    if networkVM.isConnected {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 5)
+                                                .fill(Color.gray.opacity(0.2))
+                                                .frame(width: 40, height: 30)
+                                            Text("완료")
+                                                .foregroundStyle(Color.white)
+                                        }
+                                    }
+                                    else {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .symbolRenderingMode(.palette)
+                                            .foregroundStyle(Color.white, Color.gray.opacity(0.2))
+                                            .font(.system(size: 30))
                                     }
                                 }
                             }
@@ -479,9 +493,13 @@ struct ScheduleView: View {
                         }) {
                             Image(systemName: "plus.circle.fill")
                                 .symbolRenderingMode(.palette)
-                                .foregroundStyle(Color.white, Color.gray.opacity(0.2))
+                                .foregroundStyle(
+                                    Color.white.opacity(networkVM.isConnected || colorScheme == .light ? 1 : 0.5),
+                                    Color.gray.opacity(networkVM.isConnected ? 0.2 : 0.1)
+                                )
                                 .font(.system(size: 30))
                         }
+                        .disabled(!networkVM.isConnected)
                     }
                 }
             }
