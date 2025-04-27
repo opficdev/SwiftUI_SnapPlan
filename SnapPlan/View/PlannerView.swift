@@ -14,15 +14,17 @@ struct PlannerView: View {
     @State private var showSettingView = false
     
     var body: some View {
-        VStack(spacing: 0) {
-            CalendarView(showScheduleView: $showScheduleView, showSettingView: $showSettingView)
-                .environmentObject(plannerVM)
-                .environmentObject(firebaseVM)
-            TimeLineView(showScheduleView: $showScheduleView)
-                .environmentObject(plannerVM)
-                .environmentObject(firebaseVM)
+        NavigationStack {
+            VStack(spacing: 0) {
+                CalendarView(showScheduleView: $showScheduleView, showSettingView: $showSettingView)
+                    .environmentObject(plannerVM)
+                    .environmentObject(firebaseVM)
+                TimeLineView(showScheduleView: $showScheduleView)
+                    .environmentObject(plannerVM)
+                    .environmentObject(firebaseVM)
+            }
+            .ignoresSafeArea(.all, edges: .bottom)
         }
-        .ignoresSafeArea(.all, edges: .bottom)
     }
 }
 
