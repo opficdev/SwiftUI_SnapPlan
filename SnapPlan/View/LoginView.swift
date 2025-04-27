@@ -38,7 +38,7 @@ struct LoginView: View {
                     .bold()
                 Spacer()
                 VStack(spacing: 20) {
-                    LoginButton(text: "구글 계정으로 로그인") {
+                    LoginButton(logo: Image("Google"), text: "구글 계정으로 로그인") {
                         if networkVM.isConnected {
                             Task {
                                 try await firebaseVM.signInGoogle()
@@ -50,7 +50,7 @@ struct LoginView: View {
                     }
                     .frame(width: screenWidth * 3 / 4, height: screenWidth / 13)
                         
-                    LoginButton(text: "애플 계정으로 로그인") {
+                    LoginButton(logo: Image("Apple_\(colorScheme == .light ? "black" : "white")"), text: "애플 계정으로 로그인") {
                         if networkVM.isConnected {
                             Task {
                                 try await firebaseVM.signInGoogle()
@@ -61,6 +61,7 @@ struct LoginView: View {
                         }
                     }
                     .frame(width: screenWidth * 3 / 4, height: screenWidth / 13)
+                    .id(colorScheme == .light ? "black" : "white")
                 }
                 
                 Spacer()
