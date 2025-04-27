@@ -34,36 +34,36 @@ struct CalendarView: View {
                             showSettingView = true
                         }
                     }
-                HStack(spacing: 4) {
-                    Text(plannerVM.getCurrentMonthYear())
-                        .font(.title)
-                        .bold()
-                    Image(systemName: "chevron.down")
-                        .foregroundStyle(
-                            (colorScheme == .light ? Color.black : Color.white)
-                                .opacity(showCalendar ? 1 : 0.5)
-                        )
-                        .rotationEffect(.degrees(showCalendar ? -180 : 0))
-                        .animation(.easeInOut(duration: 0.3), value: showCalendar ? 180 : 0) // 애니메이션 적용
-                }
-                .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(
-                            Color.gray.opacity(
-                                showCalendar ? 0.3 : 0
+                    HStack(spacing: 4) {
+                        Text(plannerVM.getCurrentMonthYear())
+                            .font(.title)
+                            .bold()
+                        Image(systemName: "chevron.down")
+                            .foregroundStyle(
+                                (colorScheme == .light ? Color.black : Color.white)
+                                    .opacity(showCalendar ? 1 : 0.5)
                             )
-                        )
-                )
-                .onTapGesture {
-                    withAnimation(.linear(duration: 0.1)) {
-                        showCalendar.toggle()
+                            .rotationEffect(.degrees(showCalendar ? -180 : 0))
+                            .animation(.easeInOut(duration: 0.3), value: showCalendar ? 180 : 0) // 애니메이션 적용
                     }
-                    if !showCalendar {
-                        plannerVM.currentDate = plannerVM.selectDate
+                    .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(
+                                Color.gray.opacity(
+                                    showCalendar ? 0.3 : 0
+                                )
+                            )
+                    )
+                    .onTapGesture {
+                        withAnimation(.linear(duration: 0.1)) {
+                            showCalendar.toggle()
+                        }
+                        if !showCalendar {
+                            plannerVM.currentDate = plannerVM.selectDate
+                        }
                     }
-                }
-                Spacer()
+                    Spacer()
                 
                 Text(plannerVM.dateString(date: plannerVM.today, component: .day))
                     .font(.subheadline)
