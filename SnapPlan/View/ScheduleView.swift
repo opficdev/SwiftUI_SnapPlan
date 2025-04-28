@@ -9,11 +9,6 @@
 import SwiftUI
 
 struct ScheduleView: View {
-    let colorArr = [
-        Color.macBlue, Color.macPurple, Color.macPink, Color.macRed,
-        Color.macOrange, Color.macYellow, Color.macGreen
-    ]
-    let screenWidth = UIScreen.main.bounds.width
     @EnvironmentObject var plannerVM: PlannerViewModel
     @EnvironmentObject var firebaseVM: FirebaseViewModel
     @EnvironmentObject var scheduleVM: ScheduleViewModel
@@ -41,6 +36,7 @@ struct ScheduleView: View {
     //  startDate가 변경되지 않는 이상 selectDate를 따르게 하려고
     //  해당 변수를 추가하였음
     @State private var didChangedStartDate = false
+    let screenWidth = UIScreen.main.bounds.width
     
     var body: some View {
         NavigationStack {
