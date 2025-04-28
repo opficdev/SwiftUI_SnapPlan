@@ -129,7 +129,7 @@ final class PlannerViewModel: ObservableObject {
             dateString += "\(second)초 "
         }
         if let _ = dateComponents.weekday {
-            dateString += DateFormatter.krWeekDay.string(from: date)
+            dateString += DateFormatter.krWeekDay(from: date)
         }
         
         return dateString.trimmingCharacters(in: .whitespaces)
@@ -193,9 +193,9 @@ final class PlannerViewModel: ObservableObject {
     
     func getCurrentMonthYear() -> String {
         if isSameDate(date1: currentDate, date2: today, components: [.year]) {
-            return DateFormatter.krMonthFormatter.string(from: currentDate)
+            return DateFormatter.krMonth(from: currentDate)
         }
-        return DateFormatter.krMonthYearFormatter.string(from: currentDate)
+        return DateFormatter.krMonthYear(from: currentDate)
     }
     
     func isSameDate(date1: Date, date2: Date, components: Set<Calendar.Component>) -> Bool {

@@ -18,7 +18,7 @@ struct VoiceMemoView: View {
                 Text("음성 메모")
                     .foregroundStyle(Color.gray)
                     .bold()
-                Text("\(DateFormatter.audioTimeFmt(scheduleVM.recordingTime)) / 30:00")
+                Text("\(DateFormatter.mmss(from: scheduleVM.recordingTime)) / 30:00")
                     .bold()
             }
             

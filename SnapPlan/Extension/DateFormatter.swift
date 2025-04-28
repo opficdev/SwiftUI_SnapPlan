@@ -8,33 +8,35 @@
 import Foundation
 
 extension DateFormatter {
-    static let krMonthFormatter: DateFormatter = {
+    static func krMonth(from date: Date) -> String {
         let fmt = DateFormatter()
-        fmt.dateFormat = "M월" // 한국어 형식의 월 포맷
-        return fmt
-    }()
+        fmt.locale = Locale(identifier: "ko_KR")
+        fmt.dateFormat = "M월"
+        return fmt.string(from: date)
+    }
     
-    static let krMonthYearFormatter: DateFormatter = {
+    static func krMonthYear(from date: Date) -> String {
         let fmt = DateFormatter()
-        fmt.dateFormat = "yyyy년 M월" // 한국어 형식의 연월 포맷
-        return fmt
-    }()
+        fmt.locale = Locale(identifier: "ko_KR")
+        fmt.dateFormat = "yyyy년 M월"
+        return fmt.string(from: date)
+    }
     
-    static let krWeekDay: DateFormatter = {
+    static func krWeekDay(from date: Date) -> String {
         let fmt = DateFormatter()
         fmt.locale = Locale(identifier: "ko_KR")
         fmt.dateFormat = "E"
-        return fmt
-    }()
+        return fmt.string(from: date)
+    }
     
-    static let yyyyMMdd: DateFormatter = {
+    static func yyyyMMdd(from date: Date) -> String {
         let fmt = DateFormatter()
         fmt.locale = Locale(identifier: "ko_KR")
         fmt.dateFormat = "yyyy-MM-dd"
-        return fmt
-    }()
+        return fmt.string(from: date)
+    }
     
-    static func audioTimeFmt(_ time: TimeInterval) -> String {
+    static func mmss(from time: TimeInterval) -> String {
         let minute = Int(time) / 60
         let second = Int(time) % 60
         return String(format: "%02d:%02d", minute, second)

@@ -30,7 +30,7 @@ struct LinearAudioPlayer: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack {
-                Text(DateFormatter.audioTimeFmt(player?.currentTime ?? 0))
+                Text(DateFormatter.mmss(from: player?.currentTime ?? 0))
                     .font(.caption)
                     .foregroundColor(.gray)
                 
@@ -53,7 +53,7 @@ struct LinearAudioPlayer: View {
                     }
                 }
                 
-                Text(DateFormatter.audioTimeFmt(player?.duration ?? 0))
+                Text(DateFormatter.mmss(from: player?.duration ?? 0))
                     .font(.caption)
                     .foregroundColor(.gray)
             }

@@ -47,7 +47,7 @@ struct TimeLineView: View {
                                         components: [.year, .month, .day]) ? Color.timeBar : Color.gray.opacity(0.5)
                                 )
                                 .frame(width: screenWidth / 14, height: screenWidth / 14)
-                            Text("\(DateFormatter.krWeekDay.string(from: plannerVM.selectDate))")
+                            Text("\(DateFormatter.krWeekDay(from: plannerVM.selectDate))")
                                 .font(.callout)
                                 .fontWeight(.bold)
                                 .foregroundColor(Color.white)
