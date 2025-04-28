@@ -77,6 +77,7 @@ struct CalendarView: View {
                         .foregroundStyle(Color.gray)
                         .padding(.trailing)
                 }
+                .navigationTitle("")
                 
                 Text(plannerVM.dateString(date: plannerVM.today, component: .day))
                     .font(.subheadline)
