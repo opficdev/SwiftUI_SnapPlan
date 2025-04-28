@@ -28,9 +28,10 @@ struct LoginButton: View {
                 Text(text)
                     .foregroundStyle(Color.primary)
                     .font(.system(size: height / 2))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .contentShape(RoundedRectangle(cornerRadius: 5))
         .overlay(
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
@@ -49,7 +50,6 @@ struct LoginButton: View {
                 }
             }
         )
-        
     }
 }
 
