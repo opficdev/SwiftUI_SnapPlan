@@ -8,10 +8,6 @@
 import SwiftUI
 
 struct ColorSelector: View {
-    let colorArr = [
-        Color.macBlue, Color.macPurple, Color.macPink, Color.macRed,
-        Color.macOrange, Color.macYellow, Color.macGreen
-    ]
     @Environment(\.dismiss) var dismiss
     @State private var height = CGFloat.zero
     @State private var colorWidth: CGFloat = UIScreen.main.bounds.width / 15
@@ -19,7 +15,7 @@ struct ColorSelector: View {
     
     var body: some View {
         HStack {
-            ForEach(Array(zip(colorArr.indices, colorArr)), id: \.1) { idx, color in
+            ForEach(Array(zip(Color.colorArray.indices, Color.colorArray)), id: \.1) { idx, color in
                 RoundedRectangle(cornerRadius: 5)
                     .fill(color)
                     .frame(

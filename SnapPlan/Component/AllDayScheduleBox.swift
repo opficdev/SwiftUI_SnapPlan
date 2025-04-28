@@ -8,10 +8,6 @@
 import SwiftUI
 
 struct AllDayScheduleBox: View {
-    let colorArr = [
-        Color.macBlue, Color.macPurple, Color.macPink, Color.macRed,
-        Color.macOrange, Color.macYellow, Color.macGreen
-    ]
     @Environment(\.colorScheme) var colorScheme
     @Binding var schedule: ScheduleData?
     @State private var boxHeight: CGFloat
@@ -24,11 +20,11 @@ struct AllDayScheduleBox: View {
     var body: some View {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: 4)
-                .stroke(colorArr[schedule!.color], lineWidth: 2)
+                .stroke(Color.colorArray[schedule!.color], lineWidth: 2)
                 .brightness(colorScheme == .light ? 0.4 : 0)
                 .background(
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(colorArr[schedule!.color])
+                        .fill(Color.colorArray[schedule!.color])
                         .brightness(colorScheme == .light ? 0.4 : 0)
                         .opacity(0.8)
                 )

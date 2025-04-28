@@ -8,10 +8,6 @@
 import SwiftUI
 
 struct ScheduleBox: View {
-    let colorArr = [
-        Color.macBlue, Color.macPurple, Color.macPink, Color.macRed,
-        Color.macOrange, Color.macYellow, Color.macGreen
-    ]
     @Environment(\.colorScheme) var colorScheme
     @Binding var schedule: ScheduleData?
     @State private var isChanging: Bool
@@ -48,11 +44,11 @@ struct ScheduleBox: View {
     var body: some View {
         GeometryReader { proxy in
             RoundedRectangle(cornerRadius: 4)
-                .stroke(colorArr[colorIdx], lineWidth: 2)
+                .stroke(Color.colorArray[colorIdx], lineWidth: 2)
                 .brightness(colorScheme == .light ? 0.4 : 0)
                 .background(
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(colorArr[colorIdx])
+                        .fill(Color.colorArray[colorIdx])
                         .brightness(colorScheme == .light ? 0.4 : 0)
                         .opacity(!isVisible ? 0.5 : 0.8)
                 )
@@ -98,7 +94,7 @@ struct ScheduleBox: View {
                     }
                     if isChanging {
                         Circle()
-                            .stroke(colorArr[colorIdx], lineWidth: 2)
+                            .stroke(Color.colorArray[colorIdx], lineWidth: 2)
                             .brightness(colorScheme == .light ? 0.4 : 0)
                             .frame(width: 12, height: 12)
                             .background(
@@ -131,7 +127,7 @@ struct ScheduleBox: View {
                             )
                         
                         Circle()
-                            .stroke(colorArr[colorIdx], lineWidth: 2)
+                            .stroke(Color.colorArray[colorIdx], lineWidth: 2)
                             .brightness(colorScheme == .light ? 0.4 : 0)
                             .frame(width: 12, height: 12)
                             .background(
