@@ -64,7 +64,15 @@ struct CalendarView: View {
                     }
                 }
                 Spacer()
-                NavigationLink(destination: SearchScheduleView()) {
+                NavigationLink(destination:
+                    SearchScheduleView()
+                    .onAppear {
+                        showScheduleView = false
+                    }
+                    .onDisappear {
+                        showScheduleView = true
+                    }
+                ) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(Color.gray)
                         .padding(.trailing)
