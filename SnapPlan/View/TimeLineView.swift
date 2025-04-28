@@ -92,7 +92,7 @@ struct TimeLineView: View {
                                                 }
                                             }
                                             Text(
-                                                plannerVM.getDateString(
+                                                DateFormatter.getDateString(
                                                     for: plannerVM.today,
                                                     components: [.hour, .minute],
                                                     is12hoursFmt: firebaseVM.is12TimeFmt

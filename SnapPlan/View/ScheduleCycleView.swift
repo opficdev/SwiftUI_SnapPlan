@@ -51,7 +51,7 @@ struct CycleOptionView: View {
                             dismiss()
                         }
                         .foregroundStyle(scheduleVM.cycleOption == .weekly ? Color.blue : Color.primary)
-                    Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.weekday]))
+                    Text(DateFormatter.getDateString(for: plannerVM.selectDate, components: [.weekday]))
                         .foregroundStyle(Color.gray)
                 }
                 HStack {
@@ -61,7 +61,7 @@ struct CycleOptionView: View {
                             dismiss()
                         }
                         .foregroundStyle(scheduleVM.cycleOption == .biweekly ? Color.blue : Color.primary)
-                    Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.weekday]))
+                    Text(DateFormatter.getDateString(for: plannerVM.selectDate, components: [.weekday]))
                         .foregroundStyle(Color.gray)
                 }
                 HStack {
@@ -71,7 +71,7 @@ struct CycleOptionView: View {
                             dismiss()
                         }
                         .foregroundStyle(scheduleVM.cycleOption == .monthly ? Color.blue : Color.primary)
-                    Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.day]))
+                    Text(DateFormatter.getDateString(for: plannerVM.selectDate, components: [.day]))
                         .foregroundStyle(Color.gray)
                 }
                 HStack {
@@ -81,7 +81,7 @@ struct CycleOptionView: View {
                             dismiss()
                         }
                         .foregroundStyle(scheduleVM.cycleOption == .yearly ? Color.blue : Color.primary)
-                    Text(plannerVM.getDateString(for: plannerVM.selectDate, components: [.month, .day]))
+                    Text(DateFormatter.getDateString(for: plannerVM.selectDate, components: [.month, .day]))
                         .foregroundStyle(Color.gray)
                 }
             }
