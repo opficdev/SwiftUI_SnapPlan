@@ -64,21 +64,22 @@ struct CalendarView: View {
                     }
                 }
                 Spacer()
-                NavigationLink(destination:
+                NavigationLink(destination: {
                     SearchScheduleView()
-                    .onAppear {
-                        showScheduleView = false
-                    }
-                    .onDisappear {
-                        showScheduleView = true
-                    }
-                ) {
+                        .environmentObject(firebaseVM)
+                        .environmentObject(plannerVM)
+                        .onAppear {
+                            showScheduleView = false
+                        }
+                        .onDisappear {
+                            showScheduleView = true
+                        }
+                }) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(Color.gray)
                         .padding(.trailing)
                 }
                 .navigationTitle("")
-                
                 Text(plannerVM.dateString(date: plannerVM.today, component: .day))
                     .font(.subheadline)
                     .fontWeight(.bold)
