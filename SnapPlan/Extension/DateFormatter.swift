@@ -29,16 +29,16 @@ extension DateFormatter {
         return fmt.string(from: date)
     }
     
-    static func yyyyMMdd(from date: Date) -> String {
-        let fmt = DateFormatter()
-        fmt.locale = Locale(identifier: "ko_KR")
-        fmt.dateFormat = "yyyy-MM-dd"
-        return fmt.string(from: date)
-    }
-    
     static func mmss(from time: TimeInterval) -> String {
         let minute = Int(time) / 60
         let second = Int(time) % 60
         return String(format: "%02d:%02d", minute, second)
     }
+    
+    static let yyyyMMdd = {
+        let fmt = DateFormatter()
+        fmt.locale = Locale(identifier: "ko_KR")
+        fmt.dateFormat = "yyyy-MM-dd"
+        return fmt    
+    }()
 }
