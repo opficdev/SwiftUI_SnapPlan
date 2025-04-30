@@ -251,10 +251,8 @@ struct TimeLineView: View {
                                                 .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
                                             }
                                             .onAppear {
-                                                calendarData = Array(Set(plannerVM.calendarData[0] + plannerVM.calendarData[1])).sorted(by: { $0 < $1 })
                                                 DispatchQueue.main.async {
                                                     scrollProxy.scrollTo(plannerVM.selectDate, anchor: .top)
-                                                    uiVM.allDayPadding = timeZoneSize.height * 2
                                                 }
                                             }
                                             .onChange(of: plannerVM.userTapped) { value in
@@ -336,6 +334,12 @@ struct TimeLineView: View {
                         .offset(x: timeZoneSize.width)
                 }
                
+            }
+        }
+        .onAppear {
+            calendarData = Array(Set(plannerVM.calendarData[0] + plannerVM.calendarData[1])).sorted(by: { $0 < $1 })
+            DispatchQueue.main.async {
+                uiVM.allDayPadding = timeZoneSize.height * 2
             }
         }
         .onChange(of: plannerVM.selectDate) { date in
