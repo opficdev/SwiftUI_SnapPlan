@@ -19,9 +19,16 @@ struct TimeLineView: View {
     @State private var timeZoneSize = CGSizeZero
     @State private var calendarData = [Date]()
     @State private var dragByUser = false
-    @State private var gap = UIScreen.main.bounds.width / 24    //  이거 조절해서 간격 조절
-    @State private var lastGap = UIScreen.main.bounds.width / 24
+    @State private var gap: CGFloat    //  이거 조절해서 간격 조절
+    @State private var lastGap: CGFloat
+    let minimumGap = UIFont.preferredFont(forTextStyle: .caption1).pointSize + 6
     let screenWidth = UIScreen.main.bounds.width
+    
+    init(showScheduleView: Binding<Bool>) {
+        self._showScheduleView = showScheduleView
+        self._gap = State(initialValue: minimumGap)
+        self._lastGap = State(initialValue: minimumGap)
+    }
     
     var body: some View {
         ZStack {
