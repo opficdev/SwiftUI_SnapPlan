@@ -72,7 +72,7 @@ struct TimeLineView: View {
                         ScrollViewReader { proxy in
                             ScrollView(showsIndicators: false) {
                                 HStack(spacing: 0) {
-                                    VStack {
+                                    VStack(spacing: 0) {
                                         ZStack(alignment: .topTrailing) {
                                             VStack(alignment: .trailing, spacing: gap) {
                                                 let hours = plannerVM.getHours(is12hoursFmt: firebaseVM.is12TimeFmt)
@@ -127,7 +127,7 @@ struct TimeLineView: View {
                                                         Rectangle()
                                                             .frame(width: 1)
                                                             .foregroundStyle(Color.gray.opacity(0.3))
-                                                        VStack {
+                                                        VStack(spacing: 0) {
                                                             ZStack(alignment: .top) {
                                                                 //  MARK: 시간 구분선
                                                                 VStack(spacing: 0) {

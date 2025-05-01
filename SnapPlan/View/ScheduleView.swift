@@ -28,7 +28,6 @@ struct ScheduleView: View {
     @State private var tapColor = false  //  색상 탭 여부
     @State private var tapDeleteSchedule = false   //  스케줄 삭제 탭 여부
     @State private var tapVoiceMemo = false   //  음성 메모 탭 여부
-    @State private var sheetMinHeight = CGFloat.zero //    sheet 최소 높이
     
     @FocusState private var titleFocus: Bool    //  제목 포커싱 여부
     @State private var descriptionFocus = false   //  설명 포커싱 여부
@@ -499,7 +498,6 @@ struct ScheduleView: View {
                     }
                 }
             }
-            .padding()
             .onChange(of: scheduleVM.schedule) { schedule in
                 startTask = schedule != nil
             }
@@ -526,16 +524,22 @@ struct ScheduleView: View {
             }
             .background(
                 GeometryReader { proxy in
-                    Color.clear.onChange(of: proxy.size.height) { height in
-                        if uiVM.selectedDetent != .large {
+                    Color.clear
+                        .onAppear {
                             DispatchQueue.main.async {
-                                uiVM.sheetPadding = height
+                                uiVM.sheetPadding = proxy.size.height + UIApplication.safeAreaInsets.bottom
                             }
                         }
+                        .onChange(of: proxy.size.height) { height in
+                            if uiVM.selectedDetent != .large {
+                                DispatchQueue.main.async {
+                                    uiVM.sheetPadding = height + UIApplication.safeAreaInsets.bottom
+                                }
+                            }
                     }
                 }
-                    .ignoresSafeArea(.all, edges: .bottom)
             )
+            .padding(.horizontal)
         }
     }
     
