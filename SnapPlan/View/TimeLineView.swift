@@ -37,7 +37,7 @@ struct TimeLineView: View {
                 HStack(spacing: 0) {
                     Text(firebaseVM.is12TimeFmt ? "12시간제" : "24시간제")
                         .frame(width: screenWidth / 7)
-                        .font(.caption)
+                        .font(.caption2)
                         .onTapGesture {
                             firebaseVM.is12TimeFmt.toggle()
                         }
@@ -78,7 +78,7 @@ struct TimeLineView: View {
                                                 let hours = plannerVM.getHours(is12hoursFmt: firebaseVM.is12TimeFmt)
                                                 ForEach(Array(zip(hours.indices, hours)), id: \.1.id) { index, hour in
                                                     Text("\(hour.timePeriod) \(hour.time)")
-                                                        .font(.caption)
+                                                        .font(.caption2)
                                                         .foregroundStyle(Color.gray)
                                                         .opacity(
                                                             plannerVM.isCollapsed(
@@ -105,7 +105,7 @@ struct TimeLineView: View {
                                                     is12hoursFmt: firebaseVM.is12TimeFmt
                                                 )
                                             )
-                                            .font(.caption)
+                                            .font(.caption2)
                                             .padding(.trailing, 2)
                                             .offset(y: plannerVM.getOffsetFromDate(
                                                 for: plannerVM.today,
@@ -302,7 +302,7 @@ struct TimeLineView: View {
                     }
                     HStack(alignment:. top, spacing: 2) {
                         Text("종일")
-                            .font(.caption)
+                            .font(.caption2)
                             .foregroundStyle(Color.gray)
                             .padding(.trailing, 2)
                             .frame(width: timeZoneSize.width, height: uiVM.allDayPadding, alignment: .trailing)
