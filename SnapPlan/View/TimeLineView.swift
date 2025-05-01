@@ -289,6 +289,14 @@ struct TimeLineView: View {
                                             }
                                     )
                                 }
+                                .id("anchor")
+                            }
+                            .onAppear {
+                                if 12 < Calendar.current.component(.hour, from: plannerVM.today)  {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                        proxy.scrollTo("anchor", anchor: .bottom)
+                                    }
+                                }
                             }
                         }
                     }
