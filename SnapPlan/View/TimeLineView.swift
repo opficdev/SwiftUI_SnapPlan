@@ -124,7 +124,7 @@ struct TimeLineView: View {
                                                     HStack(spacing: 0) {
                                                         Rectangle()
                                                             .frame(width: 1)
-                                                            .foregroundStyle(Color.gray.opacity(dragByUser ? 0.3 : 0))
+                                                            .foregroundStyle(Color.gray.opacity(dragByUser || plannerVM.userTapped ? 0.3 : 0))
                                                         VStack(spacing: 0) {
                                                             ZStack(alignment: .top) {
                                                                 //  MARK: 시간 구분선
@@ -262,10 +262,19 @@ struct TimeLineView: View {
                                             }
                                             .onChange(of: plannerVM.userTapped) { value in
                                                 if value {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        scrollProxy.scrollTo(plannerVM.selectDate, anchor: .top)
+                                                    Task {
+                                                        try await Task.sleep(for: .seconds(0.1))
+                                                        await MainActor.run {
+                                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                                scrollProxy.scrollTo(plannerVM.selectDate, anchor: .top)
+                                                            }
+                                                        }
+                                                        
+                                                        try await Task.sleep(for: .seconds(0.15))
+                                                        await MainActor.run {
+                                                            plannerVM.userTapped = false
+                                                        }
                                                     }
-                                                    plannerVM.userTapped = false
                                                 }
                                             }
                                         }

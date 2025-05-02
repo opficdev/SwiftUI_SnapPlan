@@ -42,7 +42,7 @@ final class PlannerViewModel: ObservableObject {
                     !self.isSameDate(date1: self.currentDate, date2: newValue, components: [.year, .month]) {
                     self.monthChange = true
                     self.newSelectDate = newValue
-                    withAnimation(.easeInOut(duration: 0.15)) {
+                    DispatchQueue.main.async {
                         self.setCalendarData(date: newValue)
                     }
                 }
