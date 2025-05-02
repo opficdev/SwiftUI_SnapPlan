@@ -26,90 +26,96 @@ struct PhotoView: View {
     }
     
     var body: some View {
-        VStack {
-            if !scheduleVM.photos.isEmpty {
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 4), GridItem(.flexible(), spacing: 4)], spacing: 4) {
-                        let photos = scheduleVM.photos.map { $0.image }
-                        ForEach(Array(zip(photos.indices, photos)), id: \.0) { idx, image in
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: UIScreen.main.bounds.width / 2 - 28)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.white, lineWidth: 2)
-                                )
-                                .onTapGesture {
-                                    selectedPhotos.remove(at: idx)
-                                    scheduleVM.photos.remove(at: idx)
-                                    removedByTap = true
+        NavigationStack {
+            VStack {
+                if !scheduleVM.photos.isEmpty {
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 4), GridItem(.flexible(), spacing: 4)], spacing: 4) {
+                            let photos = scheduleVM.photos.map { $0.image }
+                            ForEach(Array(zip(photos.indices, photos)), id: \.0) { idx, image in
+                                NavigationLink(destination: PhotoDetailView(image: image)) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: UIScreen.main.bounds.width / 2 - 28)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color.white, lineWidth: 2)
+                                        )
+                                        .highPriorityGesture(
+                                            LongPressGesture(minimumDuration: 0.5)
+                                                .onEnded { _ in
+                                                    selectedPhotos.remove(at: idx)
+                                                    scheduleVM.photos.remove(at: idx)
+                                                    removedByTap = true
+                                                }
+                                        )
                                 }
+                            }
                         }
+                        .background(
+                            GeometryReader { proxy in
+                                Color.clear
+                                    .onAppear {
+                                        innerHeight = proxy.size.height
+                                    }
+                                    .onChange(of: scheduleVM.photos) { _ in
+                                        innerHeight = proxy.size.height
+                                    }
+                            }
+                        )
+                        .padding(.horizontal, 4)
                     }
+                    .padding(.horizontal)
                     .background(
                         GeometryReader { proxy in
-                            Color.clear
-                                .onAppear {
-                                    innerHeight = proxy.size.height
-                                }
-                                .onChange(of: scheduleVM.photos) { _ in
-                                    innerHeight = proxy.size.height
-                                }
+                            Color.clear.onAppear {
+                                outerHeight = proxy.size.height
+                            }
                         }
                     )
-                    .padding(.horizontal, 4)
+                    .scrollDisabled(innerHeight <= outerHeight)
+                    
                 }
-                .padding(.horizontal)
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            outerHeight = proxy.size.height
-                        }
+                else {
+                    VStack {
+                        Text("저장된 사진이 없습니다.")
+                        Text("우측 상단 + 버튼을 눌러 사진을 추가해보세요.")
                     }
-                )
-                .scrollDisabled(innerHeight <= outerHeight)
-           
-            }
-            else {
-                VStack {
-                    Text("저장된 사진이 없습니다.")
-                    Text("우측 상단 + 버튼을 눌러 사진을 추가해보세요.")
-                }
                     .foregroundStyle(Color.gray)
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                PhotosPicker(
-                    selection: $selectedPhotos,
-                    maxSelectionCount: maxSelectedCount,
-                    matching: .images,
-                    photoLibrary: .shared()
-                ) {
-                    Image(systemName: "plus")
                 }
-                .disabled(scheduleVM.photos.count >= maxSelectedCount)
-                .onChange(of: selectedPhotos) { newValue in
-                    Task {
-                        if !removedByTap {
-                            scheduleVM.photos = await handleSelectedPhotos(newValue, assets: scheduleVM.photos)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    PhotosPicker(
+                        selection: $selectedPhotos,
+                        maxSelectionCount: maxSelectedCount,
+                        matching: .images,
+                        photoLibrary: .shared()
+                    ) {
+                        Image(systemName: "plus")
+                    }
+                    .disabled(scheduleVM.photos.count >= maxSelectedCount)
+                    .onChange(of: selectedPhotos) { newValue in
+                        Task {
+                            if !removedByTap {
+                                scheduleVM.photos = await handleSelectedPhotos(newValue, assets: scheduleVM.photos)
+                            }
+                            removedByTap = false
                         }
-                        removedByTap = false
                     }
                 }
             }
-        }
-        .navigationTitle("사진")
-        .alert("알림", isPresented: .constant(!errMsg.isEmpty)) {
-            Button("확인", role: .cancel) {
-                errMsg = ""
+            .navigationTitle("사진")
+            .alert("알림", isPresented: .constant(!errMsg.isEmpty)) {
+                Button("확인", role: .cancel) {
+                    errMsg = ""
+                }
+            } message: {
+                Text(errMsg)
             }
-        } message: {
-            Text(errMsg)
         }
-
     }
 
     private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem], assets: [ImageAsset]) async -> [ImageAsset] {
