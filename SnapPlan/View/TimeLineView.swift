@@ -126,7 +126,7 @@ struct TimeLineView: View {
                                                     HStack(spacing: 0) {
                                                         Rectangle()
                                                             .frame(width: 1)
-                                                            .foregroundStyle(Color.gray.opacity(0.3))
+                                                            .foregroundStyle(Color.gray.opacity(dragByUser ? 0.3 : 0))
                                                         VStack(spacing: 0) {
                                                             ZStack(alignment: .top) {
                                                                 //  MARK: 시간 구분선
@@ -226,7 +226,7 @@ struct TimeLineView: View {
                                                             }
                                                             Rectangle()
                                                                 .fill(Color.clear)
-                                                                .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)), height: uiVM.sheetPadding)
+                                                                .frame(width: CGFloat(ceil(screenWidth - timeZoneSize.width)), height: uiVM.sheetPadding)
                                                         }
                                                     }
                                                     .background(
@@ -255,7 +255,7 @@ struct TimeLineView: View {
                                                         }
                                                     )
                                                 }
-                                                .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
+                                                .frame(width: CGFloat(ceil(screenWidth - timeZoneSize.width)))
                                             }
                                             .onAppear {
                                                 DispatchQueue.main.async {
@@ -271,17 +271,17 @@ struct TimeLineView: View {
                                                 }
                                             }
                                         }
-                                        .frame(width: CGFloat(Int(screenWidth - timeZoneSize.width)))
+                                        .frame(width: CGFloat(ceil(screenWidth - timeZoneSize.width)))
                                         .scrollDisabled(scheduleVM.schedule != nil)
                                         .pagingEnabled()
                                     }
                                     .simultaneousGesture(
 //                                        MagnificationGesture()    //  줌 효과 -> 수정 필요
 //                                            .onChanged { value in   // min: 너무 커지지 않게, max: 너무 작아지지 않게
-//                                                gap = min(screenWidth, max(lastGap * value, screenWidth / 24))
+//                                                gap = min(screenWidth, max(lastGap * value, minimumGap))
 //                                            }
 //                                            .onEnded { _ in
-//                                                lastGap = max(gap, screenWidth / 24)
+//                                                lastGap = max(gap, minimumGap)
 //                                            }
                                         DragGesture()
                                             .onChanged { _ in
