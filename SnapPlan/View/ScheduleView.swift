@@ -527,19 +527,20 @@ struct ScheduleView: View {
                     Color.clear
                         .onAppear {
                             DispatchQueue.main.async {
-                                uiVM.sheetPadding = proxy.size.height + UIApplication.safeAreaInsets.bottom
+                                uiVM.sheetPadding = proxy.size.height + UIApplication.safeAreaInsets.bottom + 12
                             }
                         }
                         .onChange(of: proxy.size.height) { height in
                             if uiVM.selectedDetent != .large {
                                 DispatchQueue.main.async {
-                                    uiVM.sheetPadding = height + UIApplication.safeAreaInsets.bottom
+                                    uiVM.sheetPadding = height + UIApplication.safeAreaInsets.bottom + 12
                                 }
                             }
                     }
                 }
             )
             .padding(.horizontal)
+            .padding(.top, scheduleVM.schedule == nil ? 0 : 12)
         }
     }
     
