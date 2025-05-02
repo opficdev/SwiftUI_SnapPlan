@@ -6,13 +6,21 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct PhotoDetailView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    @State private var image: UIImage
+    
+    init(image: UIImage) {
+        self._image = State(initialValue: image)
     }
-}
-
-#Preview {
-    PhotoDetailView()
+    
+    var body: some View {
+        ZoomableScrollView() {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+        }
+        .padding(.vertical)
+    }
 }
