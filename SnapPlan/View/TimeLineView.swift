@@ -9,13 +9,12 @@ import SwiftUI
 import SwiftUIIntrospect
 
 struct TimeLineView: View {
-    @StateObject private var uiVM = UIViewModel()
     @StateObject private var scheduleVM = ScheduleViewModel()
+    @EnvironmentObject private var uiVM: UIViewModel
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
     @EnvironmentObject private var networkVM: NetworkViewModel
     @Environment(\.colorScheme) var colorScheme
-    @Binding var showScheduleView: Bool
     @State private var timeZoneSize = CGSizeZero
     @State private var calendarData = [Date]()
     @State private var dragByUser = false
@@ -24,8 +23,7 @@ struct TimeLineView: View {
     let minimumGap = UIFont.preferredFont(forTextStyle: .caption1).pointSize + 6
     let screenWidth = UIScreen.main.bounds.width
     
-    init(showScheduleView: Binding<Bool>) {
-        self._showScheduleView = showScheduleView
+    init() {
         self._gap = State(initialValue: minimumGap)
         self._lastGap = State(initialValue: minimumGap)
     }
@@ -442,7 +440,7 @@ struct TimeLineView: View {
                 }
             }
         }
-        .sheet(isPresented: $showScheduleView) {
+        .sheet(isPresented: $uiVM.showScheduleView) {
             ScheduleView()
                 .environmentObject(plannerVM)
                 .environmentObject(firebaseVM)
@@ -464,7 +462,8 @@ struct TimeLineView: View {
 }
 
 #Preview {
-    TimeLineView(showScheduleView: .constant(true))
+    TimeLineView()
         .environmentObject(PlannerViewModel())
         .environmentObject(FirebaseViewModel())
+        .environmentObject(UIViewModel())
 }

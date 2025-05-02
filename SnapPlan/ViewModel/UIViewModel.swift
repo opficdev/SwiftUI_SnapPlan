@@ -8,6 +8,8 @@
 import SwiftUI
 
 class UIViewModel: ObservableObject {
+    @Published var showScheduleView = true
+    @Published var showSettingView = false
     @Published var allDayPadding = CGFloat.zero    //  종일 이벤트를 보여주는 뷰에 의해 가려지는 만큼 ScrollView 내부에 추가되는 패딩
     @Published var sheetPadding = CGFloat.zero //  sheet에 의해 가려지는 만큼 ScrollView 내부에 추가되는 패딩
     @Published var currentDetent:Set<PresentationDetent> = [.fraction(0.07)]    //  ScheduleView에 쓰이는 detents

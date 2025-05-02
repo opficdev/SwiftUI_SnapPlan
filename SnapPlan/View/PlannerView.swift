@@ -9,19 +9,20 @@ import SwiftUI
 
 struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
+    @StateObject private var uiVM = UIViewModel()
     @EnvironmentObject var firebaseVM: FirebaseViewModel
-    @State private var showScheduleView = true
-    @State private var showSettingView = false
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                CalendarView(showScheduleView: $showScheduleView, showSettingView: $showSettingView)
+                CalendarView()
                     .environmentObject(plannerVM)
                     .environmentObject(firebaseVM)
-                TimeLineView(showScheduleView: $showScheduleView)
+                    .environmentObject(uiVM)
+                TimeLineView()
                     .environmentObject(plannerVM)
                     .environmentObject(firebaseVM)
+                    .environmentObject(uiVM)
             }
             .ignoresSafeArea(.all, edges: .bottom)
         }

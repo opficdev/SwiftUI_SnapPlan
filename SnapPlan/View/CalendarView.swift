@@ -11,9 +11,8 @@ import SwiftUIIntrospect
 struct CalendarView: View {
     @EnvironmentObject private var plannerVM: PlannerViewModel
     @EnvironmentObject private var firebaseVM: FirebaseViewModel
+    @EnvironmentObject private var uiVM: UIViewModel
     @Environment(\.colorScheme) var colorScheme
-    @Binding var showScheduleView: Bool
-    @Binding var showSettingView: Bool
     @State private var showCalendar = false // 전체 달력을 보여줄지 여부
     @State private var dragByUser = false
     
@@ -29,9 +28,9 @@ struct CalendarView: View {
                     .foregroundStyle(Color.gray)
                     .padding(EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 8)) //  월 보여주는거 때문에 16 - 8
                     .onTapGesture {
-                        showScheduleView = false
+                        uiVM.showScheduleView = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            showSettingView = true
+                            uiVM.showSettingView = true
                         }
                     }
                 HStack(spacing: 4) {
@@ -69,10 +68,10 @@ struct CalendarView: View {
                         .environmentObject(firebaseVM)
                         .environmentObject(plannerVM)
                         .onAppear {
-                            showScheduleView = false
+                            uiVM.showScheduleView = false
                         }
                         .onDisappear {
-                            showScheduleView = true
+                            uiVM.showScheduleView = true
                         }
                 }) {
                     Image(systemName: "magnifyingglass")
@@ -165,21 +164,19 @@ struct CalendarView: View {
             }
         }
         .background(Color.calendar)
-        .fullScreenCover(isPresented: $showSettingView) {
+        .fullScreenCover(isPresented: $uiVM.showSettingView) {
             SettingView()
                 .environmentObject(firebaseVM)
                 .onDisappear {
-                    showScheduleView = true
+                    uiVM.showScheduleView = true
                 }
         }
     }
 }
 
 #Preview {
-    CalendarView(
-        showScheduleView: .constant(true),
-        showSettingView: .constant(false)
-    )
+    CalendarView()
         .environmentObject(FirebaseViewModel())
         .environmentObject(PlannerViewModel())
+        .environmentObject(UIViewModel())
 }
