@@ -51,14 +51,14 @@ struct ContentView: View {
                 }
             }
         }
-        .alert(isPresented: $networkVM.showNetworkAlert) {
-            Alert(
-                title: Text("네트워크 문제"),
-                message: Text("네트워크 연결을 확인해주세요"),
-                dismissButton: .default(Text("확인")) {
-                    networkVM.showNetworkAlert = false
-                }
-            )
+        .alert("네트워크 문제", isPresented: $networkVM.showNetworkAlert) {
+            Button(role: .cancel, action: {
+                networkVM.showNetworkAlert = false
+            }) {
+                Text("확인")
+            }
+        } message: {
+            Text("네트워크 연결을 확인해주세요")
         }
     }
 }
