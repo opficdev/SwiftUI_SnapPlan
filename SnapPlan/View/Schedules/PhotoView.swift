@@ -11,19 +11,12 @@ import PhotosUI
 struct PhotoView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var scheduleVM: ScheduleViewModel
-    @State private var selectedPhotos: [PhotosPickerItem] = []
-    @State private var savedPhotos: [UIImage] = []
     @State private var innerHeight = CGFloat.zero   //  ScrollView 내부 요소의 총 높이
     @State private var outerHeight = CGFloat.zero   //  ScrollView 자체 높이
-    @State private var errMsg = ""
+    @State private var showSizeAlert = false
+    @State private var phAssets: [PHAsset] = []
     @State private var removedByTap = false
-    private let maxSelectedCount: Int
-    init(selectedItems: [ImageAsset], maxSelectedCount: Int = 5) {
-        self._selectedPhotos = State(initialValue: selectedItems.map { item in
-            PhotosPickerItem(itemIdentifier: item.id.replacingOccurrences(of: "_", with: "/"))
-        })
-        self.maxSelectedCount = maxSelectedCount
-    }
+    @State private var showPicker = false
     
     var body: some View {
         NavigationStack {
@@ -46,7 +39,6 @@ struct PhotoView: View {
                                         .highPriorityGesture(
                                             LongPressGesture(minimumDuration: 0.5)
                                                 .onEnded { _ in
-                                                    selectedPhotos.remove(at: idx)
                                                     scheduleVM.photos.remove(at: idx)
                                                     removedByTap = true
                                                 }
@@ -88,66 +80,17 @@ struct PhotoView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    PhotosPicker(
-                        selection: $selectedPhotos,
-                        maxSelectionCount: maxSelectedCount,
-                        matching: .images,
-                        photoLibrary: .shared()
-                    ) {
+                    Button(action: {
+                        showPicker = true
+                    }) {
                         Image(systemName: "plus")
-                    }
-                    .disabled(scheduleVM.photos.count >= maxSelectedCount)
-                    .onChange(of: selectedPhotos) { newValue in
-                        Task {
-                            if !removedByTap {
-                                scheduleVM.photos = await handleSelectedPhotos(newValue, assets: scheduleVM.photos)
-                            }
-                            removedByTap = false
-                        }
                     }
                 }
             }
             .navigationTitle("사진")
-            .alert("알림", isPresented: .constant(!errMsg.isEmpty)) {
-                Button("확인", role: .cancel) {
-                    errMsg = ""
-                }
-            } message: {
-                Text(errMsg)
+            .sheet(isPresented: $showPicker) {
+                PhotoGridPicker(selectedImages: $scheduleVM.photos)
             }
         }
     }
-
-    private func handleSelectedPhotos(_ newPhotos: [PhotosPickerItem], assets: [ImageAsset]) async -> [ImageAsset] {
-        var imageAssets: [ImageAsset] = []
-        
-        for newPhoto in newPhotos {
-            do {
-                if let data = try await newPhoto.loadTransferable(type: Data.self) {
-                    if 5 * 1024 * 1024 <= data.count {
-                        errMsg = "5MB 이하의 사진만 추가해주세요!"
-                        self.selectedPhotos.removeAll(where: { $0 == newPhoto })
-                        continue
-                    }
-                            
-                    else if let id = newPhoto.itemIdentifier, let image = UIImage(data: data) {
-                        let asset = ImageAsset(id: id, image: image)
-                        imageAssets.append(asset)
-                    }
-                }
-                else {
-                    if let id = newPhoto.itemIdentifier {
-                        if let asset = (assets.first { $0.id.replacingOccurrences(of: "_", with: "/") == id }) {
-                            imageAssets.append(asset)
-                        }
-                    }
-                }
-            } catch {
-                print("Failed to load photo: \(error)")
-            }
-        }
-        
-        return imageAssets
-    }
-
 }
