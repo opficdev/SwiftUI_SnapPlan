@@ -71,7 +71,7 @@ struct PhotoGridPicker: View {
         .alert("이미지 크기 초과", isPresented: $showingSizeAlert) {
             Button("확인", role: .cancel) { }
         } message: {
-            Text("5MB 이하 이미지만 선택 가능합니다.")
+            Text("선택한 이미지 크기가 너무 큽니다.")
         }
         .alert("최대 선택 개수", isPresented: $showingLimitAlert) {
             Button("확인", role: .cancel) { }
