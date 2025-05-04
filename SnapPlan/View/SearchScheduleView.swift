@@ -25,7 +25,7 @@ struct SearchScheduleView: View {
                         .font(.callout)
                         .padding(8)
                     TextField(text: $keyword) {
-                        Text("일정 제목, 장소, 설명")
+                        Text("일정 제목, 위치, 설명")
                             .foregroundColor(.gray)
                             .font(.callout)
                     }
