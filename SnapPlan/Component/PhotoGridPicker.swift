@@ -18,7 +18,7 @@ struct PhotoGridPicker: View {
     @State private var showingSizeAlert = false
     @State private var showingLimitAlert = false
     
-    let maxFileSize: Int = 5 * 1024 * 1024 // 5MB
+    let maxFileSize: Int = 10 * 1024 * 1024 // 10MB
     let maxSelectionCount: Int = 10
     
     var body: some View {
