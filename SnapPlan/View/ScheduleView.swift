@@ -304,7 +304,7 @@ struct ScheduleView: View {
                                     }
                                     .foregroundStyle(scheduleVM.voiceMemo == nil ? Color.gray : Color.primary)
                                     HStack {
-                                        NavigationLink(destination: PhotoView(selectedItems: scheduleVM.photos).environmentObject(scheduleVM)) {
+                                        NavigationLink(destination: PhotoView().environmentObject(scheduleVM)) {
                                             HStack {
                                                 Image(systemName: "photo")
                                                     .frame(width: 25)
