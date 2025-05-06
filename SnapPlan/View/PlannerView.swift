@@ -9,8 +9,8 @@ import SwiftUI
 
 struct PlannerView: View {
     @StateObject var plannerVM = PlannerViewModel()
-    @StateObject private var uiVM = UIViewModel()
     @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var uiVM: UIViewModel
     
     var body: some View {
         NavigationStack {

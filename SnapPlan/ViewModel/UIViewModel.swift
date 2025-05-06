@@ -40,4 +40,14 @@ class UIViewModel: ObservableObject {
             self.onAppear = false
         }
     }
+    
+    func setAppTheme(_ style: UIUserInterfaceStyle) {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                windowScene.windows.forEach { window in
+                    window.overrideUserInterfaceStyle = style
+                }
+            }
+        }
+    }
 }

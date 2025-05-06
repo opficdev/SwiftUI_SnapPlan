@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var firebaseVM = FirebaseViewModel()
+    @StateObject private var uiVM = UIViewModel()
     @StateObject private var networkVM = NetworkViewModel()
     // 앱이 설치되고 첫번째 로딩인지 저장하는 AppStorage
     @AppStorage("isFirstLaunch") var isFirstLaunch: Bool = true
@@ -20,7 +21,11 @@ struct ContentView: View {
                 if signedIn && !isFirstLaunch {
                     PlannerView()
                         .environmentObject(firebaseVM)
+                        .environmentObject(uiVM)
                         .environmentObject(networkVM)
+                        .onAppear {
+                            uiVM.setAppTheme(firebaseVM.screenMode)
+                        }
                 }
                 else {
                     LoginView()

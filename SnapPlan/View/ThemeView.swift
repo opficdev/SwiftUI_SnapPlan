@@ -9,15 +9,16 @@ import SwiftUI
 
 struct ThemeView: View {
     @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var uiVM: UIViewModel
     
     var body: some View {
         VStack {
             List {
                 Button(action: {
-                    setAppTheme(.unspecified)
+                    uiVM.setAppTheme(.unspecified)
+                    firebaseVM.screenMode = .unspecified
                     Task {
                         try await firebaseVM.updateScreenMode(mode: .unspecified)
-                        firebaseVM.screenMode = .unspecified
                     }
                 }) {
                     HStack {
@@ -31,10 +32,10 @@ struct ThemeView: View {
                 }
                 .listRowBackground(Color.timeLine)
                 Button(action: {
-                    setAppTheme(.light)
+                    firebaseVM.screenMode = .light
+                    uiVM.setAppTheme(.light)
                     Task {
                         try await firebaseVM.updateScreenMode(mode: .light)
-                        firebaseVM.screenMode = .light
                     }
                 }) {
                     HStack {
@@ -48,10 +49,10 @@ struct ThemeView: View {
                 }
                 .listRowBackground(Color.timeLine)
                 Button(action: {
-                    setAppTheme(.dark) // 다크 모드
+                    firebaseVM.screenMode = .dark
+                    uiVM.setAppTheme(.dark) // 다크 모드
                     Task {
                         try await firebaseVM.updateScreenMode(mode: .dark)
-                        firebaseVM.screenMode = .dark
                     }
                 }) {
                     HStack {
@@ -74,19 +75,7 @@ struct ThemeView: View {
                     .bold()
             }
         }
-//        .toolbarBackground(Color.timeLine, for: .navigationBar)
-//        .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
-    }
-    
-    private func setAppTheme(_ style: UIUserInterfaceStyle) {
-        DispatchQueue.main.async {
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                windowScene.windows.forEach { window in
-                    window.overrideUserInterfaceStyle = style
-                }
-            }
-        }
     }
 }
 #Preview {
