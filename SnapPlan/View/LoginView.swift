@@ -53,7 +53,7 @@ struct LoginView: View {
                     LoginButton(logo: Image("Apple_\(colorScheme == .light ? "black" : "white")"), text: "애플 계정으로 로그인") {
                         if networkVM.isConnected {
                             Task {
-                                try await firebaseVM.signInGoogle()
+                                try await firebaseVM.signInApple()
                             }
                         }
                         else {
