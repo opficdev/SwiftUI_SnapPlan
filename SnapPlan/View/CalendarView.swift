@@ -167,6 +167,7 @@ struct CalendarView: View {
         .fullScreenCover(isPresented: $uiVM.showSettingView) {
             SettingView()
                 .environmentObject(firebaseVM)
+                .environmentObject(uiVM)
                 .onDisappear {
                     uiVM.showScheduleView = true
                 }

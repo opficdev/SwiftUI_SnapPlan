@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingView: View {
     @EnvironmentObject var firebaseVM: FirebaseViewModel
+    @EnvironmentObject var uiVM: UIViewModel
     @Environment(\.dismiss) var dismiss
     @State private var logoutAlert = false
     @State private var deleteAlert = false
@@ -136,6 +137,7 @@ struct SettingView: View {
                 Button(role: .destructive, action: {
                     Task {
                         try await firebaseVM.signOutGoogle()
+                        uiVM.showSettingView = false
                     }
                 }) {
                     Text("확인")
@@ -151,6 +153,7 @@ struct SettingView: View {
                 }
                 Button(role: .destructive, action: {
                     Task {
+                        uiVM.showSettingView = false
                         try await firebaseVM.deleteUser()
                     }
                 }) {
@@ -182,4 +185,5 @@ struct SettingView: View {
 #Preview {
     SettingView()
         .environmentObject(FirebaseViewModel())
+        .environmentObject(UIViewModel())
 }
